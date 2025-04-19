@@ -2,7 +2,7 @@
 #ifndef STDHASHFUNCTION_H
 #define STDHASHFUNCTION_H
 
-#include "IHashFunction.h"
+#include "IHashFunctions.h"
 #include <functional>
 
 class StdHashFunction : public IHashFunction {

@@ -2,7 +2,7 @@
 #ifndef DOUBLEHASHFUNCTION_H
 #define DOUBLEHASHFUNCTION_H
 
-#include "IHashFunction.h"
+#include "IHashFunctions.h"
 #include <functional>
 #include <string>
 

@@ -5,7 +5,8 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "IHashFunction.h"
+#include "IHashFunctions.h"
+#include "url.h"
 
 class BloomFilter {
 public:

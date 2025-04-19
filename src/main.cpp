@@ -5,54 +5,46 @@
 #include <vector>
 #include <memory>
 #include "BloomFilter.h" // Assumes BloomFilter and URL classes are declared here
+#include "url.h"
+#include "IHashFunctions.h"
+#include "StdHashFunction.h"
+#include "DoubleHashFunction.h"
+
 
 // --- Sample Hash Function Implementations ---
 
-// Uses the built-in std::hash.
-class StdHashFunction : public IHashFunction {
-public:
-    size_t hash(const std::string &s) const override {
-        return std::hash<std::string>{}(s);
-    }
-};
 
-// A simple "double hash" function demonstration.
-// It applies std::hash once to the input and then rehashes the result.
-class DoubleHashFunction : public IHashFunction {
-public:
-    size_t hash(const std::string &s) const override {
-        size_t h1 = std::hash<std::string>{}(s);
-        size_t h2 = std::hash<std::string>{}(std::to_string(h1));
-        // Combine the two values; here we XOR and shift as an example.
-        return h1 ^ (h2 << 1);
-    }
-};
 
 int main() {
-    std::string configLine;
-    // Read the first configuration line (e.g., "256 2 1")
+    std::string configLine; // define line 
+    // read a line from keyboard
     if (!std::getline(std::cin, configLine)) {
-        return 1; // Exit if no configuration input is provided.
+        return 1; // Exit if no line provided //// 8 1 2
     }
     
-    std::istringstream configStream(configLine);
-    int filterSize;
-    configStream >> filterSize;
+    std::istringstream configStream(configLine); // Create a stream from the string configLine so we can read from it like it's input.
+
+    int filterSize; 
+
+    configStream >> filterSize; // putting the first argument into filter size 
     
     // The following integers indicate which hash functions to use:
     // 1 for StdHashFunction, 2 for DoubleHashFunction, etc.
-    std::vector<std::shared_ptr<IHashFunction>> hashFunctions;
-    int hashType;
+    std::vector<std::shared_ptr<IHashFunction>> hashFunctions; //pointer array to hash func objects
+    
+    int hashType; 
+    // while there is still numbers from user aka (1,2...) like hash funcs // puts the hash func into the vector
     while (configStream >> hashType) {
         if (hashType == 1) {
-            hashFunctions.push_back(std::make_shared<StdHashFunction>());
+            hashFunctions.push_back(std::make_shared<StdHashFunction>());       // for 1 push std into hash vector
         } else if (hashType == 2) {
-            hashFunctions.push_back(std::make_shared<DoubleHashFunction>());
+            hashFunctions.push_back(std::make_shared<DoubleHashFunction>());    // for 2 push Dstd into hash vector
         } else {
             // For any unsupported type, default to StdHashFunction.
-            hashFunctions.push_back(std::make_shared<StdHashFunction>());
+            hashFunctions.push_back(std::make_shared<StdHashFunction>());       // for unknown number use std
         }
     }
+    
     // If no hash function is specified, default to one StdHashFunction.
     if (hashFunctions.empty()) {
         hashFunctions.push_back(std::make_shared<StdHashFunction>());
@@ -61,7 +53,7 @@ int main() {
     // Create the Bloom Filter using the specified bit array size and hash functions.
     BloomFilter bloom(filterSize, hashFunctions);
     
-    // Process commands in an infinite loop
+    // Process commands in an infinite loop // 1- add or 2-check
     std::string line;
     while (std::getline(std::cin, line)) {
         if (line.empty()) {
@@ -81,16 +73,35 @@ int main() {
         if (command == 1) {
             // Command "1 [URL]" means add the URL to the Bloom filter.
             URL newURL(url); 
-            bloom.add(newURL);
+            bloom.add(newURL); // call the add func of bm filter 
         } else if (command == 2) {
             // Command "2 [URL]" means check if the URL is blacklisted.
             // Since we don't have the blacklist manager yet, we simply output the Bloom filter's result.
             URL queryURL(url);
-            bool result = bloom.possiblyContains(queryURL);
+            bool result = bloom.possiblyContains(queryURL); // call the possiblycontains func of bm filter
             std::cout << (result ? "true" : "false") << std::endl;
-        }
+        } 
         // If the command does not match the expected format, the line is ignored.
     }
     
     return 0;
 }
+// Uses the built-in std::hash.
+// class StdHashFunction : public IHashFunction {
+// public:
+//     size_t hash(const std::string &s) const override {
+//         return std::hash<std::string>{}(s);
+//     }
+// };
+
+// // A simple "double hash" function demonstration.
+// // It applies std::hash once to the input and then rehashes the result.
+// class DoubleHashFunction : public IHashFunction {
+// public:
+//     size_t hash(const std::string &s) const override {
+//         size_t h1 = std::hash<std::string>{}(s);
+//         size_t h2 = std::hash<std::string>{}(std::to_string(h1));
+//         // Combine the two values; here we XOR and shift as an example.
+//         return h1 ^ (h2 << 1);
+//     }
+// };
