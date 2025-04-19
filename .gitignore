@@ -1,1 +1,26 @@
-hi.exe
+# Ignore compiled object files and executables
+*.exe
+*.o
+*.out
+*.obj
+*.dll
+*.so
+*.a
+*.lib
+*.pdb
+
+# Ignore build folders
+/build/
+/bin/
+/dist/
+/debug/
+/release/
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Ignore editor/IDE settings
+.vscode/
+.idea/

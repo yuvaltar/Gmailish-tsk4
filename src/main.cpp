@@ -21,7 +21,6 @@ int main() {
     if (!std::getline(std::cin, configLine)) {
         return 1; // Exit if no line provided //// 8 1 2
     }
-    
     std::istringstream configStream(configLine); // Create a stream from the string configLine so we can read from it like it's input.
 
     int filterSize; 
