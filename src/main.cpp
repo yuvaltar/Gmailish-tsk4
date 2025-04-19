@@ -16,7 +16,6 @@
 
 
 int main() {
-    std::cout << "Enter";
     std::string configLine; // define line 
     // read a line from keyboard
     if (!std::getline(std::cin, configLine)) {
