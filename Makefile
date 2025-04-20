@@ -1,11 +1,8 @@
 # Compiler
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Isrc -Itests -I/mingw64/include
+CXXFLAGS = -std=c++17 -Wall -Isrc
 
-# Google Test library flags
-GTEST_LIBS = -L/mingw64/lib -lgtest -lgtest_main -pthread
-
-# Source files for main program
+# Source files
 SRC = src/main.cpp \
       src/BloomFilter.cpp \
       src/BlackList.cpp \
@@ -13,26 +10,24 @@ SRC = src/main.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-# Source files for tests
-TEST_SRC = tests/BloomFilterTests.cpp
-
-# Output binary names
+# Output binary name
 TARGET = main
 TEST_TARGET = test_runner
 
 # Default target
 all: $(TARGET)
 
-# Build the main program
+# Build rule
 $(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Build the test runner
-$(TEST_TARGET): $(TEST_SRC) src/BloomFilter.cpp src/BlackList.cpp src/url.cpp
-	$(CXX) $(CXXFLAGS) -o $(TEST_TARGET) $^ $(GTEST_LIBS)
+# Test binary rule
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
 
-# Clean all build artifacts
+$(TEST_TARGET): $(TEST_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^ third_party/googletest/googletest/src/gtest-all.cc $(LDFLAGS)
+
+# Clean up
 clean:
-	rm -f $(OBJ) $(TARGET) $(TEST_TARGET)
-
-.PHONY: all clean
+	rm -f $(OBJ) $(TARGET)
