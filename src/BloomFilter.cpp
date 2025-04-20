@@ -1,44 +1,50 @@
-// bloomfilter.cpp file
+// BloomFilter.cpp
 #include "BloomFilter.h"
-#include "url.h"
-#include <iostream>
+#include <fstream>
 
-// class members
-
-    //size_t x = std::hash<std::string>{}("ihvb");
-
-// constructor 
 BloomFilter::BloomFilter(size_t size, const std::vector<std::shared_ptr<IHashFunction>>& hashFunctions)
-    : m_size(size), bitArray(size, false), hashFunctions(hashFunctions) {} 
+    : m_size(size), bitArray(size, false), hashFunctions(hashFunctions) {}
 
-// too add the bit to the filter
-void BloomFilter::add(const URL& item) {            // 1 to add the url bit to the black list
-    for (const auto& hf : hashFunctions) {          // getting an hash func and goes over them in for loop
-        size_t hashValue = hf->hash(item.getURL()); // run the hash function on the url and get the hash value
-        size_t index = hashValue % m_size;          // devide the hash value by the size of the array
-        bitArray[index] = true;                     // mark the singhed bit as true
-        
+void BloomFilter::add(const URL& item) {
+    for (const auto& hf : hashFunctions) {
+        size_t hashValue = hf->hash(item.getURL());
+        size_t index = hashValue % m_size;
+        bitArray[index] = true;
     }
 }
-// to check if the url is in the black list
-bool BloomFilter::possiblyContains(const URL& item) const { // 2 
-    for (const auto& hf : hashFunctions) {          // getting an hash func and goes over them in for loop
-        size_t hashValue = hf->hash(item.getURL()); // run the hash function on the url and get the hash value
-        size_t index = hashValue % m_size;          // devide the hash value by the size of the array
-        
-        if (!bitArray[index])                       // mark the singhed bit as true
-            return false;                           // if the marked bits * doesnt * match return false
+
+bool BloomFilter::possiblyContains(const URL& item) const {
+    for (const auto& hf : hashFunctions) {
+        size_t hashValue = hf->hash(item.getURL());
+        size_t index = hashValue % m_size;
+        if (!bitArray[index]) return false;
     }
-    return true;                                    // else true
+    return true;
 }
-// returns the bit array
+
 const std::vector<bool>& BloomFilter::getBitArray() const {
     return bitArray;
 }
-// set the bit array
+
 void BloomFilter::setBitArray(const std::vector<bool>& bits) {
-    if(bits.size() == m_size) {
+    if (bits.size() == m_size) {
         bitArray = bits;
     }
 }
 
+void BloomFilter::saveToFile(const std::string& path) const {
+    std::ofstream out(path, std::ios::binary);
+    for (bool bit : bitArray) {
+        out.write(reinterpret_cast<const char*>(&bit), sizeof(bool));
+    }
+}
+
+void BloomFilter::loadFromFile(const std::string& path) {
+    std::ifstream in(path, std::ios::binary);
+    std::vector<bool> loadedBits;
+    bool bit;
+    while (in.read(reinterpret_cast<char*>(&bit), sizeof(bool))) {
+        loadedBits.push_back(bit);
+    }
+    setBitArray(loadedBits);
+}
