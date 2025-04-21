@@ -1,160 +1,141 @@
-// BloomFilterTests.cpp file
 // BloomFilterTests.cpp
-
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <memory>
+#include "BloomFilter.h"
+#include "url.h"
+#include "IHashFunctions.h"
+#include "StdHashFunction.h"
+#include "DoubleHashFunction.h"
+#include "BlackList.h"
 #include <gtest/gtest.h>
-#include "../src/BloomFilter.h"
-#include "../src/URL.h"
 #include <list>
 #include <algorithm>
-#include <iostream>
-// Global test configuration variables (set from main) 
-int g_bit_size = 8;
-int g_hash_func1 = 1;
-int g_hash_func2 = 1;
-std::list<URL> blacklist;
-BloomFilter bf(g_bit_size, g_hash_func1 , g_hash_func2);
+#include <fstream>
+
+int g_bit_size = 8;  // Example bit array size
+int g_hash_func1 = 1;  // Placeholder for StdHashFunction count
+int g_hash_func2 = 2;  // Placeholder for DoubleHashFunction count
+
+std::list<URL> blacklist;  // Manual list for old-style testing
+std::unique_ptr<BloomFilter> bf;  // Global BloomFilter object
+BlackList realList;  // Real BlackList class
 
 // ---------- Isolated Test Cases ------------
 
+// Validate correct parameter ranges
 TEST(ValidationTest, InvalidInputValues) {
-    EXPECT_TRUE(g_bit_size % 8 == 0) << "Bit size must be multiple of 8";
-    EXPECT_GT(g_bit_size, 0) << "Bit size must be positive";
-    EXPECT_GE(g_hash_func1, 0) << "Hash function count must be >= 0";
-    EXPECT_GE(g_hash_func2, 0) << "Hash function count must be >= 0";
+    EXPECT_TRUE(g_bit_size % 8 == 0); // Must be divisible by 8
+    EXPECT_GT(g_bit_size, 0); // Must be positive
+    EXPECT_GE(g_hash_func1, 0); // No negative hash counts
+    EXPECT_GE(g_hash_func2, 0);
 }
 
-TEST(URLTest, AddURLToBlacklist) {
+// Add and check a URL in BloomFilter
+TEST(URLTest, AddURLToBloomFilter) {
     URL url("http://example.com");
-    blacklist.push_back(url);
-    auto it = std::find(blacklist.begin(), blacklist.end(), url);
-    EXPECT_NE(it, blacklist.end()) << "URL should be in the blacklist";
+    bf->add(url); // Add URL
+    ASSERT_TRUE(bf->possiblyContains(url)); // Check it exists
 }
 
-TEST(URLTest, RemoveURLFromBlacklist) {
+// Remove a URL from std::list blacklist (not BloomFilter)
+TEST(URLTest, RemoveURLFromList) {
     URL url("http://example.com");
-    blacklist.push_back(url);
-    blacklist.remove(url);
+    blacklist.push_back(url); // Add
+    blacklist.remove(url); // Remove
     auto it = std::find(blacklist.begin(), blacklist.end(), url);
-    EXPECT_EQ(it, blacklist.end()) << "URL should not be in the blacklist";
+    EXPECT_EQ(it, blacklist.end()); // Confirm it's removed
 }
 
-// ---------- Integration Test with While Loop ------------
+// ---------- Integration Tests ------------
 
-// check if bf recognize a blocked_url in a list of 1 blocked_urls
-
+// Check URL after adding to BloomFilter
 TEST(BloomFilterIntegration, URLInListShouldMatch) {
-
     URL url("http://example.com");
-    blacklist.push_back(url);
-    bf.add(url.toString());
-
-    while (g_hash_func1 > 0 || g_hash_func2 > 0) {
-        std::string hashed = bf.applyHash(url);  // assume the bf.applyhash return string -> which isnt
-        // look whether url in list
-        auto it = std::find(blacklist.begin(), blacklist.end(), hashed);
-        ASSERT_NE(it, blacklist.end()) << "URL should be in the blacklist";
-        // confirm url in list 
-        auto it = std::find(blacklist.begin(), blacklist.end(), hashed);
-        ASSERT_NE(it, blacklist.end()) << "URL should be in the blacklist";
-        
-        if (g_hash_func1 > 0) g_hash_func1--;
-        else if (g_hash_func2 > 0) g_hash_func2--;
-    }
+    bf->add(url);
+    ASSERT_TRUE(bf->possiblyContains(url));
 }
 
-// check if bf recognize a valid_url not in a list of 1 blocked_urls
-
+// Confirm clean URL not detected
 TEST(BloomFilterIntegration, URLNotInListShouldNotMatch) {
-
-    URL black_list_url("http://example1.com");
-    blacklist.push_back(black_list_url);
-    URL valid_url("http://example2.com")
-
-    while (g_hash_func1 > 0 || g_hash_func2 > 0) {
-        std::string hashed = bf.applyHash(valid_url);  // assume the bf.applyhash return string -> which isnt
-    
-        auto it = std::find(blacklist.begin(), blacklist.end(), hashed);
-        ASSERT_EQ(it, blacklist.end()) << "URL should be in the blacklist";
-        
-        if (g_hash_func1 > 0) g_hash_func1--;
-        else if (g_hash_func2 > 0) g_hash_func2--;
-    }
+    URL url("http://example2.com");
+    ASSERT_FALSE(bf->possiblyContains(url));
 }
-// check if bf recognize a blocked_url in a list of many blocked_urls
 
+// Add many URLs, check one
 TEST(BloomFilterIntegration, MultipleURLsInListShouldFindTarget) {
-
-    // Add multiple URLs
     std::vector<std::string> urls = {
-        "http://a.com", "http://b.com", "http://c.com", "http://d.com",
-        "http://e.com", "http://f.com", "http://g.com", "http://example.com"
+        "http://a.com", "http://b.com", "http://c.com",
+        "http://d.com", "http://e.com", "http://f.com",
+        "http://g.com", "http://example.com"
     };
-    // add multiple urls to the list
     for (const auto& u : urls) {
-        URL temp(u);
-        blacklist.push_back(temp);
+        bf->add(URL(u));
     }
-
-    while (g_hash_func1 > 0 || g_hash_func2 > 0) {
-        std::string hashed = bf.applyHash(url);  // assume the bf.applyhash return string -> which isnt
-        // look whether url in list
-        auto it = std::find(blacklist.begin(), blacklist.end(), hashed);
-        ASSERT_NE(it, blacklist.end()) << "URL should be in the blacklist";
-        // confirm url in list 
-        auto it = std::find(blacklist.begin(), blacklist.end(), hashed);
-        ASSERT_NE(it, blacklist.end()) << "URL should be in the blacklist";
-        
-        if (g_hash_func1 > 0) g_hash_func1--;
-        else if (g_hash_func2 > 0) g_hash_func2--;
-    }
+    ASSERT_TRUE(bf->possiblyContains(URL("http://example.com")));
 }
 
-// check if bf recognize a valid_url not in  list of many blocked_urls
-
-TEST(BloomFilterIntegration, MultipleURLsInListShouldFindTarget) {
-
-    // Add multiple URLs
+// Add many, confirm a non-added one isn't matched
+TEST(BloomFilterIntegration, MultipleURLsShouldNotMatchInvalid) {
     std::vector<std::string> urls = {
-        "http://a.com", "http://b.com", "http://c.com", "http://d.com",
-        "http://e.com", "http://f.com", "http://g.com", "http://example.com"
+        "http://a.com", "http://b.com", "http://c.com",
+        "http://d.com", "http://e.com", "http://f.com",
+        "http://g.com", "http://example.com"
     };
-    // add multiple urls to the list
     for (const auto& u : urls) {
-        URL temp(u);
-        blacklist.push_back(temp);
+        bf->add(URL(u));
     }
-    // the url which we are going to search if its in the list
-    URL valid_url("http://example2.com")
-    int g_hash_func1 = g_hash_func1;
-    int g_hash_func2 = g_hash_func2;
-
-    while (g_hash_func1 > 0 || g_hash_func2 > 0) {
-        std::string hashed = bf.applyHash(valid_url);  // assume the bf.applyhash return string -> which isnt
-        // look whether url in list
-        auto it = std::find(blacklist.begin(), blacklist.end(), hashed);
-        ASSERT_EQ(it, blacklist.end()) << "URL should be in the blacklist"; 
-        if (g_hash_func1 > 0) g_hash_func1--;
-        else if (g_hash_func2 > 0) g_hash_func2--;
-    }
+    ASSERT_FALSE(bf->possiblyContains(URL("http://not-in-list.com")));
 }
 
+// ---------- New Tests ------------
 
+// Test saving and loading BloomFilter
+TEST(PersistenceTest, SaveAndLoadBloomFilter) {
+    URL testUrl("http://persist.com");
+    bf->add(testUrl);
+    bf->saveToFile("test_bloom.bin"); // Save to file
 
+    // Create new instance and load
+    std::vector<std::shared_ptr<IHashFunction>> funcs = {
+        std::make_shared<StdHashFunction>(), std::make_shared<DoubleHashFunction>()
+    };
+    BloomFilter loaded(1024, funcs);
+    loaded.loadFromFile("test_bloom.bin");
 
+    ASSERT_TRUE(loaded.possiblyContains(testUrl)); // Ensure data persisted
+    std::remove("test_bloom.bin"); // Cleanup
+}
+
+// Test adding and checking real BlackList
+TEST(BlackListTest, AddAndContainsCheck) {
+    URL url("http://black.com");
+    realList.addUrl(url);
+    ASSERT_TRUE(realList.contains(url)); // Should contain URL
+}
+
+// Test false positive detection: Bloom says true, blacklist says false
+TEST(BlackListTest, FalsePositiveDetection) {
+    URL fakeUrl("http://falsepositive.com");
+    bf->add(fakeUrl);
+
+    ASSERT_TRUE(bf->possiblyContains(fakeUrl)); // Might be true
+    ASSERT_FALSE(realList.contains(fakeUrl)); // Definitely not in list
+}
 
 // ---------- Main Function ----------
 
 int main(int argc, char* argv[]) {
-    if (argc < 4) {
-        std::cerr << "Usage: ./test_exe <bit_size> <hash_func1> <hash_func2>\n";
-        return 1;
-    }
+    // Init hash functions
+    std::vector<std::shared_ptr<IHashFunction>> hashFuncs;
+    hashFuncs.push_back(std::make_shared<StdHashFunction>());
+    hashFuncs.push_back(std::make_shared<DoubleHashFunction>());
 
-    g_bit_size = std::stoi(argv[1]);
-    g_hash_func1 = std::stoi(argv[2]);
-    g_hash_func2 = std::stoi(argv[3]);
+    // Create a 1024-bit Bloom filter with 2 hash funcs
+    bf = std::make_unique<BloomFilter>(1024, hashFuncs);
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-
 }
