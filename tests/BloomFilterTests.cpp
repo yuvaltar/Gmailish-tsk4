@@ -122,7 +122,7 @@ TEST(BlackListTest, FalsePositiveDetection) {
     bf->add(fakeUrl);
 
     ASSERT_TRUE(bf->possiblyContains(fakeUrl)); // Might be true
-    ASSERT_FALSE(realList.contains(fakeUrl)); // Definitely not in list
+    ASSERT_FALSE(realList.contains(fakeUrl)); // Definitely not in list/
 }
 
 // ---------- Main Function ----------
