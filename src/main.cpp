@@ -5,6 +5,7 @@
 #include <vector>                       // For std::vector
 #include <memory>                       // For std::shared_ptr
 #include <filesystem>                   // For std::filesystem::create_directory
+#include <regex>                        // For regex validation
 #include "BloomFilter.h"                // BloomFilter class declaration
 #include "url.h"                        // URL class declaration
 #include "IHashFunctions.h"            // Interface for hash functions
@@ -54,15 +55,23 @@ int main() {
         iss >> command >> url;                                  // Extract command and URL from input
         if (url.empty()) continue;                              // Skip if URL is missing
 
+        // Validate URL using regex
+        // file:///C:/path/to/file //http://example.com //192.168.1.1:8080/path
+        static const std::regex urlRegex(R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+.\-])://)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
+        if (!std::regex_match(url, urlRegex)) {
+            std::cerr << "Invalid URL format: " << url << std::endl;
+            continue;
+        }
+
         URL u(url);                                             // Wrap the URL in a URL object
         if (command == 1) {                                     // Command 1: Add URL
             bloom.add(u);                                       // Add to Bloom filter
             realList.addUrl(u);                                 // Add to actual blacklist
-            bloom.saveToFile("data/bloomfilter.bin");         // Save updated Bloom filter
-            realList.save("data/blacklist.txt");              // Save updated blacklist
+            bloom.saveToFile("data/bloomfilter.bin");           // Save updated Bloom filter
+            realList.save("data/blacklist.txt");                // Save updated blacklist
         } else if (command == 2) {                              // Command 2: Check URL
             bool result = bloom.possiblyContains(u);            // Check Bloom filter for possible presence
-            std::cout << (result ? "true" : "false") << " "; // Print result from Bloom filter
+            std::cout << (result ? "true" : "false") << " ";    // Print result from Bloom filter
             if (result) {                                       // If possibly present in Bloom filter
                 std::cout << (realList.contains(u) ? "true" : "false"); // Check actual blacklist
             }
