@@ -59,7 +59,6 @@ int main() {
         // file:///C:/path/to/file //http://example.com //192.168.1.1:8080/path
         static const std::regex urlRegex(R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+.\-])://)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
         if (!std::regex_match(url, urlRegex)) {
-            std::cerr << "Invalid URL format: " << url << std::endl;
             continue;
         }
 
