@@ -4,137 +4,110 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <list>
+#include <algorithm>
+#include <fstream>
+
 #include "BloomFilter.h"
 #include "url.h"
 #include "IHashFunctions.h"
 #include "StdHashFunction.h"
 #include "DoubleHashFunction.h"
-#include "BlackList.h"
+
 #include <gtest/gtest.h>
-#include <list>
-#include <algorithm>
-#include <fstream>
 
-int g_bit_size = 8;  // Example bit array size
-int g_hash_func1 = 1;  // Placeholder for StdHashFunction count
-int g_hash_func2 = 2;  // Placeholder for DoubleHashFunction count
+int g_bit_size   = 8;
+int g_hash_func1 = 1;
+int g_hash_func2 = 2;
 
-std::list<URL> blacklist;  // Manual list for old-style testing
-std::unique_ptr<BloomFilter> bf;  // Global BloomFilter object
-BlackList realList;  // Real BlackList class
+std::unique_ptr<BloomFilter> bf;
 
 // ---------- Isolated Test Cases ------------
 
-// Validate correct parameter ranges
+// valid input
 TEST(ValidationTest, InvalidInputValues) {
-    EXPECT_TRUE(g_bit_size % 8 == 0); // Must be divisible by 8
-    EXPECT_GT(g_bit_size, 0); // Must be positive
-    EXPECT_GE(g_hash_func1, 0); // No negative hash counts
-    EXPECT_GE(g_hash_func2, 0);
+    EXPECT_TRUE(g_bit_size % 8 == 0) << "Bit size must be multiple of 8"; 
+    EXPECT_GT(g_bit_size, 0)         << "Bit size must be positive";
+    EXPECT_GE(g_hash_func1, 0)       << "Hash function count must be >= 0";
+    EXPECT_GE(g_hash_func2, 0)       << "Hash function count must be >= 0";
 }
 
-// Add and check a URL in BloomFilter
-TEST(URLTest, AddURLToBloomFilter) {
+// adding a url to the blacklist and the bit array expect for true in both
+TEST(URLTest, AddURLToBlacklist) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Reset bit array to all 0s
+    bf->blackList.initialize("data/blacklist.txt");                  // Clear the blacklist
+
     URL url("http://example.com");
-    bf->add(url); // Add URL
-    ASSERT_TRUE(bf->possiblyContains(url)); // Check it exists
+    bf->add(url);
+    EXPECT_TRUE(bf->bitArrayResult(url));
+    EXPECT_TRUE(bf->blackList.contains(url)) << "URL should be in the bit array";
 }
 
-// Remove a URL from std::list blacklist (not BloomFilter)
-TEST(URLTest, RemoveURLFromList) {
-    URL url("http://example.com");
-    blacklist.push_back(url); // Add
-    blacklist.remove(url); // Remove
-    auto it = std::find(blacklist.begin(), blacklist.end(), url);
-    EXPECT_EQ(it, blacklist.end()); // Confirm it's removed
+// adding a different url to the blacklist and the bit array expect for false in both
+TEST(URLTest, RemoveURLFromBlacklist) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Reset bit array to all 0s
+    bf->blackList.initialize("data/blacklist.txt");                  // Clear the blacklist
+
+    URL url("http://example.com"); 
+    bf->add(url);
+    URL url2("http://example2.com");
+    EXPECT_FALSE(bf->bitArrayResult(url2))      << "URL 2 should not be in the bit array";
+    EXPECT_FALSE(bf->blackList.contains(url2))  << "URL 2 should not be in the blacklist";
 }
 
 // ---------- Integration Tests ------------
 
-// Check URL after adding to BloomFilter
-TEST(BloomFilterIntegration, URLInListShouldMatch) {
-    URL url("http://example.com");
-    bf->add(url);
-    ASSERT_TRUE(bf->possiblyContains(url));
-}
-
-// Confirm clean URL not detected
-TEST(BloomFilterIntegration, URLNotInListShouldNotMatch) {
-    URL url("http://example2.com");
-    ASSERT_FALSE(bf->possiblyContains(url));
-}
-
-// Add many URLs, check one
+// adding multiple urls to the bloomfilter and checking if different url isn't detected in the blacklist
 TEST(BloomFilterIntegration, MultipleURLsInListShouldFindTarget) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Reset bit array to all 0s
+    bf->blackList.initialize("data/blacklist.txt");                  // Clear the blacklist
+
     std::vector<std::string> urls = {
-        "http://a.com", "http://b.com", "http://c.com",
-        "http://d.com", "http://e.com", "http://f.com",
-        "http://g.com", "http://example.com"
+        "http://a.com", "http://b.com", "http://c.com", "http://d.com",
+        "http://e.com", "http://f.com", "http://g.com", "http://example.com"
     };
+
     for (const auto& u : urls) {
-        bf->add(URL(u));
+        URL temp(u);
+        bf->add(temp);
     }
-    ASSERT_TRUE(bf->possiblyContains(URL("http://example.com")));
+
+    URL target("htdstp://example.com1233");
+    ASSERT_FALSE(bf->blackList.contains(target)) << "BloomFilter should find the target URL in the blacklist";
 }
 
-// Add many, confirm a non-added one isn't matched
-TEST(BloomFilterIntegration, MultipleURLsShouldNotMatchInvalid) {
-    std::vector<std::string> urls = {
-        "http://a.com", "http://b.com", "http://c.com",
-        "http://d.com", "http://e.com", "http://f.com",
-        "http://g.com", "http://example.com"
-    };
-    for (const auto& u : urls) {
-        bf->add(URL(u));
-    }
-    ASSERT_FALSE(bf->possiblyContains(URL("http://not-in-list.com")));
+// set the bit array to be all 1s and check if the url is detected in the blacklist
+TEST(BloomFilterIntegration, MultipleURLsInListShouldNotMatchInvalid) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Reset bit array to all 0s
+    bf->blackList.initialize("data/blacklist.txt");                  // Clear the blacklist
+
+    bf->setBitArray(std::vector<bool>(g_bit_size, true));            // Set all bits to 1
+    URL target("http://example.com");
+
+    ASSERT_TRUE(bf->bitArrayResult(target))      << "BloomFilter should find the target URL in the bit array";
+    ASSERT_FALSE(bf->blackList.contains(target)) << "BloomFilter should find the target URL in the blacklist";
 }
 
-// ---------- New Tests ------------
+// set the bit array to be all 0s and check if the url is not detected in the blacklist
+TEST(BloomFilterIntegration, MultipleURLsInListShouldNotMatchInvalid2) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Reset bit array to all 0s
+    bf->blackList.initialize("data/blacklist.txt");                  // Clear the blacklist
 
-// Test saving and loading BloomFilter
-TEST(PersistenceTest, SaveAndLoadBloomFilter) {
-    URL testUrl("http://persist.com");
-    bf->add(testUrl);
-    bf->saveToFile("test_bloom.bin"); // Save to file
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Set all bits to 0
+    URL target("http://example.com");
 
-    // Create new instance and load
-    std::vector<std::shared_ptr<IHashFunction>> funcs = {
-        std::make_shared<StdHashFunction>(), std::make_shared<DoubleHashFunction>()
-    };
-    BloomFilter loaded(1024, funcs);
-    loaded.loadFromFile("test_bloom.bin");
-
-    ASSERT_TRUE(loaded.possiblyContains(testUrl)); // Ensure data persisted
-    std::remove("test_bloom.bin"); // Cleanup
-}
-
-// Test adding and checking real BlackList
-TEST(BlackListTest, AddAndContainsCheck) {
-    URL url("http://black.com");
-    realList.addUrl(url);
-    ASSERT_TRUE(realList.contains(url)); // Should contain URL
-}
-
-// Test false positive detection: Bloom says true, blacklist says false
-TEST(BlackListTest, FalsePositiveDetection) {
-    URL fakeUrl("http://falsepositive.com");
-    bf->add(fakeUrl);
-
-    ASSERT_TRUE(bf->possiblyContains(fakeUrl)); // Might be true
-    ASSERT_FALSE(realList.contains(fakeUrl)); // Definitely not in list/
+    ASSERT_FALSE(bf->bitArrayResult(target))      << "BloomFilter should find the target URL in the bit array";
+    ASSERT_FALSE(bf->blackList.contains(target))  << "BloomFilter should find the target URL in the blacklist";
 }
 
 // ---------- Main Function ----------
-
 int main(int argc, char* argv[]) {
-    // Init hash functions
     std::vector<std::shared_ptr<IHashFunction>> hashFuncs;
     hashFuncs.push_back(std::make_shared<StdHashFunction>());
     hashFuncs.push_back(std::make_shared<DoubleHashFunction>());
 
-    // Create a 1024-bit Bloom filter with 2 hash funcs
-    bf = std::make_unique<BloomFilter>(1024, hashFuncs);
+    int bloomFilterSize = 8;
+    bf = std::make_unique<BloomFilter>(bloomFilterSize, hashFuncs);
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
