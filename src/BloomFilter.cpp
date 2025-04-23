@@ -1,41 +1,59 @@
-// bloomfilter.cpp file
-#include "BloomFilter.h"
-#include "url.h"
+// BloomFilter.cpp
+#include "BloomFilter.h"                   // Include BloomFilter class definition
+#include <fstream>                          // For file I/O operations
 
-// class members
 
-    //size_t x = std::hash<std::string>{}("ihvb");
 
-// constructor 
+// Constructor: initializes size, bit array, and hash functions
 BloomFilter::BloomFilter(size_t size, const std::vector<std::shared_ptr<IHashFunction>>& hashFunctions)
-    : m_size(size), bitArray(size, false), hashFunctions(hashFunctions) {} 
+    : m_size(size), bitArray(size, false), hashFunctions(hashFunctions) {}
 
-// too add the bit to the filter
-void BloomFilter::add(const URL& item) {            // 1 to add the url bit to the black list
-    for (const auto& hf : hashFunctions) {          // getting an hash func and goes over them in for loop
-        size_t hashValue = hf->hash(item.getURL()); // run the hash function on the url and get the hash value
-        size_t index = hashValue % m_size;          // devide the hash value by the size of the array
-        bitArray[index] = true;                     // mark the singhed bit as true
+// Add a URL to the Bloom filter by hashing and setting bits
+void BloomFilter::add(const URL& item) {
+    for (const auto& hf : hashFunctions) {                         // For each hash function
+        size_t hashValue = hf->hash(item.getURL());               // Hash the URL
+        size_t index = hashValue % m_size;                        // Map to index in bit array
+        bitArray[index] = true;                                   // Set bit to true
     }
 }
-// to check if the url is in the black list
-bool BloomFilter::possiblyContains(const URL& item) const { // 2 
-    for (const auto& hf : hashFunctions) {          // getting an hash func and goes over them in for loop
-        size_t hashValue = hf->hash(item.getURL()); // run the hash function on the url and get the hash value
-        size_t index = hashValue % m_size;          // devide the hash value by the size of the array
-        if (!bitArray[index])                       // mark the singhed bit as true
-            return false;                           // if the marked bits * doesnt * match return false
+
+// Check if a URL might be in the Bloom filter
+bool BloomFilter::possiblyContains(const URL& item) const {
+    for (const auto& hf : hashFunctions) {                         // For each hash function
+        size_t hashValue = hf->hash(item.getURL());               // Hash the URL
+        size_t index = hashValue % m_size;                        // Map to index
+        if (!bitArray[index]) return false;                       // If any bit is false, it's not in
     }
-    return true;                                    // else true
+    return true;                                                  // Otherwise, possibly in set
 }
-// returns the bit array
+
+// Get the internal bit array (for external use or testing)
 const std::vector<bool>& BloomFilter::getBitArray() const {
     return bitArray;
 }
-// set the bit array
+
+// Set the bit array (used when loading from file)
 void BloomFilter::setBitArray(const std::vector<bool>& bits) {
-    if(bits.size() == m_size) {
-        bitArray = bits;
+    if (bits.size() == m_size) {                                   // Check size match
+        bitArray = bits;                                          // Replace internal bit array
     }
 }
 
+// Save the bit array to a binary file
+void BloomFilter::saveToFile(const std::string& path) const {
+    std::ofstream out(path, std::ios::binary);                    // Open file in binary write mode
+    for (bool bit : bitArray) {                                   // Write each bit
+        out.write(reinterpret_cast<const char*>(&bit), sizeof(bool));
+    }
+}
+
+// Load bit array from binary file and update internal array
+void BloomFilter::loadFromFile(const std::string& path) {
+    std::ifstream in(path, std::ios::binary);                     // Open file in binary read mode
+    std::vector<bool> loadedBits;                                 // Temporary container
+    bool bit;
+    while (in.read(reinterpret_cast<char*>(&bit), sizeof(bool))) { // Read each bit
+        loadedBits.push_back(bit);                                // Store in vector
+    }
+    setBitArray(loadedBits);                                      // Set internal bit array
+}
