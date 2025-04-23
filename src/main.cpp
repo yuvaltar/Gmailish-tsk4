@@ -1,82 +1,73 @@
-// main.cpp
-#include <iostream>                     // For std::cin, std::cout
-#include <sstream>                      // For std::istringstream
-#include <string>                       // For std::string
-#include <vector>                       // For std::vector
-#include <memory>                       // For std::shared_ptr
-#include <filesystem>                   // For std::filesystem::create_directory
-#include <regex>                        // For regex validation
-#include "BloomFilter.h"                // BloomFilter class declaration
-#include "url.h"                        // URL class declaration
-#include "IHashFunctions.h"            // Interface for hash functions
-#include "StdHashFunction.h"           // Standard hash function class
-#include "DoubleHashFunction.h"        // Double hash function class
-#include "BlackList.h"                 // Blacklist class declaration
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <filesystem>
+#include <regex>
+#include "BloomFilter.h"
+#include "url.h"
+#include "IHashFunctions.h"
+#include "StdHashFunction.h"
+#include "DoubleHashFunction.h"
+#include "BlackList.h"
 
 int main() {
-    std::string configLine;                                     // Line to read configuration input
-    if (!std::getline(std::cin, configLine)) {                  // Read a line from input; exit if fail
-        return 1;
-    }
-    std::istringstream configStream(configLine);                // Stream to parse input line
-    int filterSize;                                             // Bloom filter size
-    configStream >> filterSize;                                 // Read the size from input
+    std::string configLine;
+    if (!std::getline(std::cin, configLine)) return 1;  
 
-    std::vector<std::shared_ptr<IHashFunction>> hashFunctions;  // Store selected hash functions
-    int stdCount = 0, doubleCount = 0;                          // Number of std and double hash functions
-    configStream >> stdCount >> doubleCount;                    // Read those numbers from input
+    std::istringstream configStream(configLine);
+    int filterSize;
+    configStream >> filterSize;
 
-    for (int i = 0; i < stdCount; ++i) {                         // Add std hash functions
-        hashFunctions.push_back(std::make_shared<StdHashFunction>());
-    }
-    for (int i = 0; i < doubleCount; ++i) {                      // Add double hash functions
-        hashFunctions.push_back(std::make_shared<DoubleHashFunction>());
+    std::vector<std::shared_ptr<IHashFunction>> hashFunctions;
+    int iterCount;
+    while (configStream >> iterCount) {
+        hashFunctions.push_back(std::make_shared<StdHashFunction>(iterCount));
     }
 
-    if (hashFunctions.empty()) {                                // Ensure at least one hash function
-        hashFunctions.push_back(std::make_shared<StdHashFunction>());
+    if (hashFunctions.empty()) {
+        hashFunctions.push_back(std::make_shared<StdHashFunction>(1));
     }
 
-    std::filesystem::create_directory("data");                 // Create directory for saved data if not exists
+    std::filesystem::create_directory("data");
 
-    BloomFilter bloom(filterSize, hashFunctions);               // Initialize Bloom filter with given size and hash functions
-    BlackList realList;                                         // Initialize actual blacklist
+    BloomFilter bloom(filterSize, hashFunctions);
+    BlackList realList;
 
-    bloom.loadFromFile("data/bloomfilter.bin");                // Load Bloom filter bit array from file
-    realList.load("data/blacklist.txt");                       // Load blacklist entries from file
+    bloom.loadFromFile("data/bloomfilter.bin");
+    realList.load("data/blacklist.txt");
 
-    std::string line;                                           // Buffer to read input commands
-    while (std::getline(std::cin, line)) {                      // Loop over each input line
-        if (line.empty()) continue;                             // Skip empty lines
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
 
-        std::istringstream iss(line);                           // Parse command line
-        int command;                                            // Command type (1 = add, 2 = check)
-        std::string url;                                        // URL to operate on
-        iss >> command >> url;                                  // Extract command and URL from input
-        if (url.empty()) continue;                              // Skip if URL is missing
+        std::istringstream iss(line);
+        int command;
+        std::string url;
+        iss >> command >> url;
+        if (url.empty()) continue;
 
-        // Validate URL using regex
-        // file:///C:/path/to/file //http://example.com //192.168.1.1:8080/path
-        static const std::regex urlRegex(R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+.\-])://)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
+        static const std::regex urlRegex(R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+\.\-]*)://)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
         if (!std::regex_match(url, urlRegex)) {
             continue;
         }
 
-        URL u(url);                                             // Wrap the URL in a URL object
-        if (command == 1) {                                     // Command 1: Add URL
-            bloom.add(u);                                       // Add to Bloom filter
-            realList.addUrl(u);                                 // Add to actual blacklist
-            bloom.saveToFile("data/bloomfilter.bin");           // Save updated Bloom filter
-            realList.save("data/blacklist.txt");                // Save updated blacklist
-        } else if (command == 2) {                              // Command 2: Check URL
-            bool result = bloom.possiblyContains(u);            // Check Bloom filter for possible presence
-            std::cout << (result ? "true" : "false") << " ";    // Print result from Bloom filter
-            if (result) {                                       // If possibly present in Bloom filter
-                std::cout << (realList.contains(u) ? "true" : "false"); // Check actual blacklist
+        URL u(url);
+        if (command == 1) {
+            bloom.add(u);
+            realList.addUrl(u);
+            bloom.saveToFile("data/bloomfilter.bin");
+            realList.save("data/blacklist.txt");
+        } else if (command == 2) {
+            bool result = bloom.possiblyContains(u);
+            std::cout << (result ? "true" : "false") << " ";
+            if (result) {
+                std::cout << (realList.contains(u) ? "true" : "false");
             }
-            std::cout << std::endl;                             // End line of output
+            std::cout << std::endl;
         }
     }
 
-    return 0;                                                   // Exit program normally
+    return 0;
 }

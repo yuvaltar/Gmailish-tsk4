@@ -1,6 +1,7 @@
 // BloomFilter.cpp
 #include "BloomFilter.h"                   // Include BloomFilter class definition
 #include <fstream>                          // For file I/O operations
+#include <iostream>
 
 
 
@@ -8,7 +9,7 @@
 BloomFilter::BloomFilter(size_t size, const std::vector<std::shared_ptr<IHashFunction>>& hashFunctions)
     : m_size(size), bitArray(size, false), hashFunctions(hashFunctions) {}
 
-// Add a URL to the Bloom filter by hashing and setting bits
+//Add a URL to the Bloom filter by hashing and setting bits
 void BloomFilter::add(const URL& item) {
     for (const auto& hf : hashFunctions) {                         // For each hash function
         size_t hashValue = hf->hash(item.getURL());               // Hash the URL
@@ -16,6 +17,7 @@ void BloomFilter::add(const URL& item) {
         bitArray[index] = true;                                   // Set bit to true
     }
 }
+
 
 // Check if a URL might be in the Bloom filter
 bool BloomFilter::possiblyContains(const URL& item) const {
@@ -57,3 +59,4 @@ void BloomFilter::loadFromFile(const std::string& path) {
     }
     setBitArray(loadedBits);                                      // Set internal bit array
 }
+
