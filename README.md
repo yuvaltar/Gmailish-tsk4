@@ -10,13 +10,23 @@ was used
 
 ## How It Works
 
-- After every update, the Bloom filter (its bit array) is saved to `data/bloomfilter.dat`.
+- After every update, the Bloom filter (its bit array) is saved to `data/bloomfilter.bin`.
 
 ## How to Build and Run
 
-A C++17 compiler is needed.
+### Option 1: Manual Build (requires a C++17 compiler)
 
 From the project root run:
 ```bash
-g++ -std=c++17 -o ex1 src/*.cpp
-./ex1
+make clean 
+make
+./testFile
+
+### Option 2: Using Docker
+
+1. Build the image:
+```bash
+docker build -t bloom-filter-url .
+
+2. run the project:
+docker run --rm bloom-filter-url
