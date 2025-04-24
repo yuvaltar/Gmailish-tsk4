@@ -57,6 +57,7 @@ make
 ./test_runner
 
 Sample Outputs:
+
 Running the main program: (see ./images/main_run.png)
 
 (Another example of the main program): (see ./images/second_test_run.png)
