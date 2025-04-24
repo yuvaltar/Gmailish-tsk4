@@ -58,6 +58,7 @@ make
 
 Sample Outputs:
 Running the main program: (see ./images/main_run.png)
+(Another example of the main program): (see ./images/second_test_run.png)
 Running the test version: (see ./images/tests_run.png)
 
 #### Option 2: Using Docker
