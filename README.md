@@ -30,4 +30,4 @@ make
 docker build -t bloom-filter-url .
 
 2. run the project:
-docker run --rm bloom-filter-url
+docker run -it --rm bloom-filter-url
