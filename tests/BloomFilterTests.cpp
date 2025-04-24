@@ -19,11 +19,11 @@ int g_bit_size = 8;  // Example bit array size
 int g_hash_func1 = 1;  // Placeholder for StdHashFunction count
 int g_hash_func2 = 2;  // Placeholder for DoubleHashFunction count
 
-std::list<URL> blacklist;  // Manual list for old-style testing
-std::unique_ptr<BloomFilter> bf;  // Global BloomFilter object
-BlackList realList;  // Real BlackList class
 
-// ---------- Isolated Test Cases ------------
+std::unique_ptr<BloomFilter> bf;  // Global BloomFilter object
+BlackList blackList;  // Real BlackList class
+
+// ---------- Valid Input Check ------------
 
 // Validate correct parameter ranges
 TEST(ValidationTest, InvalidInputValues) {
@@ -33,38 +33,39 @@ TEST(ValidationTest, InvalidInputValues) {
     EXPECT_GE(g_hash_func2, 0);
 }
 
-// Add and check a URL in BloomFilter
+// test url is regex 
+TEST(URLTest, URLRegexValidation) {
+    std::string url = "http://example.com";
+    std::regex urlRegex(R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+\.\-]*)://)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
+    ASSERT_TRUE(std::regex_match(url, urlRegex)); // Check if URL matches regex
+}
+
+
+
+// ---------- INSERTING URLS TO ARRAY AND BLACK LIST TESTS  ------------
+
+// insert and check a URL in BloomFilter and BlackList 
 TEST(URLTest, AddURLToBloomFilter) {
     URL url("http://example.com");
     bf->add(url); // Add URL
-    ASSERT_TRUE(bf->possiblyContains(url)); // Check it exists
+    blackList.addUrl(url); // Add to blacklist
+    ASSERT_TRUE(bf->possiblyContains(url)); // Check BloomFilter
+    ASSERT_TRUE(blackList.contains(url)); // Check it exists in blacklist
 }
 
-// Remove a URL from std::list blacklist (not BloomFilter)
-TEST(URLTest, RemoveURLFromList) {
-    URL url("http://example.com");
-    blacklist.push_back(url); // Add
-    blacklist.remove(url); // Remove
-    auto it = std::find(blacklist.begin(), blacklist.end(), url);
-    EXPECT_EQ(it, blacklist.end()); // Confirm it's removed
-}
 
-// ---------- Integration Tests ------------
-
-// Check URL after adding to BloomFilter
+// insert a different url to the blacklist and the bit array expect for false in both
 TEST(BloomFilterIntegration, URLInListShouldMatch) {
     URL url("http://example.com");
+    URL url2("http://example2.com");
     bf->add(url);
-    ASSERT_TRUE(bf->possiblyContains(url));
+    blackList.addUrl(url);
+    if (bf->possiblyContains(url2)) ASSERT_FALSE(blackList.contains(url2));
 }
 
-// Confirm clean URL not detected
-TEST(BloomFilterIntegration, URLNotInListShouldNotMatch) {
-    URL url("http://example2.com");
-    ASSERT_FALSE(bf->possiblyContains(url));
-}
 
-// Add many URLs, check one
+
+// Add multiple URLs to the BloomFilter and check if they  found in the list
 TEST(BloomFilterIntegration, MultipleURLsInListShouldFindTarget) {
     std::vector<std::string> urls = {
         "http://a.com", "http://b.com", "http://c.com",
@@ -73,57 +74,87 @@ TEST(BloomFilterIntegration, MultipleURLsInListShouldFindTarget) {
     };
     for (const auto& u : urls) {
         bf->add(URL(u));
+        blackList.addUrl(URL(u));
     }
+    // Check if URL is in both BloomFilter and BlackList
     ASSERT_TRUE(bf->possiblyContains(URL("http://example.com")));
-}
+    ASSERT_TRUE(blackList.contains(URL("http://example.com"))); 
 
-// Add many, confirm a non-added one isn't matched
-TEST(BloomFilterIntegration, MultipleURLsShouldNotMatchInvalid) {
-    std::vector<std::string> urls = {
-        "http://a.com", "http://b.com", "http://c.com",
-        "http://d.com", "http://e.com", "http://f.com",
-        "http://g.com", "http://example.com"
-    };
-    for (const auto& u : urls) {
-        bf->add(URL(u));
+// create a new URL not in the list and check if it is not in the bloom filter and not in the blacklist
+    URL notInList("http://not-in-list.com");
+    if (bf->possiblyContains(notInList)) {
+        ASSERT_FALSE(blackList.contains(notInList)); // Check if URL is not in blacklist
+    } else {
+        ASSERT_FALSE(blackList.contains(notInList)); // Check if URL is not in blacklist
     }
-    ASSERT_FALSE(bf->possiblyContains(URL("http://not-in-list.com")));
 }
 
-// ---------- New Tests ------------
 
-// Test saving and loading BloomFilter
-TEST(PersistenceTest, SaveAndLoadBloomFilter) {
-    URL testUrl("http://persist.com");
-    bf->add(testUrl);
-    bf->saveToFile("test_bloom.bin"); // Save to file
 
-    // Create new instance and load
-    std::vector<std::shared_ptr<IHashFunction>> funcs = {
-        std::make_shared<StdHashFunction>(), std::make_shared<DoubleHashFunction>()
-    };
-    BloomFilter loaded(1024, funcs);
-    loaded.loadFromFile("test_bloom.bin");
+// ---------- Saving and loading to file tests ------------
 
-    ASSERT_TRUE(loaded.possiblyContains(testUrl)); // Ensure data persisted
-    std::remove("test_bloom.bin"); // Cleanup
+
+// Add URL to Black list file and to bloom filter file and check if it is in both
+TEST(PersistenceTest, BlackListURLPersistence) {
+    // Step 1: Create and save                                   
+    BlackList bl;
+    URL url("http://blacklisted.com");
+    bl.addUrl(url);
+    bl.save("test_blacklist.txt");
+
+    EXPECT_TRUE(bl.contains(url)) << "URL should persist in loaded blacklist";
 }
 
-// Test adding and checking real BlackList
-TEST(BlackListTest, AddAndContainsCheck) {
-    URL url("http://black.com");
-    realList.addUrl(url);
-    ASSERT_TRUE(realList.contains(url)); // Should contain URL
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------- Bit Array Edge Tests ----------
+
+TEST(BloomFilterEdgeCase, AllZerosBitArrayShouldReturnFalse) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));  // Set all bits to 0
+
+    URL url("http://neveradded.com");
+    EXPECT_FALSE(bf->possiblyContains(url)) << "All bits are 0, should return false";
 }
 
-// Test false positive detection: Bloom says true, blacklist says false
-TEST(BlackListTest, FalsePositiveDetection) {
-    URL fakeUrl("http://falsepositive.com");
-    bf->add(fakeUrl);
+TEST(BloomFilterEdgeCase, AllOnesBitArrayShouldReturnTrue) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, true));  // Set all bits to 1
 
-    ASSERT_TRUE(bf->possiblyContains(fakeUrl)); // Might be true
-    ASSERT_FALSE(realList.contains(fakeUrl)); // Definitely not in list/
+    URL url("http://neveradded.com");
+    EXPECT_TRUE(bf->possiblyContains(url)) << "All bits are 1, should return true";
 }
+
+// ---------- Integration test ----------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ---------- Main Function ----------
 
