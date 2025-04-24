@@ -4,12 +4,16 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <list>
+#include <algorithm>
+#include <fstream>
+
 #include "BloomFilter.h"
 #include "url.h"
 #include "IHashFunctions.h"
 #include "StdHashFunction.h"
 #include "DoubleHashFunction.h"
-#include "BlackList.h"
+
 #include <gtest/gtest.h>
 #include <list>
 #include <algorithm>
@@ -25,12 +29,12 @@ BlackList blackList;  // Real BlackList class
 
 // ---------- Valid Input Check ------------
 
-// Validate correct parameter ranges
+// valid input
 TEST(ValidationTest, InvalidInputValues) {
-    EXPECT_TRUE(g_bit_size % 8 == 0); // Must be divisible by 8
-    EXPECT_GT(g_bit_size, 0); // Must be positive
-    EXPECT_GE(g_hash_func1, 0); // No negative hash counts
-    EXPECT_GE(g_hash_func2, 0);
+    EXPECT_TRUE(g_bit_size % 8 == 0) << "Bit size must be multiple of 8"; 
+    EXPECT_GT(g_bit_size, 0)         << "Bit size must be positive";
+    EXPECT_GE(g_hash_func1, 0)       << "Hash function count must be >= 0";
+    EXPECT_GE(g_hash_func2, 0)       << "Hash function count must be >= 0";
 }
 
 // test url is regex 
@@ -67,11 +71,14 @@ TEST(BloomFilterIntegration, URLInListShouldMatch) {
 
 // Add multiple URLs to the BloomFilter and check if they  found in the list
 TEST(BloomFilterIntegration, MultipleURLsInListShouldFindTarget) {
+    bf->setBitArray(std::vector<bool>(g_bit_size, false));           // Reset bit array to all 0s
+    bf->blackList.initialize("data/blacklist.txt");                  // Clear the blacklist
+
     std::vector<std::string> urls = {
-        "http://a.com", "http://b.com", "http://c.com",
-        "http://d.com", "http://e.com", "http://f.com",
-        "http://g.com", "http://example.com"
+        "http://a.com", "http://b.com", "http://c.com", "http://d.com",
+        "http://e.com", "http://f.com", "http://g.com", "http://example.com"
     };
+
     for (const auto& u : urls) {
         bf->add(URL(u));
         blackList.addUrl(URL(u));
@@ -157,15 +164,13 @@ TEST(BloomFilterEdgeCase, AllOnesBitArrayShouldReturnTrue) {
 
 
 // ---------- Main Function ----------
-
 int main(int argc, char* argv[]) {
-    // Init hash functions
     std::vector<std::shared_ptr<IHashFunction>> hashFuncs;
     hashFuncs.push_back(std::make_shared<StdHashFunction>());
     hashFuncs.push_back(std::make_shared<DoubleHashFunction>());
 
-    // Create a 1024-bit Bloom filter with 2 hash funcs
-    bf = std::make_unique<BloomFilter>(1024, hashFuncs);
+    int bloomFilterSize = 8;
+    bf = std::make_unique<BloomFilter>(bloomFilterSize, hashFuncs);
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

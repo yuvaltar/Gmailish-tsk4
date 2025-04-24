@@ -9,7 +9,6 @@ GTEST_LIBS = -L/mingw64/lib -lgtest -lgtest_main -pthread
 SRC = src/main.cpp \
       src/BloomFilter.cpp \
       src/BlackList.cpp \
-      src/HashFunctions.cpp \
       src/url.cpp
 
 OBJ = $(SRC:.cpp=.o)
@@ -29,7 +28,7 @@ $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
 
 # Build the test runner
-$(TEST_TARGET): $(TEST_SRC) src/BloomFilter.cpp src/BlackList.cpp src/HashFunctions.cpp src/url.cpp
+$(TEST_TARGET): $(TEST_SRC) src/BloomFilter.cpp src/BlackList.cpp src/url.cpp
 	$(CXX) $(CXXFLAGS) -o $(TEST_TARGET) $^ $(GTEST_LIBS)
 
 # Clean all build artifacts
