@@ -20,7 +20,8 @@ From the project root run:
 ```bash
 make clean 
 make
-./testFile
+./main  
+./test_runner
 
 ### Option 2: Using Docker
 
