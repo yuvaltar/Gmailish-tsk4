@@ -153,8 +153,8 @@ TEST(IntegrationTest, BlacklistAndBloomFilterPersistence) {
     bf.add(badUrl);
     bl.addUrl(badUrl);
 
-    std::string bloomFile = "integration_bloom.bin";
-    std::string blacklistFile = "integration_blacklist.txt";
+    std::string bloomFile = "data/integration_bloom.bin";
+    std::string blacklistFile = "data/integration_blacklist.txt";
 
     bf.saveToFile(bloomFile);
     bl.save(blacklistFile);
