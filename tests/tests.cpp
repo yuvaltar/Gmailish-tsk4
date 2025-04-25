@@ -96,7 +96,7 @@ TEST(PersistenceTest, BlackListURLFilePersistence) {
     bl.save("data/test_blacklist.txt");
 
     BlackList loaded;
-    loaded.load("test_blacklist.txt");
+    loaded.load("data/test_blacklist.txt");
     EXPECT_TRUE(loaded.contains(url));
 }
 
@@ -114,7 +114,7 @@ TEST(PersistenceTest, BloomFilterFilePersistence) {
         std::make_shared<StdHashFunction>(g_hash_func1),
         std::make_shared<StdHashFunction>(g_hash_func2)
     });
-    loaded.loadFromFile("test_bloomfilter.bin");
+    loaded.loadFromFile("data/test_bloomfilter.bin");
 
     EXPECT_TRUE(loaded.possiblyContains(url));
 }
