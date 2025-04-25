@@ -89,7 +89,7 @@ To build the Docker image:
 docker build -t bloom-filter-url .
 
 To run the main program (default): 
-docker run -it --rm bloom-filter-url
+docker run -it -v "/$(pwd)/data:/app/data" bloom-filter-url
 
 This runs the main program in interactive mode. You can type input directly into the terminal as described above.
 
