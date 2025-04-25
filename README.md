@@ -70,6 +70,8 @@ Running the main program:
 
 ![Alt text](images\first_example.png)
 
+Here you can also see that in the first iteration of the program, we add the url "hello.com" into the blacklist, and that data remained even after the closing of the program, as the command "2 hello.com" returned "true true", without ever needing to insert the url in the second iteration.
+
 
 (Another example of the main program):
 
