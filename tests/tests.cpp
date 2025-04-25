@@ -93,10 +93,10 @@ TEST(PersistenceTest, BlackListURLFilePersistence) {
     BlackList bl;
     URL url("http://blacklisted.com");
     bl.addUrl(url);
-    bl.save("test_blacklist.txt");
+    bl.save("data/test_blacklist.txt");
 
     BlackList loaded;
-    loaded.load("test_blacklist.txt");
+    loaded.load("data/test_blacklist.txt");
     EXPECT_TRUE(loaded.contains(url));
 }
 
@@ -108,13 +108,13 @@ TEST(PersistenceTest, BloomFilterFilePersistence) {
         std::make_shared<StdHashFunction>(g_hash_func2)
     });
     bf.add(url);
-    bf.saveToFile("test_bloomfilter.bin");
+    bf.saveToFile("data/test_bloomfilter.bin");
 
     BloomFilter loaded(g_bit_size, {
         std::make_shared<StdHashFunction>(g_hash_func1),
         std::make_shared<StdHashFunction>(g_hash_func2)
     });
-    loaded.loadFromFile("test_bloomfilter.bin");
+    loaded.loadFromFile("data/test_bloomfilter.bin");
 
     EXPECT_TRUE(loaded.possiblyContains(url));
 }
