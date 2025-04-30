@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstring>
-#include "command_manager.h"
+#include "CommandManager.h"
 
 // SessionHandler is responsible for interacting with a single client.
 // It reads full commands from the socket, calls CommandManager, and sends back results.
