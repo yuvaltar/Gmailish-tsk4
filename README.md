@@ -1,7 +1,7 @@
-# advanced_programing_tsk1
-GitHub Repository: https://github.com/yuvaltar/advanced_programing_tsk1.git
+# Gmailish-tsk2
+GitHub Repository: https://github.com/yuvaltar/Gmailish-tsk2.git
 
-# Ex1 – Bloom Filter URL Blacklist
+# Ex2 – Client-Server TCP
 
 This project implements a URL filtering system using a Bloom Filter to efficiently manage and query blacklisted URLs. It was built using SOLID object-oriented design principles and follows a Test-Driven Development (TDD) workflow to ensure correctness and robustness, especially in edge and extreme cases.
 
