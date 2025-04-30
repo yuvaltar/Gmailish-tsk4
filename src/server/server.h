@@ -9,7 +9,9 @@
 class Server {
 public:
     // Constructor: initializes server with port, bloom filter size, and hash functions.
-    Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns);
+    //Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns);
+    Server(int port);
+
 
     // Starts the server: binds the socket and begins accepting client connections.
     void run();
