@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <cstring>
 #include "command_manager.h"
 
 // SessionHandler is responsible for interacting with a single client.
@@ -22,7 +22,4 @@ private:
 
     // Sends a full response (ending with newline) back to the client.
     void sendResponse(const std::string& response);
-
-    // Closes the client socket cleanly.
-    void closeConnection();
 };
