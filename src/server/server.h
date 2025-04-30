@@ -1,5 +1,3 @@
-#pragma once
-
 #include "BloomFilter.h"
 #include "BlackList.h"
 #include "CommandManager.h"
@@ -9,7 +7,7 @@
 class Server {
 public:
     // Constructor: initializes server with port, bloom filter size, and hash functions.
-    //Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns);
+    Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns);
     Server(int port);
 
 

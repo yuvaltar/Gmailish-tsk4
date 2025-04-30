@@ -6,11 +6,17 @@
 #include <unistd.h>      // For close()
 #include <string.h>      // For memset
 #include "server.h"
+#include "SessionHandler.h"
 
-Server::Server(int port) {
+Server::Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns)
+    : bloom(bloomSize, hashFns),  
+      blacklist(),
+      commandManager(bloom, blacklist)
+{
     serverSocket = -1;
     initSocket(port);
 }
+
 // create socket
 void Server::initSocket(int port) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -54,6 +60,6 @@ void Server::run() {
     }
 }
 void Server::handleClient(int clientSocket) {
-    SessionHandler session(clientSocket, &commandManager);
+    SessionHandler session(clientSocket, commandManager);
     session.handle();  // Handles read/process/respond
 }
