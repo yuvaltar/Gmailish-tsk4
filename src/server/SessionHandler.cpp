@@ -1,12 +1,15 @@
-#include "IHashFunctions.h"
-#include "StdHashFunction.h"
 #include "SessionHandler.h"
 #include <unistd.h>      
 #include <sys/socket.h>  
 #include <stdexcept>     
 #include <iostream>      
 #include <cstring>
-
+#include <sstream>       // For parsing config line
+#include <filesystem>    // For persistence directory
+#include "StdHashFunction.h" // For StdHashFunction
+#include "BloomFilter.h"     // For per-client Bloom
+#include "BlackList.h"       // For per-client Blacklist
+#include "CommandManager.h"  // For per-client CommandManager
 SessionHandler::SessionHandler(int socket)
     : clientSocket(socket) {} 
 
@@ -78,6 +81,10 @@ void SessionHandler::handle() {
 
     BloomFilter bloom(filterSize, hashFunctions);
     BlackList blacklist;
+    // Try loading previous state (optional, not per-client persistent ID)
+    bloom.loadFromFile("data/bloomfilter.bin");
+    blacklist.load("data/blacklist.txt");
+
     CommandManager commandManager(bloom, blacklist);
 
     // Now enter command loop
@@ -87,6 +94,8 @@ void SessionHandler::handle() {
 
         std::string response = commandManager.execute(command);
         sendResponse(response);
+        bloom.saveToFile("data/bloomfilter.bin");
+        blacklist.save("data/blacklist.txt");
     }
 
     close(clientSocket);
