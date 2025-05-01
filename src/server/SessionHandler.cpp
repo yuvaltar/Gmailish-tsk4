@@ -91,7 +91,7 @@ void SessionHandler::handle() {
     while (true) {
         std::string command = receiveLine();
         if (command.empty()) break;
-
+// needed to be in the command manager? for modular code
         std::string response = commandManager.execute(command);
         sendResponse(response);
         bloom.saveToFile("data/bloomfilter.bin");
