@@ -18,7 +18,7 @@ private:
     int serverSocket;                 // Listening socket
     BloomFilter bloom;               // Shared Bloom filter
     BlackList blacklist;             // Shared blacklist (exact match)
-    CommandManager commandManager;   // Logic dispatcher for all commands
+    
 
     // Initializes the server socket: bind, listen, etc.
     void initSocket(int port);
