@@ -9,9 +9,6 @@
 #include "SessionHandler.h"
 
 Server::Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns)
-    : bloom(bloomSize, hashFns),  
-      blacklist(),
-      commandManager(bloom, blacklist)
 {
     serverSocket = -1;
     initSocket(port);
@@ -37,7 +34,7 @@ void Server::initSocket(int port) {
     }
 
     if (listen(serverSocket, 5) < 0) {
-        perror("error listening on socket");
+        perror("error listening on socket"); /// temporery
         exit(1);
     }
 
@@ -56,10 +53,10 @@ void Server::run() {
         }
 
         handleClient(clientSocket);
-        close(clientSocket);  // optional if you don't handle it inside handleClient
+        
     }
 }
 void Server::handleClient(int clientSocket) {
-    SessionHandler session(clientSocket, commandManager);
+    SessionHandler session(clientSocket);
     session.handle();  // Handles read/process/respond
 }

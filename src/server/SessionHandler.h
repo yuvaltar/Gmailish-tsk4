@@ -1,4 +1,6 @@
 #include <string>
+#include "IHashFunctions.h"
+#include "StdHashFunction.h"
 #include "CommandManager.h"
 
 // SessionHandler is responsible for interacting with a single client.
@@ -6,7 +8,8 @@
 class SessionHandler {
 public:
     // Constructor: requires the connected client socket and reference to the CommandManager.
-    SessionHandler(int socket, CommandManager& manager);
+    //SessionHandler(int socket, CommandManager& manager);
+    SessionHandler(int socket);
 
     // Runs the full client session: read-process-respond loop.
     void handle();

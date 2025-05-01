@@ -1,3 +1,5 @@
+#include "IHashFunctions.h"
+#include "StdHashFunction.h"
 #include "SessionHandler.h"
 #include <unistd.h>      
 #include <sys/socket.h>  
@@ -5,8 +7,8 @@
 #include <iostream>      
 #include <cstring>
 
-SessionHandler::SessionHandler(int socket, CommandManager& manager)
-    : clientSocket(socket), commandManager(manager) {}
+SessionHandler::SessionHandler(int socket)
+    : clientSocket(socket) {} 
 
 std::string SessionHandler::receiveLine() {
     std::string line;
@@ -49,15 +51,43 @@ void SessionHandler::sendResponse(const std::string& response) {
 }
 
 void SessionHandler::handle() {
-    while (true) {                                                                      // Run an infinite loop to be able ot handle multiple commands from one client
-        std::string command = receiveLine();                                            // call ReceiveLine function - waits for a "full line" to be written by the client 
+    // Receive initial config line
+    std::string configLine = receiveLine();
+    std::istringstream configStream(configLine);
+    int filterSize;
+    std::vector<std::shared_ptr<IHashFunction>> hashFunctions;
 
-        if (command.empty()) {                                                          // Client disconnected or read error
-            break;
-        }
-
-        std::string response = commandManager.execute(command);                         // Passes "raw" string of command to the CommandManager
-        sendResponse(response);                                                         // Sends the response provided by the CommandManager back to the client
+    if (!(configStream >> filterSize) || filterSize <= 0) {
+        sendResponse("400 Bad Request\n");
+        return;
     }
-    close(clientSocket);                                                                // Closes the client socket
+
+    int iterCount;
+    while (configStream >> iterCount) {
+        if (iterCount <= 0) {
+            sendResponse("400 Bad Request\n");
+            return;
+        }
+        hashFunctions.push_back(std::make_shared<StdHashFunction>(iterCount));
+    }
+
+    if (hashFunctions.empty()) {
+        sendResponse("400 Bad Request\n");
+        return;
+    }
+
+    BloomFilter bloom(filterSize, hashFunctions);
+    BlackList blacklist;
+    CommandManager commandManager(bloom, blacklist);
+
+    // Now enter command loop
+    while (true) {
+        std::string command = receiveLine();
+        if (command.empty()) break;
+
+        std::string response = commandManager.execute(command);
+        sendResponse(response);
+    }
+
+    close(clientSocket);
 }

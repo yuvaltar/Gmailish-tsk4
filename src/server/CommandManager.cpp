@@ -16,18 +16,18 @@ std::string CommandManager::execute(const std::string& commandLine) {
     std::string command, urlStr;
 
     if (!(iss >> command >> urlStr)) {
-        return "400 Bad Request";
+        return "400 Bad Request\n";
     }
 
     // Reject extra tokens (only 2 allowed)
     std::string extra;
     if (iss >> extra) {
-        return "400 Bad Request";
+        return "400 Bad Request\n";  //mybe usless
     }
 
     // URL format check
     if (!std::regex_match(urlStr, urlRegex)) {
-        return "400 Bad Request";
+        return "400 Bad Request\n";
     }
 
     URL url(urlStr);
@@ -37,15 +37,15 @@ std::string CommandManager::execute(const std::string& commandLine) {
             blacklist.addUrl(url);
             bloom.add(url);
         }
-        return "201 Created";
+        return "201 Created\n";
     }
 
     else if (command == "DELETE") {
         if (blacklist.contains(url)) {
             blacklist.removeUrl(url);  
-            return "204 No Content";
+            return "204 No Content\n";
         } else {
-            return "404 Not Found";
+            return "404 Not Found\n";
         }
     }
 
@@ -61,6 +61,7 @@ std::string CommandManager::execute(const std::string& commandLine) {
     
         return response;
     }
+    // i want the client to be able 
     
     return "400 Bad Request";
 }
