@@ -7,7 +7,7 @@
 
 SessionHandler::SessionHandler(int socket, CommandManager& manager)
     : clientSocket(socket), commandManager(manager) {}
-
+// a function to handle the client's output strings
 std::string SessionHandler::receiveLine() {
     std::string line;
     char ch;

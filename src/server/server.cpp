@@ -24,18 +24,18 @@ void Server::initSocket(int port) {
         perror("error creating socket");
         exit(1);
     }
-    // c
+    // creating a struct for the socket 
     struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = INADDR_ANY;
-    sin.sin_port = htons(port);
-
+    memset(&sin, 0, sizeof(sin)); // initialize everything to be 0 
+    sin.sin_family = AF_INET; // what kind of 
+    sin.sin_addr.s_addr = INADDR_ANY; // 
+    sin.sin_port = htons(port); // converting to vig endians
+// create the binding and check its valid
     if (bind(serverSocket, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
         perror("error binding socket");
         exit(1);
     }
-
+// create the listen and check for validation
     if (listen(serverSocket, 5) < 0) {
         perror("error listening on socket");
         exit(1);
