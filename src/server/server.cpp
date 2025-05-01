@@ -46,8 +46,8 @@ void Server::initSocket(int port) {
 
 void Server::run() {
     while (true) {
-        sockaddr_in clientAddr;
-        socklen_t clientLen = sizeof(clientAddr);
+        sockaddr_in clientAddr; // create a sin struct 
+        socklen_t clientLen = sizeof(clientAddr); // holds the lentgh of the clientaddress (considering its in binary and decoding either while moving the adr )
 
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
         if (clientSocket < 0) {

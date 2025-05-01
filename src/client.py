@@ -4,8 +4,8 @@ import socket
 # Configuration: Server details
 # ------------------------------
 SERVER_IP = '127.0.0.1'   # Localhost IP (server and client on same machine)
-SERVER_PORT = 12345       # Port number the server listens on
-
+SERVER_PORT = int(input("Enter server port number: ")) 
+ 
 # ------------------------------
 # Create a TCP socket
 # ------------------------------
@@ -28,14 +28,10 @@ except Exception as e:
 try:
     while True:
         # Prompt user for input
-        message = input("[Input] Message to send (type 'quit' to exit): ")
+        message = input("[Input] Message to send (type 'quit' to exit): ") 
 
         # ---- EXIT CONDITION ----
-        # If the user types 'quit' (in any capitalization), we break the loop.
-        # .lower() is used to make it case-insensitive, so 'QUIT' and 'Quit' also work.
-        if message.lower() == 'quit':
-            print("[Exit] User requested to quit.")
-            break
+ 
 
         # Send the message to the server (append newline since server expects it)
         client_socket.send((message + '\n').encode('utf-8'))
