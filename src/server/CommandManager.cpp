@@ -6,8 +6,9 @@
 
 // Static regex to validate simple URLs
 static const std::regex urlRegex(
-    R"(^(https?|file)://[^\\s/$.?#].[^\\s]*$)"
+    R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+.-])://)?(?:localhost|(?:[A-Za-z0-9-]+.)+[A-Za-z0-9-]+|(?:\d{1,3}.){3}\d{1,3})(?::\d+)?(?:/[^\s])?)$)"
 );
+
 
 CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
     : bloom(bloom), blacklist(blacklist) {}

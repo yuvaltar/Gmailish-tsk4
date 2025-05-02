@@ -117,6 +117,7 @@ void SessionHandler::handle() {
         }
 
         std::cout << "[DEBUG] Received command: " << command << std::endl;
+        //
 
         std::string response = commandManager.execute(command);
         std::cout << "[DEBUG] Response: " << response;
