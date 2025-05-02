@@ -1,7 +1,7 @@
 import socket
 
 SERVER_IP = input("Enter server IP number: ")
-SERVER_PORT = input("Enter server port number: ")
+SERVER_PORT = int(input("Enter server port number: "))
  
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

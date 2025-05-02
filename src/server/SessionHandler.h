@@ -16,7 +16,7 @@ public:
 
 private:
     int clientSocket;                    // Socket descriptor for this client
-    CommandManager& commandManager;      // Shared logic dispatcher
+       
 
     // Receives a line (command) from the client, blocking until newline is encountered.
     std::string receiveLine();
