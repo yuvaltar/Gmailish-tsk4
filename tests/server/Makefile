@@ -1,35 +1,45 @@
-# Makefile in tests/server/
-
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -I../../src -I../../src/BloomFilter -I../../src/server -I../../third_party/googletest/googletest/include
+CXXFLAGS = -std=c++17 -Wall -I../src -I../third_party/googletest/googletest/include
+LDFLAGS = -pthread
 
 # Directories
-ROOT_DIR = ../..
-SRC_DIR = $(ROOT_DIR)/src
-GTEST_DIR = $(ROOT_DIR)/third_party/googletest/googletest
-BUILD_DIR = $(ROOT_DIR)/build
+GTEST_DIR = ../third_party/googletest/googletest
+BUILD_DIR = ../build
 GTEST_LIB = $(BUILD_DIR)/libgtest.a
 
-# Source and test files
-SRC_FILES = $(wildcard $(SRC_DIR)/BloomFilter/*.cpp) $(wildcard $(SRC_DIR)/server/*.cpp)
-TEST_FILES = server_client_tests.cpp tests.cpp
+# Source files for the main program and tests
+SRC = ../src/BloomFilter/BloomFilter.cpp \
+      ../src/BloomFilter/BlackList.cpp \
+      ../src/BloomFilter/url.cpp \
+      ../src/server/server.cpp \
+      ../src/server/SessionHandler.cpp \
+      ../src/server/CommandManager.cpp
 
-# Output
-TARGET = test_runner
+TEST_SRC = server/server_client_tests.cpp
 
-# Default target
-all: $(TARGET)
+# Output binary
+TEST_TARGET = test_runner
 
-$(TARGET): $(GTEST_LIB) $(SRC_FILES) $(TEST_FILES)
-	$(CXX) $(CXXFLAGS) -pthread $(SRC_FILES) $(TEST_FILES) $(GTEST_LIB) -o $(TARGET)
+# Default target builds the test runner
+all: $(TEST_TARGET)
 
-# Build GTest
+# Build the test runner
+$(TEST_TARGET): $(TEST_SRC) $(SRC) $(GTEST_LIB)
+    $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+# Build Google Test library
 $(GTEST_LIB):
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) -std=c++17 -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(BUILD_DIR)/gtest-all.o
-	ar rcs $(GTEST_LIB) $(BUILD_DIR)/gtest-all.o
+    @mkdir -p $(BUILD_DIR)
+    $(CXX) -std=c++17 -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(BUILD_DIR)/gtest-all.o
+    ar rcs $(GTEST_LIB) $(BUILD_DIR)/gtest-all.o
 
-# Cleanup
+# Run tests
+run_tests: $(TEST_TARGET)
+    ./$(TEST_TARGET)
+
+# Clean build artifacts
 clean:
-	rm -rf $(BUILD_DIR) *.o $(TARGET)
+    rm -rf $(BUILD_DIR) *.o $(TEST_TARGET)
+
+.PHONY: all clean run_tests

@@ -119,3 +119,5 @@ test_runner.cpp – test entry point
 Yuval Tarnopolsky, 
 Tal Amitay, 
 Itay Smouha
+
+cd ~/Desktop/Gmailish-tsk2
