@@ -95,7 +95,7 @@ void SessionHandler::handle() {
     std::cerr << "[DEBUG] BloomFilter and hash functions parsed.\n";
     BloomFilter bloom(filterSize, hashFunctions);
     BlackList blacklist;
-
+    std::filesystem::create_directory("data");
     std::string BloomFile = "data/bloom_" + std::to_string(clientSocket) + ".bin";
     std::string BlackListFile = "data/BlackList" + std::to_string(clientSocket) + ".txt";
 
