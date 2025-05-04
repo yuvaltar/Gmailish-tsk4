@@ -55,7 +55,7 @@ GTEST_LIB = $(BUILD_DIR)/libgtest.a
 # Includes
 INCLUDES = -I$(SRC_DIR)/BloomFilter -I$(SRC_DIR)/server -I$(GTEST_DIR)/include
 
-# Main source files
+# Source files
 MAIN_SRC = \
     $(SRC_DIR)/main.cpp \
     $(SRC_DIR)/BloomFilter/BloomFilter.cpp \
@@ -65,7 +65,16 @@ MAIN_SRC = \
     $(SRC_DIR)/server/SessionHandler.cpp \
     $(SRC_DIR)/server/CommandManager.cpp
 
-# Test source files
+# All non-main sources (for tests)
+SRC_NO_MAIN = \
+    $(SRC_DIR)/BloomFilter/BloomFilter.cpp \
+    $(SRC_DIR)/BloomFilter/BlackList.cpp \
+    $(SRC_DIR)/BloomFilter/url.cpp \
+    $(SRC_DIR)/server/server.cpp \
+    $(SRC_DIR)/server/SessionHandler.cpp \
+    $(SRC_DIR)/server/CommandManager.cpp
+
+# Test sources
 TEST_SRC = tests/server_client_tests.cpp
 
 # Targets
@@ -83,8 +92,8 @@ $(MAIN_TARGET): $(MAIN_SRC)
 run: $(MAIN_TARGET)
 	./$(MAIN_TARGET)
 
-# Build test runner
-$(TEST_TARGET): $(TEST_SRC) $(MAIN_SRC) $(GTEST_LIB)
+# Build test runner (exclude main.cpp)
+$(TEST_TARGET): $(TEST_SRC) $(SRC_NO_MAIN) $(GTEST_LIB)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LDFLAGS)
 
 # Run tests

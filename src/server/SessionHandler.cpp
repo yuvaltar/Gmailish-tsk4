@@ -9,7 +9,7 @@
 #include "CommandManager.h"
 
 SessionHandler::SessionHandler(int socket, const BloomFilter& sharedFilter)
-    : clientSocket(socket), bloom(sharedFilter) {}  // Copy the BloomFilter
+    : clientSocket(socket), bloom(sharedFilter) {}  // Copy the shared BloomFilter config
 
 std::string SessionHandler::receiveLine() {
     std::string line;
@@ -18,7 +18,6 @@ std::string SessionHandler::receiveLine() {
     while (true) {
         ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);
         if (bytesRead == 1) {
-            std::cout << "[DEBUG] Char received: '" << (ch == '\n' ? "\\n" : std::string(1, ch)) << "'\n";
             line += ch;
             if (ch == '\n') break;
         } else if (bytesRead == 0) {
@@ -53,12 +52,16 @@ void SessionHandler::sendResponse(const std::string& response) {
 }
 
 void SessionHandler::handle() {
-    BlackList blacklist;
+    // Create data directory if not present
     std::filesystem::create_directory("data");
-    std::string BloomFile = "data/bloom_" + std::to_string(clientSocket) + ".bin";
-    std::string BlackListFile = "data/BlackList" + std::to_string(clientSocket) + ".txt";
 
+    // Use fixed persistence file names (shared across clients)
+    std::string BloomFile = "data/bloom_shared.bin";
+    std::string BlackListFile = "data/blacklist_shared.txt";
+
+    // Load previous filter state
     std::cerr << "[DEBUG] Loading from persistence files...\n";
+    BlackList blacklist;
     bloom.loadFromFile(BloomFile);
     blacklist.load(BlackListFile);
 
@@ -82,6 +85,7 @@ void SessionHandler::handle() {
 
         sendResponse(response);
 
+        // Save updated state after every command
         bloom.saveToFile(BloomFile);
         blacklist.save(BlackListFile);
     }
