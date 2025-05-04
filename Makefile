@@ -41,24 +41,65 @@
 
 # .PHONY: all clean run_tests
 
+# Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Isrc/BloomFilter -Isrc/server
+CXXFLAGS = -std=c++17 -Wall
+LDFLAGS = -pthread
 
-SRC = \
-    src/main.cpp \
-    src/BloomFilter/BloomFilter.cpp \
-    src/BloomFilter/BlackList.cpp \
-    src/BloomFilter/url.cpp \
-    src/server/server.cpp \
-    src/server/SessionHandler.cpp \
-    src/server/CommandManager.cpp
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+GTEST_DIR = third_party/googletest/googletest
+GTEST_LIB = $(BUILD_DIR)/libgtest.a
 
-TARGET = server
+# Includes
+INCLUDES = -I$(SRC_DIR)/BloomFilter -I$(SRC_DIR)/server -I$(GTEST_DIR)/include
 
-all: $(TARGET)
+# Main source files
+MAIN_SRC = \
+    $(SRC_DIR)/main.cpp \
+    $(SRC_DIR)/BloomFilter/BloomFilter.cpp \
+    $(SRC_DIR)/BloomFilter/BlackList.cpp \
+    $(SRC_DIR)/BloomFilter/url.cpp \
+    $(SRC_DIR)/server/server.cpp \
+    $(SRC_DIR)/server/SessionHandler.cpp \
+    $(SRC_DIR)/server/CommandManager.cpp
 
-$(TARGET): $(SRC)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+# Test source files
+TEST_SRC = tests/server_client_tests.cpp
 
+# Targets
+MAIN_TARGET = server
+TEST_TARGET = test_runner
+
+# Default target
+all: run
+
+# Build main program
+$(MAIN_TARGET): $(MAIN_SRC)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^
+
+# Run the main program
+run: $(MAIN_TARGET)
+	./$(MAIN_TARGET)
+
+# Build test runner
+$(TEST_TARGET): $(TEST_SRC) $(MAIN_SRC) $(GTEST_LIB)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LDFLAGS)
+
+# Run tests
+test: run_tests
+
+run_tests: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+# Build GTest static lib
+$(GTEST_LIB):
+	@mkdir -p $(BUILD_DIR)
+	$(CXX) -std=c++17 -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread \
+        -c $(GTEST_DIR)/src/gtest-all.cc -o $(BUILD_DIR)/gtest-all.o
+	ar rcs $(GTEST_LIB) $(BUILD_DIR)/gtest-all.o
+
+# Clean
 clean:
-	rm -f $(TARGET)
+	rm -rf $(BUILD_DIR) *.o $(MAIN_TARGET) $(TEST_TARGET)
