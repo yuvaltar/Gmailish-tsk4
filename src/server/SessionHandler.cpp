@@ -10,6 +10,7 @@
 #include "BloomFilter.h"     // For per-client Bloom
 #include "BlackList.h"       // For per-client Blacklist
 #include "CommandManager.h"  // For per-client CommandManager
+
 SessionHandler::SessionHandler(int socket)
     : clientSocket(socket) {} 
 
@@ -17,50 +18,60 @@ std::string SessionHandler::receiveLine() {
     std::string line;
     char ch;
 
-    while (true) {                                                                      // Infinite loop to read one charachter at a time
-        ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);                              // Read 1 byte at a time from the socket
+    while (true) {
+        ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);  // read 1 byte
 
-        if (bytesRead == 1) {                                                           // Normal case: read a single character
-            line += ch;                                                                 // Add charchter to the line
-            if (ch == '\n') {
-                break;                                                                  // No more charachters to add to line
-            }
-        } else if (bytesRead == 0) {                                                    // Client closed connection on purpose
+        if (bytesRead == 1) {
+            std::cout << "[DEBUG] Char received: '"
+                      << (ch == '\n' ? "\\n" : std::string(1, ch)) << "'\n";
+
+            line += ch;
+            if (ch == '\n') break;
+        } 
+        else if (bytesRead == 0) {
+            std::cout << "[DEBUG] Client closed connection.\n";
             return "";
-        } else {                                                                        // Error occurred
+        } 
+        else {
             perror("recv failed");
             return "";
         }
+    }
+
+    // Remove trailing \r and \n (normalize line endings)
+    while (!line.empty() && (line.back() == '\n' || line.back() == '\r')) {
+        line.pop_back();
     }
 
     return line;
 }
 
 void SessionHandler::sendResponse(const std::string& response) {
-    size_t totalSent = 0;                                                               // Use to track how many bytes are sent to client
-    size_t toSend = response.size();                                                    // The size of the response neede to be sent
-    const char* buffer = response.c_str();                                              // Convert the response to const char* to be able to use it is send()
+    size_t totalSent = 0;
+    size_t toSend = response.size();
+    const char* buffer = response.c_str();
 
-    while (totalSent < toSend) {                                                        // Loop until all bytes are sent (send() may not send all the bytes at one)
-        ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);   // Send the remaining bytes back to the client
-
-        if (sent == -1) {                                                               // Error occured while sending
+    while (totalSent < toSend) {
+        ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);
+        if (sent == -1) {
             perror("send failed");
             break;
         }
-
-        totalSent += sent;                                                              // x number of bytes were sent successfully and totalSent is updated according to x  
+        totalSent += sent;
     }
 }
 
 void SessionHandler::handle() {
-    // Receive initial config line
+    std::cerr << "[DEBUG] Waiting for config line...\n";
     std::string configLine = receiveLine();
+    std::cout << "[DEBUG] Received config: " << configLine << std::endl;
+
     std::istringstream configStream(configLine);
     int filterSize;
     std::vector<std::shared_ptr<IHashFunction>> hashFunctions;
 
     if (!(configStream >> filterSize) || filterSize <= 0) {
+        std::cerr << "[DEBUG] Invalid filter size.\n";
         sendResponse("400 Bad Request\n");
         return;
     }
@@ -68,6 +79,7 @@ void SessionHandler::handle() {
     int iterCount;
     while (configStream >> iterCount) {
         if (iterCount <= 0) {
+            std::cerr << "[DEBUG] Invalid hash iteration count: " << iterCount << "\n";
             sendResponse("400 Bad Request\n");
             return;
         }
@@ -75,27 +87,37 @@ void SessionHandler::handle() {
     }
 
     if (hashFunctions.empty()) {
+        std::cerr << "[DEBUG] No hash functions provided.\n";
         sendResponse("400 Bad Request\n");
         return;
     }
 
+    std::cerr << "[DEBUG] BloomFilter and hash functions parsed.\n";
     BloomFilter bloom(filterSize, hashFunctions);
     BlackList blacklist;
-    // Try loading previous state (optional, not per-client persistent ID)
-    bloom.loadFromFile("data/bloomfilter.bin");
-    blacklist.load("data/blacklist.txt");
+    std::filesystem::create_directory("data");
+    std::string BloomFile = "data/bloom_" + std::to_string(clientSocket) + ".bin";
+    std::string BlackListFile = "data/BlackList" + std::to_string(clientSocket) + ".txt";
+
+    std::cerr << "[DEBUG] Loading from persistence files...\n";
+    bloom.loadFromFile(BloomFile);
+    blacklist.load(BlackListFile);
 
     CommandManager commandManager(bloom, blacklist);
 
-    // Now enter command loop
+    std::cerr << "[DEBUG] Entering command loop.\n";
     while (true) {
+        std::cerr << "[DEBUG] Waiting for command...\n";
         std::string command = receiveLine();
         if (command.empty()) break;
-// needed to be in the command manager? for modular code
+
         std::string response = commandManager.execute(command);
+        std::cout << "[DEBUG] Response: " << response;
+
         sendResponse(response);
-        bloom.saveToFile("data/bloomfilter.bin");
-        blacklist.save("data/blacklist.txt");
+
+        bloom.saveToFile(BloomFile);
+        blacklist.save(BlackListFile);
     }
 
     close(clientSocket);

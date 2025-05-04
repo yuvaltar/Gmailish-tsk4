@@ -8,7 +8,7 @@
 #include "server.h"
 #include "SessionHandler.h"
 
-Server::Server(int port, size_t bloomSize, const std::vector<std::shared_ptr<IHashFunction>>& hashFns)
+Server::Server(int port)
 {
     serverSocket = -1;
     initSocket(port);

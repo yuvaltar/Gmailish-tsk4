@@ -2,34 +2,41 @@
 #include "url.h"
 #include <sstream>
 #include <regex>
+#include <iostream>
 
 // Static regex to validate simple URLs
 static const std::regex urlRegex(
-    R"(^(https?|file)://[^\\s/$.?#].[^\\s]*$)"
+    R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s])?)|(?:(?:[A-Za-z][A-Za-z0-9+.-])://)?(?:localhost|(?:[A-Za-z0-9-]+.)+[A-Za-z0-9-]+|(?:\d{1,3}.){3}\d{1,3})(?::\d+)?(?:/[^\s])?)$)"
 );
+
 
 CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
     : bloom(bloom), blacklist(blacklist) {}
 
-std::string CommandManager::execute(const std::string& commandLine) {
-    std::istringstream iss(commandLine);
-    std::string command, urlStr;
-
-    if (!(iss >> command >> urlStr)) {
-        return "400 Bad Request\n";
-    }
-
-    // Reject extra tokens (only 2 allowed)
-    std::string extra;
-    if (iss >> extra) {
-        return "400 Bad Request\n";  //mybe usless
-    }
-
-    // URL format check
-    if (!std::regex_match(urlStr, urlRegex)) {
-        return "400 Bad Request\n";
-    }
-
+    std::string CommandManager::execute(const std::string& commandLine) {
+        std::cout << "[DEBUG] Executing: " << commandLine;
+    
+        std::istringstream iss(commandLine);
+        std::string command, urlStr;
+    
+        if (!(iss >> command >> urlStr)) {
+            std::cerr << "[DEBUG] Malformed command.\n";
+            return "400 Bad Request\n";
+        }
+    
+        std::string extra;
+        if (iss >> extra) {
+            std::cerr << "[DEBUG] Extra tokens after URL.\n";
+            return "400 Bad Request\n";
+        }
+    
+        if (!std::regex_match(urlStr, urlRegex)) {
+            std::cerr << "[DEBUG] Invalid URL format: " << urlStr << "\n";
+            return "400 Bad Request\n";
+        }
+    
+        std::cout << "[DEBUG] Parsed command: " << command << ", URL: " << urlStr << "\n";
+    
     URL url(urlStr);
 
     if (command == "POST") {
