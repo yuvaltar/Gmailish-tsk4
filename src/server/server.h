@@ -7,14 +7,15 @@
 class Server {
 public:
     // Constructor: initializes server with port only (per-client filters are handled in sessions).
-    Server(int port);
     
+    Server(int port, const BloomFilter& bloomFilter);
 
     // Starts the server: binds the socket and begins accepting client connections.
     void run();
 
 private:
     int serverSocket;                 // Listening socket
+    BloomFilter bloomFilter;
 
     // Initializes the server socket: bind, listen, etc.
     void initSocket(int port);
