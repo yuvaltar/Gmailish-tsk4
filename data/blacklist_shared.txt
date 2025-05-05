@@ -1,4 +1,0 @@
-http://example.com
-http://good.com
-http://url1.com
-http://url2.com

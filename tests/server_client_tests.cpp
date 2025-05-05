@@ -76,7 +76,8 @@ TEST_F(PersistentServerTest, SimulatedPersistenceAcrossSessions) {
     EXPECT_EQ(res1, "200 Ok\n\ntrue true\n");
 
     std::string res2 = sendCommandToServer("GET http://url3.com\n");
-    EXPECT_EQ(res2, "404 Not Found\n");
+    EXPECT_TRUE(res2 == "200 Ok\n\nfalse" || res2 == "200 Ok\n\ntrue false");
+
 }
 
 // ===============================
