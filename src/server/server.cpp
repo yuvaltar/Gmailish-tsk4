@@ -8,7 +8,9 @@
 #include "server.h"
 #include "SessionHandler.h"
 
-Server::Server(int port)
+
+Server::Server(int port, const BloomFilter& filter)
+    : bloomFilter(filter)
 {
     serverSocket = -1;
     initSocket(port);
@@ -57,6 +59,7 @@ void Server::run() {
     }
 }
 void Server::handleClient(int clientSocket) {
-    SessionHandler session(clientSocket);
+    SessionHandler session(clientSocket, bloomFilter);
     session.handle();  // Handles read/process/respond
 }
+

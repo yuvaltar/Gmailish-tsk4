@@ -1,44 +1,34 @@
 #include "SessionHandler.h"
-#include <unistd.h>      
-#include <sys/socket.h>  
-#include <stdexcept>     
-#include <iostream>      
+#include <unistd.h>
+#include <sys/socket.h>
+#include <iostream>
 #include <cstring>
-#include <sstream>       // For parsing config line
-#include <filesystem>    // For persistence directory
-#include "StdHashFunction.h" // For StdHashFunction
-#include "BloomFilter.h"     // For per-client Bloom
-#include "BlackList.h"       // For per-client Blacklist
-#include "CommandManager.h"  // For per-client CommandManager
+#include <sstream>
+#include <filesystem>
+#include "BlackList.h"
+#include "CommandManager.h"
 
-SessionHandler::SessionHandler(int socket)
-    : clientSocket(socket) {} 
+SessionHandler::SessionHandler(int socket, const BloomFilter& sharedFilter)
+    : clientSocket(socket), bloom(sharedFilter) {}  // Copy the shared BloomFilter config
 
 std::string SessionHandler::receiveLine() {
     std::string line;
     char ch;
 
     while (true) {
-        ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);  // read 1 byte
-
+        ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);
         if (bytesRead == 1) {
-            std::cout << "[DEBUG] Char received: '"
-                      << (ch == '\n' ? "\\n" : std::string(1, ch)) << "'\n";
-
             line += ch;
             if (ch == '\n') break;
-        } 
-        else if (bytesRead == 0) {
+        } else if (bytesRead == 0) {
             std::cout << "[DEBUG] Client closed connection.\n";
             return "";
-        } 
-        else {
+        } else {
             perror("recv failed");
             return "";
         }
     }
 
-    // Remove trailing \r and \n (normalize line endings)
     while (!line.empty() && (line.back() == '\n' || line.back() == '\r')) {
         line.pop_back();
     }
@@ -62,44 +52,16 @@ void SessionHandler::sendResponse(const std::string& response) {
 }
 
 void SessionHandler::handle() {
-    std::cerr << "[DEBUG] Waiting for config line...\n";
-    std::string configLine = receiveLine();
-    std::cout << "[DEBUG] Received config: " << configLine << std::endl;
-
-    std::istringstream configStream(configLine);
-    int filterSize;
-    std::vector<std::shared_ptr<IHashFunction>> hashFunctions;
-
-    if (!(configStream >> filterSize) || filterSize <= 0) {
-        std::cerr << "[DEBUG] Invalid filter size.\n";
-        sendResponse("400 Bad Request\n");
-        return;
-    }
-
-    int iterCount;
-    while (configStream >> iterCount) {
-        if (iterCount <= 0) {
-            std::cerr << "[DEBUG] Invalid hash iteration count: " << iterCount << "\n";
-            sendResponse("400 Bad Request\n");
-            return;
-        }
-        hashFunctions.push_back(std::make_shared<StdHashFunction>(iterCount));
-    }
-
-    if (hashFunctions.empty()) {
-        std::cerr << "[DEBUG] No hash functions provided.\n";
-        sendResponse("400 Bad Request\n");
-        return;
-    }
-
-    std::cerr << "[DEBUG] BloomFilter and hash functions parsed.\n";
-    BloomFilter bloom(filterSize, hashFunctions);
-    BlackList blacklist;
+    // Create data directory if not present
     std::filesystem::create_directory("data");
-    std::string BloomFile = "data/bloom_" + std::to_string(clientSocket) + ".bin";
-    std::string BlackListFile = "data/BlackList" + std::to_string(clientSocket) + ".txt";
 
+    // Use fixed persistence file names (shared across clients)
+    std::string BloomFile = "data/bloom_shared.bin";
+    std::string BlackListFile = "data/blacklist_shared.txt";
+
+    // Load previous filter state
     std::cerr << "[DEBUG] Loading from persistence files...\n";
+    BlackList blacklist;
     bloom.loadFromFile(BloomFile);
     blacklist.load(BlackListFile);
 
@@ -109,13 +71,22 @@ void SessionHandler::handle() {
     while (true) {
         std::cerr << "[DEBUG] Waiting for command...\n";
         std::string command = receiveLine();
-        if (command.empty()) break;
+        std::cerr << "[DEBUG] receiveLine returned.\n";
+
+        if (command.empty()) {
+            std::cerr << "[DEBUG] Client disconnected or sent empty command.\n";
+            break;
+        }
+
+        std::cout << "[DEBUG] Received command: " << command << std::endl;
+        //
 
         std::string response = commandManager.execute(command);
         std::cout << "[DEBUG] Response: " << response;
 
         sendResponse(response);
 
+        // Save updated state after every command
         bloom.saveToFile(BloomFile);
         blacklist.save(BlackListFile);
     }
