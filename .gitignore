@@ -23,7 +23,7 @@ src/*.o
 *.swp
 .DS_Store
 main.exe
-src/main.cpp
+
 # Ignore compiled object files and executables
 *.exe
 *.o
