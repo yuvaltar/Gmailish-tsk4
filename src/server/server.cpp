@@ -9,7 +9,7 @@
 #include "SessionHandler.h"
 
 
-Server::Server(int port, const BloomFilter& filter)
+Server::Server(int port, BloomFilter& filter)
     : bloomFilter(filter)
 {
     serverSocket = -1;

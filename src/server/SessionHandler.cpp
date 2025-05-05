@@ -8,7 +8,7 @@
 #include "BlackList.h"
 #include "CommandManager.h"
 
-SessionHandler::SessionHandler(int socket, const BloomFilter& sharedFilter)
+SessionHandler::SessionHandler(int socket, BloomFilter& sharedFilter)
     : clientSocket(socket), bloom(sharedFilter) {}  // Copy the shared BloomFilter config
 
 std::string SessionHandler::receiveLine() {
