@@ -20,10 +20,10 @@ all: $(TARGET)
 
 # Build the main program
 $(TARGET): $(SRC)
-    $(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 # Clean build artifacts
 clean:
-    rm -f $(TARGET)
+	rm -f $(TARGET)
 
 .PHONY: all clean

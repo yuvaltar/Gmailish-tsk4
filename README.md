@@ -121,4 +121,8 @@ Tal Amitay,
 Itay Smouha
 
 cd ~/Desktop/Gmailish-tsk2
+
 cd /mnt/c/Users/talgx/Desktop/Gmailish-tsk2/tests/server
+wsl
+cd /mnt/c/Users/talgx/Desktop/Gmailish-tsk2
+ 
