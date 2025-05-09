@@ -21,6 +21,8 @@ public:
     // Load URLs from a file into the blacklist
     void load(const std::string& path);
 
+    void removeUrl(const URL& url);
+
 private:
     std::list<URL> blacklist;     // Container holding the blacklisted URLs
 };

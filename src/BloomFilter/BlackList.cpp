@@ -31,3 +31,6 @@ void BlackList::load(const std::string& path) {
         }
     }
 }
+void BlackList::removeUrl(const URL& url) {
+    blacklist.remove(url);  // std::list::remove calls operator== on URL
+}
