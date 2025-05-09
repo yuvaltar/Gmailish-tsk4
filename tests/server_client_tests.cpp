@@ -62,6 +62,9 @@ TEST(ServerClientTest, InvalidLogicAfterValidInit) {
     EXPECT_EQ(response, "400 Bad Request\n");
 }
 
+// deleting a url that wasnt in the list
+
+
 class PersistentServerTest : public ::testing::Test {
 protected:
     void SetUp() override {
