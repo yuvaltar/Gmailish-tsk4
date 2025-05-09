@@ -1,121 +1,237 @@
-# advanced_programing_tsk1
-GitHub Repository: https://github.com/yuvaltar/advanced_programing_tsk1.git
+# Gmailish-tsk2: TCP-Based Bloom Filter URL Blacklist
 
-# Ex1 – Bloom Filter URL Blacklist
+## GitHub Repository
 
-This project implements a URL filtering system using a Bloom Filter to efficiently manage and query blacklisted URLs. It was built using SOLID object-oriented design principles and follows a Test-Driven Development (TDD) workflow to ensure correctness and robustness, especially in edge and extreme cases.
+https://github.com/yuvaltar/Gmailish-tsk2.git
 
-## How It Works:
+## Ex2 – Client-Server URL Blacklist Over TCP
 
-The project provides a hybrid filtering system based on:
+This project builds on the work from Task 1, extending the Bloom Filter-based blacklist system into a **client-server architecture over TCP sockets**. The server is implemented in C++ and handles all business logic, while the client is written in Python 3 and serves as a lightweight interface for user input and output.
 
-1. A Bloom Filter – a probabilistic data structure optimized for space and speed, allowing fast lookups with a small probability of false positives.
+The project is designed with **SOLID principles** and **loose coupling**, ensuring easy extensibility for future changes. It supports persistent storage, clean protocol definitions, and modular command handling.
 
-2. An Exact Matching List (BlackList) – for exact verification in case of positive hits from the Bloom Filter.
+---
 
-## Program Stages:
+## How It Works
 
-At startup, the program loads a previously saved Bloom filter from data/bloomfilter.bin (if available) and an exact blacklist from data/blacklist.txt.
+### Client (Python 3)
 
-The first line of user input should define:
+* Prompts the user for server IP and port.
+* Connects once via TCP and keeps the connection open.
+* Reads user commands from the console and sends them line-by-line to the server.
+* Waits for server response and prints it before accepting the next command.
+* Does not validate or interpret commands – forwards them as-is.
 
-The size of the Bloom filter (bit array)
+### Server (C++)
 
-A list of integers, each representing the number of iterations for a separate hash function.
+* Accepts a port number as argument and listens on a TCP socket.
+* For each client connection, initializes a session handler.
+* The first message from any client is a configuration line specifying the Bloom filter size and hash function iteration counts.
+* All clients share a **single Bloom Filter and blacklist** in memory, updated by each session.
+* The shared data is persisted across sessions to:
 
-The program then enters a loop, reading commands in the format:
+  * `data/bloom_shared.bin`
+  * `data/blacklist_shared.txt`
 
-*command_id* *url*
+---
 
-For example:
-1 example.com → adds the URL to both the Bloom filter and the exact blacklist.
+## Supported Commands
 
-2 example.com → checks if the URL possibly exists in the Bloom filter, and if so, confirms it using the exact list.
+| Command  | Format         | Description                               | Response Example                        |
+| -------- | -------------- | ----------------------------------------- | --------------------------------------- |
+| `POST`   | `POST <url>`   | Adds a URL to the Bloom and Blacklist.    | `201 Created\n`                         |
+| `GET`    | `GET <url>`    | Checks if URL might exist (Bloom + list). | `200 Ok\n\ntrue true\n`                 |
+| `DELETE` | `DELETE <url>` | Removes URL from the exact list only.     | `204 No Content\n` or `404 Not Found\n` |
 
-Upon each update (specifically on each addition), the Bloom filter is saved to data/bloomfilter.bin, and the exact list is saved to data/blacklist.txt.
+Invalid or malformed commands return:
 
-### How to Build and Run:
+```text
+400 Bad Request
+```
 
-You can build and run the project in two main ways:
+---
 
-#### Option 1: Manual Build (requires a C++17 compiler)
+## Persistence
 
-You can run the program either in interactive mode with your own input (main), or run the automated test suite (test_runner) which verifies functionality and edge cases.
+A **single shared Bloom Filter and Blacklist** are used by all clients. Data is saved to disk after each valid modifying command:
 
-From the project root, use the following commands:
+* `data/bloom_shared.bin`
+* `data/blacklist_shared.txt`
 
+These files are loaded once when the first client session initializes.
+
+---
+
+## Building and Running
+
+### Prerequisites
+
+* C++17 compiler (e.g. `g++`)
+* Python 3
+* Make
+* WSL or Linux (or MinGW/WSL on Windows)
+
+### Build the Server
+
+```bash
 make clean
-
 make
+```
 
-./main
+### Run the Server
 
-Example usage: 16 5 4 7 → sets Bloom filter size to 16, with hash functions using 5, 4, and 7 iterations
+```bash
+./server 12345
+```
 
-1 https://example.com → adds the URL to the filter
+### Run the Client
 
-2 https://example.com → checks if the URL is in the filter and confirms against the exact list
+```bash
+python3 src/client.py
+```
 
-To run the test version instead:
+Provide:
 
-make clean
+```
+Server IP: 127.0.0.1
+Server Port: 12345
+```
+It should look somehting like this:
 
-make
+![Example run](images/server_build.png)
+---
 
+## Docker Support
+
+You can also build and run the project using Docker.
+
+### Build Docker image
+
+```bash
+docker build -t bloom-server .
+```
+
+### Run Server
+
+```bash
+docker run -it --rm -v "$PWD/data:/app/data" -p 12345:12345 bloom-server ./server 12345
+```
+
+### Run Client
+
+Use your host machine to run the client script:
+
+```bash
+python3 src/client.py
+```
+
+(Connect to `localhost` and port `12345`)
+
+---
+
+This should look something like this:
+
+![Example run](images/docker_run.png)
+
+## Running Tests
+
+### Bash
+
+To run tests from your terminal:
+
+```bash
+make test_runner
 ./test_runner
+```
 
-Sample Outputs:
+**Test Screenshot Example:**
+![Test run on Bash](images/bash_test_results.png)
 
-Running the main program:
+### Docker
 
-![Alt text](images\first_example.png)
+Run the test suite inside the container:
 
-Here you can also see that in the first iteration of the program, we add the url "hello.com" into the blacklist, and that data remained even after the closing of the program, as the command "2 hello.com" returned "true true", without ever needing to insert the url in the second iteration.
+```bash
+docker run --rm bloom-server ./test_runner
+```
 
+**Docker Test Screenshot Example:**
+![Test run on Docker](images/docker_test_results.png)
 
-(Another example of the main program):
+---
 
-![Alt text](images\second_example.png)
+## Sample Run
 
-Running the test version:
+**Startup:**
 
-![Alt text](images\test_runner.png)
+```
+128 3 7
+```
 
-#### Option 2: Using Docker
+**Commands:**
 
-Docker allows a fully isolated and portable environment to build and run the project regardless of local setup.
+```
+POST hello.com
+GET hello.com
+DELETE hello.com
+```
 
-To build the Docker image: 
-docker build -t bloom-filter-url .
+### Screenshot Example:
 
-To run the main program (default): 
-docker run -it -v "/$(pwd)/data:/app/data" bloom-filter-url
+> *Include an image here showing a full client-server exchange*
 
-This runs the main program in interactive mode. You can type input directly into the terminal as described above.
+---
 
-To run the test runner:
-docker run --rm bloom-filter-url ./test_runner
+## Code Structure
 
-This runs the automated test version inside the Docker container.
+```
+Gmailish-tsk2/
+├── data/                       # Shared Bloom filter and blacklist
+├── images/                     # Screenshots for documentation
+├── src/
+│   ├── BloomFilter/            # BloomFilter logic, URL handling, hash functions
+│   ├── server/                 # SessionHandler, CommandManager, TCP server
+│   ├── client.py               # Python 3 client
+│   └── main.cpp                # Entry point for server
+├── tests/
+│   ├── tests.cpp               # Core functionality tests
+│   └── server_client_tests.cpp # Client-server interaction tests
+├── third_party/                # GoogleTest submodule
+├── .gitignore
+├── .gitmodules
+├── Dockerfile                  # Docker setup
+├── Makefile                    # Build instructions
+├── README.md
+├── details.txt                 # Project metadata
+├── server                      # Compiled server binary
+└── test_runner                 # Compiled test runner
+```
 
-#### Folder Structure:
+---
 
-src/ – core implementation files (BloomFilter, URL class, etc.)
+## SOLID and Extensibility Discussion
 
-tests/ – Google Test unit test files
+This project was refactored to improve maintainability, modularity, and separation of concerns — particularly in preparation for its evolution into a client-server model.
 
-data/ – contains the persisted Bloom filter and blacklist
+| Change Type                                       | Did It Require Code Change? | Why or Why Not?                                                                                                 |
+|--------------------------------------------------|------------------------------|------------------------------------------------------------------------------------------------------------------|
+| **Command names changed (e.g., `1` to `POST`)**  | ✅ Yes                       | Originally hardcoded in `main.cpp`. In Task 2, parsing was abstracted into `CommandManager` for flexibility.    |
+| **New commands added (e.g., `DELETE`)**          | ✅ Yes                       | Required expanding `CommandManager` with new logic. Modular design now allows easier addition of new commands. |
+| **Response formatting changed**                  | ✅ Yes                       | Previously printed directly in `main.cpp`. Now formatted consistently inside `CommandManager::execute()`.       |
+| **Switched from console I/O to sockets**         | ✅ Yes                       | Required full redesign: input/output now handled in `SessionHandler`, with blocking socket reads and sends.     |
 
-Dockerfile – Docker configuration
+---
 
-Makefile – build configuration
+## Future-Proof Design
 
-main.cpp – main application logic (interactive)
+* All logic modules (BloomFilter, BlackList, CommandManager) are fully decoupled from networking.
+* The code separates data management, protocol parsing, and socket transport.
+* Each component is tested independently.
 
-test_runner.cpp – test entry point
+This ensures we are **closed to changes, but open to extension**.
 
-##### Author Information:
+---
 
-Yuval Tarnopolsky, 
-Tal Amitay, 
-Itay Smouha
+## Authors
+
+Yuval Tarnopolsky, Tal Amitay, Itay Smouha
