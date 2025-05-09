@@ -1,5 +1,4 @@
 #include "SessionHandler.h"
-<<<<<<< HEAD
 #include <unistd.h>
 #include <sys/socket.h>
 #include <iostream>
@@ -11,22 +10,11 @@
 
 SessionHandler::SessionHandler(int socket, BloomFilter& sharedFilter)
     : clientSocket(socket), bloom(sharedFilter) {}  // Copy the shared BloomFilter config
-=======
-#include <unistd.h>      
-#include <sys/socket.h>  
-#include <stdexcept>     
-#include <iostream>      
-#include <cstring>
-
-SessionHandler::SessionHandler(int socket, CommandManager& manager)
-    : clientSocket(socket), commandManager(manager) {}
->>>>>>> acc7475c714ac1572ce779d12c42b155c58c699d
 
 std::string SessionHandler::receiveLine() {
     std::string line;
     char ch;
 
-<<<<<<< HEAD
     while (true) {
         ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);
         if (bytesRead == 1) {
@@ -35,36 +23,18 @@ std::string SessionHandler::receiveLine() {
         } else if (bytesRead == 0) {
             return "";
         } else {
-=======
-    while (true) {                                                                      // Infinite loop to read one charachter at a time
-        ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);                              // Read 1 byte at a time from the socket
-
-        if (bytesRead == 1) {                                                           // Normal case: read a single character
-            line += ch;                                                                 // Add charchter to the line
-            if (ch == '\n') {
-                break;                                                                  // No more charachters to add to line
-            }
-        } else if (bytesRead == 0) {                                                    // Client closed connection on purpose
-            return "";
-        } else {                                                                        // Error occurred
-            perror("recv failed");
->>>>>>> acc7475c714ac1572ce779d12c42b155c58c699d
             return "";
         }
     }
 
-<<<<<<< HEAD
     while (!line.empty() && (line.back() == '\n' || line.back() == '\r')) {
         line.pop_back();
     }
 
-=======
->>>>>>> acc7475c714ac1572ce779d12c42b155c58c699d
     return line;
 }
 
 void SessionHandler::sendResponse(const std::string& response) {
-<<<<<<< HEAD
     size_t totalSent = 0;
     size_t toSend = response.size();
     const char* buffer = response.c_str();
@@ -75,26 +45,10 @@ void SessionHandler::sendResponse(const std::string& response) {
             break;
         }
         totalSent += sent;
-=======
-    size_t totalSent = 0;                                                               // Use to track how many bytes are sent to client
-    size_t toSend = response.size();                                                    // The size of the response neede to be sent
-    const char* buffer = response.c_str();                                              // Convert the response to const char* to be able to use it is send()
-
-    while (totalSent < toSend) {                                                        // Loop until all bytes are sent (send() may not send all the bytes at one)
-        ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);   // Send the remaining bytes back to the client
-
-        if (sent == -1) {                                                               // Error occured while sending
-            perror("send failed");
-            break;
-        }
-
-        totalSent += sent;                                                              // x number of bytes were sent successfully and totalSent is updated according to x  
->>>>>>> acc7475c714ac1572ce779d12c42b155c58c699d
     }
 }
 
 void SessionHandler::handle() {
-<<<<<<< HEAD
     // Create data directory if not present
     std::filesystem::create_directory("data");
 
@@ -127,17 +81,3 @@ void SessionHandler::handle() {
 
     close(clientSocket);
 }
-=======
-    while (true) {                                                                      // Run an infinite loop to be able ot handle multiple commands from one client
-        std::string command = receiveLine();                                            // call ReceiveLine function - waits for a "full line" to be written by the client 
-
-        if (command.empty()) {                                                          // Client disconnected or read error
-            break;
-        }
-
-        std::string response = commandManager.execute(command);                         // Passes "raw" string of command to the CommandManager
-        sendResponse(response);                                                         // Sends the response provided by the CommandManager back to the client
-    }
-    close(clientSocket);                                                                // Closes the client socket
-}
->>>>>>> acc7475c714ac1572ce779d12c42b155c58c699d
