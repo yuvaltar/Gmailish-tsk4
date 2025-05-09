@@ -1,20 +1,25 @@
-# Use a base image with g++ and Python
+# Use official Ubuntu base image
 FROM ubuntu:22.04
 
-# Install dependencies
-RUN apt update && apt install -y g++ make python3 python3-pip
+# Install necessary packages and GoogleTest
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libgtest-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create and switch to app directory
+# Compile GoogleTest (libgtest-dev only provides source)
+RUN cd /usr/src/gtest && cmake . && make && cp lib/libgtest*.a /usr/lib
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy entire project into the container
+# Copy local project files into the container
 COPY . .
 
-# Build the server using your Makefile
-RUN make
+# Build the project using the provided Makefile
+RUN make clean && make
 
-# Expose the server port
-EXPOSE 54321
-
-# Start the server with desired parameters
-CMD ["./server", "54321", "1000", "123", "456"]
+# Default command: run the test runner
+CMD ["./main"]
