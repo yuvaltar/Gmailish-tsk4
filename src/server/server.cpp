@@ -20,10 +20,9 @@ Server::Server(int port, BloomFilter& filter)
 void Server::initSocket(int port) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0) {
-        perror("error creating socket");
         exit(1);
     }
-    // c
+   
     struct sockaddr_in sin;
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
@@ -31,16 +30,12 @@ void Server::initSocket(int port) {
     sin.sin_port = htons(port);
 
     if (bind(serverSocket, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
-        perror("error binding socket");
         exit(1);
     }
 
-    if (listen(serverSocket, 5) < 0) {
-        perror("error listening on socket"); /// temporery
+    if (listen(serverSocket, 1) < 0) {
         exit(1);
     }
-
-    std::cout << "Server listening on port " << port << std::endl;
 }
 
 void Server::run() {
@@ -50,8 +45,7 @@ void Server::run() {
 
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
         if (clientSocket < 0) {
-            perror("error accepting client");
-            continue;  // or exit(1) depending on your strategy
+            exit(1);  
         }
 
         handleClient(clientSocket);
