@@ -9,7 +9,7 @@
 #include "SessionHandler.h"
 
 
-Server::Server(int port, const BloomFilter& filter)
+Server::Server(int port, BloomFilter& filter)
     : bloomFilter(filter)
 {
     serverSocket = -1;
@@ -20,10 +20,9 @@ Server::Server(int port, const BloomFilter& filter)
 void Server::initSocket(int port) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0) {
-        perror("error creating socket");
         exit(1);
     }
-    // creating a struct for the socket 
+    // c
     struct sockaddr_in sin;
     memset(&sin, 0, sizeof(sin)); // initialize everything to be 0 
     sin.sin_family = AF_INET; // what kind of 
@@ -31,16 +30,13 @@ void Server::initSocket(int port) {
     sin.sin_port = htons(port); // converting to vig endians
 // create the binding and check its valid
     if (bind(serverSocket, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
-        perror("error binding socket");
         exit(1);
     }
-// create the listen and check for validation
+
     if (listen(serverSocket, 5) < 0) {
         perror("error listening on socket"); /// temporery
         exit(1);
     }
-
-    std::cout << "Server listening on port " << port << std::endl;
 }
 
 void Server::run() {
@@ -50,8 +46,7 @@ void Server::run() {
 
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
         if (clientSocket < 0) {
-            perror("error accepting client");
-            continue;  // or exit(1) depending on your strategy
+            exit(1);  
         }
 
         handleClient(clientSocket);

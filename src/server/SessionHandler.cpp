@@ -8,7 +8,7 @@
 #include "BlackList.h"
 #include "CommandManager.h"
 
-SessionHandler::SessionHandler(int socket, const BloomFilter& sharedFilter)
+SessionHandler::SessionHandler(int socket, BloomFilter& sharedFilter)
     : clientSocket(socket), bloom(sharedFilter) {}  // Copy the shared BloomFilter config
 
 std::string SessionHandler::receiveLine() {
@@ -21,10 +21,8 @@ std::string SessionHandler::receiveLine() {
             line += ch;
             if (ch == '\n') break;
         } else if (bytesRead == 0) {
-            std::cout << "[DEBUG] Client closed connection.\n";
             return "";
         } else {
-            perror("recv failed");
             return "";
         }
     }
@@ -44,7 +42,6 @@ void SessionHandler::sendResponse(const std::string& response) {
     while (totalSent < toSend) {
         ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);
         if (sent == -1) {
-            perror("send failed");
             break;
         }
         totalSent += sent;
@@ -60,32 +57,25 @@ void SessionHandler::handle() {
     std::string BlackListFile = "data/blacklist_shared.txt";
 
     // Load previous filter state
-    std::cerr << "[DEBUG] Loading from persistence files...\n";
+    
     BlackList blacklist;
     bloom.loadFromFile(BloomFile);
     blacklist.load(BlackListFile);
 
     CommandManager commandManager(bloom, blacklist);
 
-    std::cerr << "[DEBUG] Entering command loop.\n";
     while (true) {
-        std::cerr << "[DEBUG] Waiting for command...\n";
         std::string command = receiveLine();
-        std::cerr << "[DEBUG] receiveLine returned.\n";
 
         if (command.empty()) {
-            std::cerr << "[DEBUG] Client disconnected or sent empty command.\n";
             break;
         }
 
         std::cout << "[DEBUG] Received command: " << command << std::endl;
-        //
 
         std::string response = commandManager.execute(command);
-        std::cout << "[DEBUG] Response: " << response;
 
         sendResponse(response);
-
         // Save updated state after every command
         bloom.saveToFile(BloomFile);
         blacklist.save(BlackListFile);

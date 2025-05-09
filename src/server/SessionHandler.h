@@ -9,7 +9,7 @@
 // Handles interaction with a single client
 class SessionHandler {
 public:
-    SessionHandler(int socket, const BloomFilter& sharedFilter);  // Now accepts BloomFilter
+    SessionHandler(int socket, BloomFilter& sharedFilter);  // Now accepts BloomFilter
 
     void handle();
 

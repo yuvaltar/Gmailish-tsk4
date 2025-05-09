@@ -14,28 +14,26 @@ CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
     : bloom(bloom), blacklist(blacklist) {}
 
     std::string CommandManager::execute(const std::string& commandLine) {
-        std::cout << "[DEBUG] Executing: " << commandLine;
+       
     
         std::istringstream iss(commandLine);
         std::string command, urlStr;
     
         if (!(iss >> command >> urlStr)) {
-            std::cerr << "[DEBUG] Malformed command.\n";
-            return "400 Bad Request\n";
+          
+            return "400 Bad Request";
         }
     
         std::string extra;
         if (iss >> extra) {
-            std::cerr << "[DEBUG] Extra tokens after URL.\n";
-            return "400 Bad Request\n";
+           
+            return "400 Bad Request";
         }
     
         if (!std::regex_match(urlStr, urlRegex)) {
-            std::cerr << "[DEBUG] Invalid URL format: " << urlStr << "\n";
-            return "400 Bad Request\n";
+            
+            return "400 Bad Request";
         }
-    
-        std::cout << "[DEBUG] Parsed command: " << command << ", URL: " << urlStr << "\n";
     
     URL url(urlStr);
 
@@ -44,15 +42,15 @@ CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
             blacklist.addUrl(url);
             bloom.add(url);
         }
-        return "201 Created\n";
+        return "201 Created";
     }
 
     else if (command == "DELETE") {
         if (blacklist.contains(url)) {
             blacklist.removeUrl(url);  
-            return "204 No Content\n";
+            return "204 No Content";
         } else {
-            return "404 Not Found\n";
+            return "404 Not Found";
         }
     }
 
@@ -68,7 +66,6 @@ CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
     
         return response;
     }
-    // i want the client to be able 
     
     return "400 Bad Request";
 }
