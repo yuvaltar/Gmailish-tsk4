@@ -22,4 +22,4 @@ COPY . .
 RUN make clean && make
 
 # Default command: run the test runner
-CMD ["./main"]
+CMD ["./server", "54321", "1000", "123", "456"]
