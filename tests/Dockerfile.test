@@ -1,0 +1,26 @@
+FROM ubuntu:22.04
+
+# Install build tools and dependencies
+RUN apt-get update && apt-get install -y \
+    g++ cmake make git \
+    libgtest-dev libpthread-stubs0-dev \
+    && apt-get clean
+
+# Manually build Google Test (Ubuntu provides only source, not compiled lib)
+RUN mkdir /gtest_build && cd /gtest_build && \
+    cmake /usr/src/googletest && \
+    make && \
+    cp ./lib/*.a /usr/lib/
+
+# Set working directory
+WORKDIR /app
+
+# Copy the entire project into the container
+COPY . .
+
+# Build test_runner inside the test directory
+WORKDIR /app/tests/server
+RUN make clean && make
+
+# Run the test binary when the container starts
+CMD ["./test_runner"]

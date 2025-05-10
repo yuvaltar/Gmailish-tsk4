@@ -20,7 +20,6 @@ try:
 
         # Wait for server response
         response = client_socket.recv(4096).decode('utf-8')
-        print(response)
 
 
 except KeyboardInterrupt:
