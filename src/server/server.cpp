@@ -1,29 +1,37 @@
-#include <iostream>
-#include <sys/socket.h>  // For socket functions
-#include <stdio.h>       // For perror
-#include <netinet/in.h>  // For sockaddr_in
-#include <arpa/inet.h>   // For htons and inet_addr
-#include <unistd.h>      // For close()
-#include <string.h>      // For memset
 #include "server.h"
 #include "SessionHandler.h"
-
+#include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <string.h>
 
 Server::Server(int port, BloomFilter& filter)
-    : bloomFilter(filter)
-{
-    serverSocket = -1;
+    : serverSocket(-1), bloomFilter(filter), running(true) {
     initSocket(port);
 }
 
-// create socket
+
+Server::~Server() {
+    shutdown();
+}
+
+void Server::shutdown() {
+    running = false;
+    if (serverSocket != -1) {
+        close(serverSocket);
+        serverSocket = -1;
+    }
+}
+
 void Server::initSocket(int port) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0) {
+        perror("socket");
         exit(1);
     }
-   
-    struct sockaddr_in sin;
+
+    sockaddr_in sin;
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = INADDR_ANY;
@@ -39,21 +47,21 @@ void Server::initSocket(int port) {
 }
 
 void Server::run() {
-    while (true) {
+    while (running) {
         sockaddr_in clientAddr;
         socklen_t clientLen = sizeof(clientAddr);
 
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
         if (clientSocket < 0) {
-            exit(1);  
+            if (!running) break;  // accept failed due to shutdown
+            exit(1);
         }
 
         handleClient(clientSocket);
-        
     }
 }
+
 void Server::handleClient(int clientSocket) {
     SessionHandler session(clientSocket, bloomFilter);
-    session.handle();  // Handles read/process/respond
+    session.handle();
 }
-
