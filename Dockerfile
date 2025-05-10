@@ -1,24 +1,20 @@
-# Dockerfile
+# Use a base image with g++ and Python
+FROM ubuntu:22.04
 
-FROM gcc:13
+# Install dependencies
+RUN apt update && apt install -y g++ make python3 python3-pip
 
+# Create and switch to app directory
 WORKDIR /app
 
-# Install Python and Git
-RUN apt-get update && \
-    apt-get install -y python3 git cmake make
-
-# Copy everything into the container
+# Copy entire project into the container
 COPY . .
 
-# Build Google Test (if not precompiled)
-RUN mkdir -p build && \
-    g++ -std=c++17 -isystem third_party/googletest/googletest/include -Ithird_party/googletest/googletest -pthread \
-    -c third_party/googletest/googletest/src/gtest-all.cc -o build/gtest-all.o && \
-    ar rcs build/libgtest.a build/gtest-all.o
+# Build the server using your Makefile
+RUN make
 
-# Compile all binaries
-RUN make all
+# Expose the server port
+EXPOSE 54321
 
-# Set default command to bash so you can run tests or server manually
-CMD ["bash"]
+# Start the server with desired parameters
+CMD ["./server", "54321", "1000", "123", "456"]

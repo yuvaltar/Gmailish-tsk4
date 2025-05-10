@@ -29,7 +29,7 @@ void Server::initSocket(int port) {
     if (serverSocket < 0) {
         perror("socket");
         exit(1);
-    }
+    }l
 
     sockaddr_in sin;
     memset(&sin, 0, sizeof(sin));
@@ -37,19 +37,23 @@ void Server::initSocket(int port) {
     sin.sin_addr.s_addr = INADDR_ANY;
     sin.sin_port = htons(port);
 
+
     if (bind(serverSocket, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
         exit(1);
     }
 
-    if (listen(serverSocket, 1) < 0) {
+    if (listen(serverSocket, 5) < 0) {
+        perror("error listening on socket"); /// temporery
         exit(1);
     }
 }
 
 void Server::run() {
+
     while (running) {
         sockaddr_in clientAddr;
         socklen_t clientLen = sizeof(clientAddr);
+
 
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
         if (clientSocket < 0) {
