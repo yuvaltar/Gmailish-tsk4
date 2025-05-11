@@ -96,13 +96,11 @@ Provide:
 Server IP: 127.0.0.1
 Server Port: 12345
 ```
-It should look something like this:
+It should look something like this (example run of the code via bash):
 
 ![Example run1](images/example_10.png)
 ---
 ![Example run1](images/example_11.png)
----
-![Example run1](images/example_12.png)
 ---
 
 
@@ -136,11 +134,11 @@ python3 src/client.py
 
 This should look something like this:
 
-![Example run](images/docker_run.png)
+![Example run](images/docker_10.png)
 ---
-![Example run1](images/example_11.png)
+![Example run1](images/docker_11.png)
 ---
-![Example run1](images/example_12.png)
+![Example run1](images/docker_12.png)
 ---
 
 ## Running Tests
@@ -155,7 +153,7 @@ make test_runner
 ```
 
 **Test Screenshot Example:**
-![Test run on Bash](images/bash_test_results.png)
+![Test run on Bash](images/test_runner.png)
 
 ### Docker
 
@@ -166,29 +164,7 @@ docker run --rm bloom-server ./test_runner
 ```
 
 **Docker Test Screenshot Example:**
-![Test run on Docker](images/docker_test_results.png)
-
----
-
-## Sample Run
-
-**Startup:**
-
-```
-128 3 7
-```
-
-**Commands:**
-
-```
-POST hello.com
-GET hello.com
-DELETE hello.com
-```
-
-### Screenshot Example:
-
-> *Include an image here showing a full client-server exchange*
+![Test run on Docker](images/docker_test_runner.png)
 
 ---
 
