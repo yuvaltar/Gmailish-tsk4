@@ -98,8 +98,13 @@ Server Port: 12345
 ```
 It should look somehting like this:
 
-![Example run](images/server_build.png)
+![Example run1](images/example_10.png)
 ---
+![Example run1](images/example_11.png)
+---
+![Example run1](images/example_12.png)
+---
+
 
 ## Docker Support
 
