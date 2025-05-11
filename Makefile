@@ -1,71 +1,33 @@
-
+# Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall
-LDFLAGS = -pthread
+CXXFLAGS = -std=c++17 -Wall -Isrc/BloomFilter -Isrc/server
 
-# Directories
-SRC_DIR = src
-BUILD_DIR = build
-GTEST_DIR = third_party/googletest/googletest
-GTEST_LIB = $(BUILD_DIR)/libgtest.a
+# C++ source files for the server
+SERVER_SRC = \
+    src/main.cpp \
+    src/BloomFilter/BloomFilter.cpp \
+    src/BloomFilter/BlackList.cpp \
+    src/BloomFilter/url.cpp \
+    src/server/server.cpp \
+    src/server/SessionHandler.cpp \
+    src/server/CommandManager.cpp
 
-# Includes
-INCLUDES = -I$(SRC_DIR)/BloomFilter -I$(SRC_DIR)/server -I$(GTEST_DIR)/include
+# Output binary
+SERVER_TARGET = server
 
-# Source files
-MAIN_SRC = \
-    $(SRC_DIR)/main.cpp \
-    $(SRC_DIR)/BloomFilter/BloomFilter.cpp \
-    $(SRC_DIR)/BloomFilter/BlackList.cpp \
-    $(SRC_DIR)/BloomFilter/url.cpp \
-    $(SRC_DIR)/server/server.cpp \
-    $(SRC_DIR)/server/SessionHandler.cpp \
-    $(SRC_DIR)/server/CommandManager.cpp
+# Default: compile the server
+all: $(SERVER_TARGET)
 
-# All non-main sources (for tests)
-SRC_NO_MAIN = \
-    $(SRC_DIR)/BloomFilter/BloomFilter.cpp \
-    $(SRC_DIR)/BloomFilter/BlackList.cpp \
-    $(SRC_DIR)/BloomFilter/url.cpp \
-    $(SRC_DIR)/server/server.cpp \
-    $(SRC_DIR)/server/SessionHandler.cpp \
-    $(SRC_DIR)/server/CommandManager.cpp
+# Compile the server
+$(SERVER_TARGET): $(SERVER_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Test sources
-TEST_SRC = tests/server_client_tests.cpp
+# Run the Python client
+run_client:
+	python3 src/client.py
 
-# Targets
-MAIN_TARGET = server
-TEST_TARGET = test_runner
-
-# Default target
-all: run
-
-# Build main program
-$(MAIN_TARGET): $(MAIN_SRC)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^
-
-# Run the main program
-run: $(MAIN_TARGET)
-	./$(MAIN_TARGET)
-
-# Build test runner (exclude main.cpp)
-$(TEST_TARGET): $(TEST_SRC) $(SRC_NO_MAIN) $(GTEST_LIB)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LDFLAGS)
-
-# Run tests
-test: run_tests
-
-run_tests: $(TEST_TARGET)
-	./$(TEST_TARGET)
-
-# Build GTest static lib
-$(GTEST_LIB):
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) -std=c++17 -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread \
-        -c $(GTEST_DIR)/src/gtest-all.cc -o $(BUILD_DIR)/gtest-all.o
-	ar rcs $(GTEST_LIB) $(BUILD_DIR)/gtest-all.o
-
-# Clean
+# Clean all compiled files
 clean:
-	rm -rf $(BUILD_DIR) *.o $(MAIN_TARGET) $(TEST_TARGET)
+	rm -f $(SERVER_TARGET)
+
+.PHONY: all clean run_client

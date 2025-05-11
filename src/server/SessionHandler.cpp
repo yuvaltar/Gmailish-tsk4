@@ -9,31 +9,32 @@
 #include "CommandManager.h"     // handles command parsing and execution
 
 // Constructor: store the client socket and reference to shared BloomFilter
+
 SessionHandler::SessionHandler(int socket, BloomFilter& sharedFilter)
     : clientSocket(socket), bloom(sharedFilter) {}  // Copy the shared BloomFilter config reference
 
-// Reads a line from the client socket (until '\n' or disconnect)
+
+// Reads a single line (terminated by '\n') from the client socket
 std::string SessionHandler::receiveLine() {
     std::string line;
     char ch;
 
     while (true) {
         // Read one byte at a time from socket
+
         ssize_t bytesRead = recv(clientSocket, &ch, 1, 0);
 
         if (bytesRead == 1) {
             line += ch;
             if (ch == '\n') break;  // End of line
         } else if (bytesRead == 0) {
-            // Connection closed by client
-            return "";
+            return "";  // Connection closed by client
         } else {
-            // Error during recv
-            return "";
+            return "";  // Error occurred
         }
     }
 
-    // Strip trailing newline or carriage return characters
+    // Remove trailing newline or carriage return characters
     while (!line.empty() && (line.back() == '\n' || line.back() == '\r')) {
         line.pop_back();
     }
@@ -42,6 +43,7 @@ std::string SessionHandler::receiveLine() {
 }
 
 // Sends a response string back to the client
+
 void SessionHandler::sendResponse(const std::string& response) {
     size_t totalSent = 0;
     size_t toSend = response.size();
@@ -49,6 +51,7 @@ void SessionHandler::sendResponse(const std::string& response) {
 
     // Send loop to ensure all bytes are transmitted
     while (totalSent < toSend) {
+        // Send remaining portion of the response
         ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);
         if (sent == -1) {
             // Send error (likely connection broken)
@@ -68,6 +71,7 @@ void SessionHandler::handle() {
     std::string BlackListFile = "data/blacklist_shared.txt";
 
     // Create a BlackList object to hold exact blacklisted URLs
+
     BlackList blacklist;
 
     // Load existing Bloom filter and blacklist from persistent files
@@ -78,10 +82,12 @@ void SessionHandler::handle() {
     CommandManager commandManager(bloom, blacklist);
 
     // Main session loop: process incoming commands from the client
+
     while (true) {
         std::string command = receiveLine();  // Read client command line
 
         if (command.empty()) {
+
             // Client disconnected or sent an empty line
             break;
         }
@@ -98,5 +104,6 @@ void SessionHandler::handle() {
     }
 
     // Close the socket once the session ends
+
     close(clientSocket);
 }

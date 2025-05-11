@@ -105,6 +105,7 @@ TEST_F(ServerClientTest, InvalidLogicAfterValidInit) {
     EXPECT_EQ(response, "400 Bad Request");
 }
 
+
 // ✅ New test: client reconnects and still sees same state
 TEST_F(ServerClientTest, ClientDisconnectReconnectSeesSameBloomState) {
     std::string postResponse = sendCommandToServer("POST http://reconnect.com\n");
@@ -118,6 +119,7 @@ TEST_F(ServerClientTest, ClientDisconnectReconnectSeesSameBloomState) {
 // ===============================
 // Persistent Test
 // ===============================
+
 class PersistentServerTest : public ::testing::Test {
 protected:
     void SetUp() override {

@@ -8,6 +8,7 @@
 static const std::regex urlRegex(
     R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s]*)?)|(?:(?:[A-Za-z][A-Za-z0-9+.-]*)://)?(?:localhost|(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
 
+
 // Constructor: initializes references to the shared BloomFilter and BlackList
 CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
     : bloom(bloom), blacklist(blacklist) {}
@@ -18,11 +19,13 @@ std::string CommandManager::execute(const std::string& commandLine) {
     std::string command, urlStr;
 
     // Extract command and URL; reject malformed input
+
     if (!(iss >> command >> urlStr)) {
         return "400 Bad Request";
     }
-
+  
     // Ensure there are no extra tokens after the URL
+
     std::string extra;
     if (iss >> extra) {
         return "400 Bad Request";
@@ -33,11 +36,11 @@ std::string CommandManager::execute(const std::string& commandLine) {
         return "400 Bad Request";
     }
 
-    // Wrap the string URL in a URL class (assumed to handle normalization/comparison)
+
+    // Construct a URL object for further processing
     URL url(urlStr);
 
-    // === POST ===
-    // Adds a URL to the blacklist and Bloom filter if not already there
+    // Handle POST command: add to blacklist and Bloom filter if not already present
     if (command == "POST") {
         if (!blacklist.contains(url)) {
             blacklist.addUrl(url);   // Add to exact list
@@ -46,8 +49,7 @@ std::string CommandManager::execute(const std::string& commandLine) {
         return "201 Created";        // Success response
     }
 
-    // === DELETE ===
-    // Removes a URL from the blacklist if it's present
+    // Handle DELETE command: remove from blacklist if it exists
     else if (command == "DELETE") {
         if (blacklist.contains(url)) {
             blacklist.removeUrl(url);  // Remove from blacklist
@@ -57,12 +59,12 @@ std::string CommandManager::execute(const std::string& commandLine) {
         }
     }
 
-    // === GET ===
-    // Checks whether a URL is *possibly* in the Bloom filter and if it's in the blacklist
+    // Handle GET command: report presence in Bloom filter and blacklist
     else if (command == "GET") {
-        std::string response = "200 Ok\n\n";  // Standard OK header
-        bool inBloom = bloom.possiblyContains(url);  // Probabilistic check
-        response += (inBloom ? "true " : "false ");  // Bloom filter result
+        std::string response = "200 Ok\n\n";
+
+        bool inBloom = bloom.possiblyContains(url);
+        response += (inBloom ? "true " : "false ");
 
         if (inBloom) {
             // Only check blacklist if Bloom thinks it's present
@@ -72,6 +74,6 @@ std::string CommandManager::execute(const std::string& commandLine) {
         return response;
     }
 
-    // If command is unrecognized
+    // If command is unrecognized, return an error
     return "400 Bad Request";
 }

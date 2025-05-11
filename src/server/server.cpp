@@ -7,17 +7,20 @@
 #include <string.h>         // for memset()
 
 // Constructor: initializes the server socket and BloomFilter reference
+
 Server::Server(int port, BloomFilter& filter)
     : serverSocket(-1), bloomFilter(filter), running(true) {
     initSocket(port);  // Set up listening socket
 }
 
 // Destructor: calls shutdown to cleanly close the socket
+
 Server::~Server() {
     shutdown();
 }
 
-// Gracefully shuts down the server
+
+// Gracefully shuts down the server socket
 void Server::shutdown() {
     running = false;  // stop the run loop
     if (serverSocket != -1) {
@@ -29,20 +32,23 @@ void Server::shutdown() {
 // Sets up the TCP socket, binds it to the given port, and starts listening
 void Server::initSocket(int port) {
     // Create a socket (IPv4, stream-based, TCP)
+
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0) {
         perror("socket");  // Print error and exit if socket creation fails
         exit(1);
     }
 
-    // Configure the server address structure
+
+    // Set up address structure for binding
     sockaddr_in sin;
     memset(&sin, 0, sizeof(sin));     // Zero out the structure
     sin.sin_family = AF_INET;         // IPv4
     sin.sin_addr.s_addr = INADDR_ANY; // Accept connections on any network interface
     sin.sin_port = htons(port);       // Convert port to network byte order
 
-    // Bind the socket to the specified address and port
+
+    // Bind the socket to the given port
     if (bind(serverSocket, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
         perror("bind");
         exit(1);
@@ -50,7 +56,6 @@ void Server::initSocket(int port) {
 
     // Listen for incoming connections (max 1 pending connection in backlog)
     if (listen(serverSocket, 1) < 0) {
-        perror("listen");
         exit(1);
     }
 }
@@ -61,17 +66,15 @@ void Server::run() {
         sockaddr_in clientAddr;             // Client address info
         socklen_t clientLen = sizeof(clientAddr);
 
-        // Accept an incoming connection (blocking call)
+        // Accept a new client connection
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
 
         if (clientSocket < 0) {
-            // If shutdown is requested, break cleanly
-            if (!running) break;
-            perror("accept");  // Otherwise, show error and exit
+            if (!running) break;  // Exit gracefully if server is shutting down
             exit(1);
         }
 
-        // Handle the client in a single-threaded manner (can be threaded if needed)
+        // Handle communication with the connected client
         handleClient(clientSocket);
     }
 }
