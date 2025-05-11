@@ -96,7 +96,7 @@ Provide:
 Server IP: 127.0.0.1
 Server Port: 12345
 ```
-It should look somehting like this:
+It should look something like this:
 
 ![Example run1](images/example_10.png)
 ---
@@ -137,6 +137,11 @@ python3 src/client.py
 This should look something like this:
 
 ![Example run](images/docker_run.png)
+---
+![Example run1](images/example_11.png)
+---
+![Example run1](images/example_12.png)
+---
 
 ## Running Tests
 
