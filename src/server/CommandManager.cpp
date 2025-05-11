@@ -1,28 +1,31 @@
 #include "CommandManager.h"
 #include "url.h"
-#include <sstream>
-#include <regex>
-#include <iostream>
+#include <sstream>  // For parsing input
+#include <regex>    // For validating URL format
+#include <iostream> // For debugging (not actively used)
 
-// Static regex to validate simple URLs
+// A regex pattern to validate URL formats
 static const std::regex urlRegex(
     R"(^(?:(?:file:///(?:[A-Za-z]:)?(?:/[^\s]*)?)|(?:(?:[A-Za-z][A-Za-z0-9+.-]*)://)?(?:localhost|(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:/[^\s]*)?)$)");
 
-// Constructor: stores references to shared Bloom filter and blacklist
+
+// Constructor: initializes references to the shared BloomFilter and BlackList
 CommandManager::CommandManager(BloomFilter& bloom, BlackList& blacklist)
     : bloom(bloom), blacklist(blacklist) {}
 
+// Executes a single command line: expects format "COMMAND URL"
 std::string CommandManager::execute(const std::string& commandLine) {
-    // Parse the command and URL from the input line
     std::istringstream iss(commandLine);
     std::string command, urlStr;
 
-    // Ensure both command and URL are provided
+    // Extract command and URL; reject malformed input
+
     if (!(iss >> command >> urlStr)) {
         return "400 Bad Request";
     }
+  
+    // Ensure there are no extra tokens after the URL
 
-    // Check for extra unexpected input
     std::string extra;
     if (iss >> extra) {
         return "400 Bad Request";
@@ -33,25 +36,26 @@ std::string CommandManager::execute(const std::string& commandLine) {
         return "400 Bad Request";
     }
 
+
     // Construct a URL object for further processing
     URL url(urlStr);
 
     // Handle POST command: add to blacklist and Bloom filter if not already present
     if (command == "POST") {
         if (!blacklist.contains(url)) {
-            blacklist.addUrl(url);
-            bloom.add(url);
+            blacklist.addUrl(url);   // Add to exact list
+            bloom.add(url);          // Add to probabilistic filter
         }
-        return "201 Created";
+        return "201 Created";        // Success response
     }
 
     // Handle DELETE command: remove from blacklist if it exists
     else if (command == "DELETE") {
         if (blacklist.contains(url)) {
-            blacklist.removeUrl(url);  
-            return "204 No Content";
+            blacklist.removeUrl(url);  // Remove from blacklist
+            return "204 No Content";   // Success, no content
         } else {
-            return "404 Not Found";
+            return "404 Not Found";    // Cannot remove nonexistent entry
         }
     }
 
@@ -63,6 +67,7 @@ std::string CommandManager::execute(const std::string& commandLine) {
         response += (inBloom ? "true " : "false ");
 
         if (inBloom) {
+            // Only check blacklist if Bloom thinks it's present
             response += (blacklist.contains(url) ? "true" : "false");
         }
 
