@@ -214,6 +214,10 @@ python3 src/client.py
 
 ---
 
+Explanation:
+
+The server was run via Docker rather than locally. Therefore the addition of the url "url.com" was updated in the data file "blacklist_shared.txt" in the docker and not in the local file where the client was run.
+
 ## Running Tests
 
 ### Bash
