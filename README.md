@@ -111,14 +111,35 @@ You can also build and run the project using Docker.
 ### Build Docker image
 
 ```bash
-docker build -t bloom-server .
+    docker build -t gmailish-server1 .
 ```
+
+This command builds a Docker image and names it "gmailish-server1".
+
 
 ### Run Server
 
 ```bash
-docker run -it --rm -v "$PWD/data:/app/data" -p 12345:12345 bloom-server ./server 12345
+    docker run -p 54321:54321 gmailish-server1 54321 256 8 16
 ```
+- `-p 54321:54321` maps port 54321 from the container to your host.
+- `gmailish-server1` is the image name.
+- `54321 256 8 16` are arguments passed to your ./server program.
+
+---
+
+### Dockerfile Setup (for reference)
+
+Your Dockerfile should end with:
+
+    ENTRYPOINT ["./server"]
+    CMD ["54321", "256", "8", "16"]
+
+This allows you to override arguments easily when running the container.
+
+You can verify this in Docker Desktop by looking at the "containers" tab and check to see that the container appears there, this means tht it is indeed running.
+
+---
 
 ### Run Client
 
@@ -127,9 +148,6 @@ Use your host machine to run the client script:
 ```bash
 python3 src/client.py
 ```
-
-(Connect to `localhost` and port `12345`)
-
 ---
 
 This should look something like this:
@@ -148,7 +166,7 @@ This should look something like this:
 To run tests from your terminal:
 
 ```bash
-make test_runner
+make test
 ./test_runner
 ```
 
@@ -160,7 +178,7 @@ make test_runner
 Run the test suite inside the container:
 
 ```bash
-docker run --rm bloom-server ./test_runner
+docker run --rm gmailish-test
 ```
 
 **Docker Test Screenshot Example:**
