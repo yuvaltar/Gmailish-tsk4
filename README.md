@@ -1,14 +1,47 @@
 # Gmailish-tsk2: TCP-Based Bloom Filter URL Blacklist
 
+
 ## GitHub Repository
 
 https://github.com/yuvaltar/Gmailish-tsk2.git
 
-## Ex2 – Client-Server URL Blacklist Over TCP
 
-This project builds on the work from Task 1, extending the Bloom Filter-based blacklist system into a **client-server architecture over TCP sockets**. The server is implemented in C++ and handles all business logic, while the client is written in Python 3 and serves as a lightweight interface for user input and output.
 
-The project is designed with **SOLID principles** and **loose coupling**, ensuring easy extensibility for future changes. It supports persistent storage, clean protocol definitions, and modular command handling.
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [How It Works](#how-it-works)
+  - [Client (Python 3)](#client-python-3)
+  - [Server (C++)](#server-c)
+- [Supported Commands](#supported-commands)
+- [Persistence](#persistence)
+- [Building and Running](#building-and-running)
+- [Docker Support](#docker-support)
+- [Running Tests](#running-tests)
+- [Code Structure](#code-structure)
+- [SOLID Principles](#solid-and-extensibility-discussion)
+- [Jira Link](#jira-link)
+- [Authors](#authors)
+
+---
+
+## Overview
+
+This project implements a TCP-based client-server application for **URL blacklisting** using a **Bloom Filter** — a space-efficient probabilistic data structure that supports fast membership checks with no false negatives.
+
+The client (Python) sends user commands, while the server (C++) maintains a shared Bloom Filter and blacklist. Commands like `POST`, `GET`, and `DELETE` are supported. The state persists across sessions.
+
+---
+
+## Features
+
+- ✅ Efficient URL lookup via Bloom Filter  
+- ✅ Shared in-memory state for all client sessions  
+- ✅ TCP-based communication using sockets  
+- ✅ Persistent storage with auto-load support  
+- ✅ Modular C++ design with Python frontend  
+- ✅ Dockerized setup for ease of deployment  
+- ✅ Adheres to **SOLID principles**  
 
 ---
 
@@ -16,47 +49,87 @@ The project is designed with **SOLID principles** and **loose coupling**, ensuri
 
 ### Client (Python 3)
 
-* Prompts the user for server IP and port.
-* Connects once via TCP and keeps the connection open.
-* Reads user commands from the console and sends them line-by-line to the server.
-* Waits for server response and prints it before accepting the next command.
-* Does not validate or interpret commands – forwards them as-is.
+- Prompts for IP and port.
+- Connects over TCP and remains connected.
+- Sends user commands line-by-line.
+- Prints server responses.
+- Does **not validate or preprocess commands** — simply forwards them.
 
 ### Server (C++)
 
-* Accepts a port number as argument and listens on a TCP socket.
-* For each client connection, initializes a session handler.
-* The first message from any client is a configuration line specifying the Bloom filter size and hash function iteration counts.
-* All clients share a **single Bloom Filter and blacklist** in memory, updated by each session.
-* The shared data is persisted across sessions to:
-
-  * `data/bloom_shared.bin`
-  * `data/blacklist_shared.txt`
+- Accepts port number via command line.
+- Uses `SessionHandler` to manage input/output per session.
+- All sessions share:
+  - **One Bloom Filter**
+  - **One URL blacklist**
+- Data is persisted after every `POST` or `DELETE`.
 
 ---
 
 ## Supported Commands
 
-| Command  | Format         | Description                               | Response Example                        |
-| -------- | -------------- | ----------------------------------------- | --------------------------------------- |
-| `POST`   | `POST <url>`   | Adds a URL to the Bloom and Blacklist.    | `201 Created\n`                         |
-| `GET`    | `GET <url>`    | Checks if URL might exist (Bloom + list). | `200 Ok\n\ntrue true\n`                 |
-| `DELETE` | `DELETE <url>` | Removes URL from the exact list only.     | `204 No Content\n` or `404 Not Found\n` |
+### POST  
+Adds a URL to both the Bloom Filter and blacklist.
 
-Invalid or malformed commands return:
+**Format:**  
+`POST www.example.com`  
 
-```text
-400 Bad Request
+**Output:**  
+`201 Created`
+
+---
+
+### GET  
+Checks if a URL might be blacklisted.
+
+**Format:**  
+`GET www.example.com`  
+
+**Output:**  
 ```
+200 OK
+
+true true
+```
+
+- `true true`: In Bloom filter AND in exact list.  
+- `true false`: In Bloom filter but not in list.  
+- `false`: Definitely not in filter.  
+
+---
+
+### DELETE  
+Removes a URL from the exact blacklist only.
+
+**Format:**  
+`DELETE www.example.com`  
+
+**Output (success):**  
+`204 No Content`  
+
+**Output (not found):**  
+`404 Not Found`  
+
+---
+
+### Invalid Input
+
+Any malformed or invalid command returns:  
+`400 Bad Request`
 
 ---
 
 ## Persistence
 
-A **single shared Bloom Filter and Blacklist** are used by all clients. Data is saved to disk after each valid modifying command:
+A **single shared Bloom Filter and Blacklist** are used by all clients. Data is saved to disk after each valid modifying command.
 
-* `data/bloom_shared.bin`
-* `data/blacklist_shared.txt`
+- **Files:**
+  - `data/bloom_shared.bin` — serialized Bloom Filter
+  - `data/blacklist_shared.txt` — plain-text blacklist
+
+- **Behavior:**
+  - Data loads once on the first session's initialization.
+  - Any `POST` or `DELETE` automatically triggers saving.
 
 These files are loaded once when the first client session initializes.
 
@@ -64,121 +137,109 @@ These files are loaded once when the first client session initializes.
 
 ## Building and Running
 
-### Prerequisites
+### Requirements
 
-* C++17 compiler (e.g. `g++`)
-* Python 3
-* Make
-* WSL or Linux (or MinGW/WSL on Windows)
+- C++17
+- Python 3
+- `make`
+- Linux / WSL / MinGW
 
-### Build the Server
+### Build Server
 
-```bash
+```
 make clean
 make
 ```
 
-### Run the Server
-
-```bash
-./server 12345
-```
-
-### Run the Client
-
-```bash
-python3 src/client.py
-```
-
-Provide:
-
-```
-Server IP: 127.0.0.1
-Server Port: 12345
-```
-It should look somehting like this:
-
-![Example run](images/server_build.png)
----
-
-## Docker Support
-
-You can also build and run the project using Docker.
-
-### Build Docker image
-
-```bash
-docker build -t bloom-server .
-```
-
 ### Run Server
 
-```bash
-docker run -it --rm -v "$PWD/data:/app/data" -p 12345:12345 bloom-server ./server 12345
+```
+./server 12345 128 3 7
 ```
 
 ### Run Client
 
-Use your host machine to run the client script:
-
-```bash
+```
 python3 src/client.py
 ```
 
-(Connect to `localhost` and port `12345`)
+You’ll be prompted for:
+
+```
+Server IP: 127.0.0.1  
+Server Port: 12345
+```
+
+### Client Example:
+![Client example](images/example_10.png)
+
+### Server Example:
+![Server example](images/example_11.png)
 
 ---
 
-This should look something like this:
+## Docker Support
 
-![Example run](images/docker_run.png)
+### Build Server Image
+
+```
+docker build -t gmailish-server1 .
+```
+![Docker Test 1](images/docker_13.png)  
+---
+
+It should create an imae in the docker that looks like this:
+
+![Docker Build](images/docker_10.png)
+
+---
+
+### Run Server Container
+
+```
+docker run -p 54321:54321 gmailish-server1 54321 256 8 16
+```
+
+- `54321` is the port
+- `256` is Bloom filter size
+- `8` and `16` are hash function seeds
+
+### Run Client (outside Docker)
+
+```
+python3 src/client.py
+```
+
+![Client Docker Output](images/docker_16.png)
+
+---
+
+Explanation:
+
+The server was run via Docker rather than locally. Therefore the addition of the url "url.com" was updated in the data file "blacklist_shared.txt" in the docker and not in the local file where the client was run.
 
 ## Running Tests
 
 ### Bash
 
-To run tests from your terminal:
-
-```bash
-make test_runner
+```
+make test
 ./test_runner
 ```
 
-**Test Screenshot Example:**
-![Test run on Bash](images/bash_test_results.png)
-
-### Docker
-
-Run the test suite inside the container:
-
-```bash
-docker run --rm bloom-server ./test_runner
-```
-
-**Docker Test Screenshot Example:**
-![Test run on Docker](images/docker_test_results.png)
+![Bash Test](images/test_runner.png)
 
 ---
 
-## Sample Run
-
-**Startup:**
+### Docker
 
 ```
-128 3 7
+docker build -f Dockerfile.test -t gmailish-tests .
+docker run --rm gmailish-test
 ```
 
-**Commands:**
-
-```
-POST hello.com
-GET hello.com
-DELETE hello.com
-```
-
-### Screenshot Example:
-
-> *Include an image here showing a full client-server exchange*
+![Docker Test 2](images/docker_14.png)  
+![Docker Test 3](images/docker_15.png)
 
 ---
 
@@ -186,39 +247,38 @@ DELETE hello.com
 
 ```
 Gmailish-tsk2/
-├── data/                       # Shared Bloom filter and blacklist
-├── images/                     # Screenshots for documentation
+├── data/
+├── images/
 ├── src/
-│   ├── BloomFilter/            # BloomFilter logic, URL handling, hash functions
-│   ├── server/                 # SessionHandler, CommandManager, TCP server
-│   ├── client.py               # Python 3 client
-│   └── main.cpp                # Entry point for server
+│   ├── BloomFilter/
+│   ├── server/
+│   ├── client.py
+│   └── main.cpp
 ├── tests/
-│   ├── tests.cpp               # Core functionality tests
-│   └── server_client_tests.cpp # Client-server interaction tests
-├── third_party/                # GoogleTest submodule
+│   ├── tests.cpp
+│   └── server_client_tests.cpp
+├── third_party/
 ├── .gitignore
 ├── .gitmodules
-├── Dockerfile                  # Docker setup
-├── Makefile                    # Build instructions
+├── Dockerfile
+├── Makefile
 ├── README.md
-├── details.txt                 # Project metadata
-├── server                      # Compiled server binary
-└── test_runner                 # Compiled test runner
+├── details.txt
+├── server
+└── test_runner
 ```
 
 ---
 
 ## SOLID and Extensibility Discussion
 
-This project was refactored to improve maintainability, modularity, and separation of concerns — particularly in preparation for its evolution into a client-server model.
+| Change | Required Refactoring? | Justification |
+|--------|------------------------|----------------|
+| `1`, `2`, commands to `POST`, `GET` | ✅ Yes | Now parsed in `CommandManager` using string mapping instead of hardcoded numeric commands. |
+| Added `DELETE` command | ✅ Yes | Required expanding `CommandManager` with new logic. Modular design now allows easier addition of new commands. |
+| New response formatting | ✅ Yes | Now centralized inside `CommandManager::execute()`. |
+| Socket-based I/O | ✅ Yes | I/O logic moved from `main.cpp` to `SessionHandler`. Modular design kept the logic layer unchanged. |
 
-| Change Type                                       | Did It Require Code Change? | Why or Why Not?                                                                                                 |
-|--------------------------------------------------|------------------------------|------------------------------------------------------------------------------------------------------------------|
-| **Command names changed (e.g., `1` to `POST`)**  | ✅ Yes                       | Originally hardcoded in `main.cpp`. In Task 2, parsing was abstracted into `CommandManager` for flexibility.    |
-| **New commands added (e.g., `DELETE`)**          | ✅ Yes                       | Required expanding `CommandManager` with new logic. Modular design now allows easier addition of new commands. |
-| **Response formatting changed**                  | ✅ Yes                       | Previously printed directly in `main.cpp`. Now formatted consistently inside `CommandManager::execute()`.       |
-| **Switched from console I/O to sockets**         | ✅ Yes                       | Required full redesign: input/output now handled in `SessionHandler`, with blocking socket reads and sends.     |
 
 ---
 
@@ -232,6 +292,16 @@ This ensures we are **closed to changes, but open to extension**.
 
 ---
 
+## Jira Link
+
+Project planning and task tracking are managed in Jira.  
+View the board here:  
+**[Jira: GIT2 Project Board](https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT2/boards/67)**
+
+---
+
 ## Authors
 
-Yuval Tarnopolsky, Tal Amitay, Itay Smouha
+- Yuval Tarnopolsky  
+- Tal Amitay  
+- Itay Smouha
