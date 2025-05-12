@@ -239,6 +239,11 @@ This ensures we are **closed to changes, but open to extension**.
 
 ---
 
+## Jira Link
+
+https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT2/boards/67/calendar
+
+
 ## Authors
 
 Yuval Tarnopolsky, Tal Amitay, Itay Smouha
