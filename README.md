@@ -177,6 +177,7 @@ make test
 Run the test suite inside the container:
 
 ```bash
+docker build -t gmailish-test .
 docker run --rm gmailish-test
 ```
 
@@ -186,7 +187,6 @@ docker run --rm gmailish-test
 ![Test run on Docker](images/docker_14.png)
 ---
 ![Test run on Docker](images/docker_15.png)
-
 ---
 
 ## Code Structure
