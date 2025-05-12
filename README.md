@@ -58,7 +58,6 @@ The client (Python) sends user commands, while the server (C++) maintains a shar
 ### Server (C++)
 
 - Accepts port number via command line.
-- Accepts multiple clients (sequential or concurrent).
 - Uses `SessionHandler` to manage input/output per session.
 - All sessions share:
   - **One Bloom Filter**
@@ -155,7 +154,7 @@ make
 ### Run Server
 
 ```
-./server 12345
+./server 12345 128 3 7
 ```
 
 ### Run Client
@@ -186,6 +185,10 @@ Server Port: 12345
 ```
 docker build -t gmailish-server1 .
 ```
+![Docker Test 1](images/docker_13.png)  
+---
+
+It should create an imae in the docker that looks like this:
 
 ![Docker Build](images/docker_10.png)
 
@@ -200,15 +203,6 @@ docker run -p 54321:54321 gmailish-server1 54321 256 8 16
 - `54321` is the port
 - `256` is Bloom filter size
 - `8` and `16` are hash function seeds
-
-### Dockerfile Ending
-
-Make sure your Dockerfile ends with:
-
-```
-ENTRYPOINT ["./server"]
-CMD ["54321", "256", "8", "16"]
-```
 
 ### Run Client (outside Docker)
 
@@ -236,11 +230,10 @@ make test
 ### Docker
 
 ```
-docker build -t gmailish-test .
+docker build -f Dockerfile.test -t gmailish-tests .
 docker run --rm gmailish-test
 ```
 
-![Docker Test 1](images/docker_13.png)  
 ![Docker Test 2](images/docker_14.png)  
 ![Docker Test 3](images/docker_15.png)
 
