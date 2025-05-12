@@ -25,7 +25,7 @@ try:
         client_socket.send((message + '\n').encode('utf-8'))
 
         # Wait and receive the server's response (up to 4096 bytes)
-        response = client_socket.recv(4096).decode('utf-8'
+        response = client_socket.recv(4096).decode('utf-8')
         
         # Print the server's response
         print(response)

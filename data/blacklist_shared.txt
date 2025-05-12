@@ -1,3 +1,0 @@
-http://url1.com
-http://url2.com
-http://url3.com

@@ -1,25 +1,25 @@
-# Use official Ubuntu base image
 FROM ubuntu:22.04
 
-# Install necessary packages and GoogleTest
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
+    python3 \
     libgtest-dev \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Compile GoogleTest (libgtest-dev only provides source)
+# Build Google Test
 RUN cd /usr/src/gtest && cmake . && make && cp lib/libgtest*.a /usr/lib
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy local project files into the container
+# Copy all files
 COPY . .
 
-# Build the project using the provided Makefile
+# Build everything using your Makefile
 RUN make clean && make
 
-# Default command: run the test runner
-CMD ["./server", "54321", "1000", "123", "456"]
+# This is the fix — always run ./server and allow args
+ENTRYPOINT ["./server"]

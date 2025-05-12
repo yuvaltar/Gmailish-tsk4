@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     // Ensure the user provides enough arguments
 
     if (argc < 4) {
-        std::cerr << "Usage: ./main <port> <filter_size> <hash1> <hash2> ..." << std::endl;
+        
         return 1;
     }
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
     // Check if port is in valid range (non-privileged port)
     if (port <= 1024 || port > 65535) {
-        std::cerr << "Port must be between 1025 and 65535." << std::endl;
+        
         return 1;
     }
 
@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
         filterSize = std::stoi(argv[2]);
 
     } catch (...) {
-        std::cerr << "Invalid filter size." << std::endl;
+       
         return 1;
     }
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
         try {
             iterCount = std::stoi(argv[i]); // Convert iteration count
         } catch (...) {
-            std::cerr << "Invalid hash function iteration count." << std::endl;
+            
             return 1;
         }
 
