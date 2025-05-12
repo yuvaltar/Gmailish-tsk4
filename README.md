@@ -126,6 +126,7 @@ This command builds a Docker image and names it "gmailish-server1".
 - `gmailish-server1` is the image name.
 - `54321 256 8 16` are arguments passed to your ./server program.
 
+![Example docker_build](images/docker_10.png)
 ---
 
 ### Dockerfile Setup (for reference)
@@ -139,6 +140,7 @@ This allows you to override arguments easily when running the container.
 
 You can verify this in Docker Desktop by looking at the "containers" tab and check to see that the container appears there, this means tht it is indeed running.
 
+![Example docker_build](images/docker_11.png)
 ---
 
 ### Run Client
@@ -148,15 +150,9 @@ Use your host machine to run the client script:
 ```bash
 python3 src/client.py
 ```
----
 
-This should look something like this:
-
-![Example run](images/docker_10.png)
 ---
-![Example run1](images/docker_11.png)
----
-![Example run1](images/docker_12.png)
+![Example run1](images/docker_16.png)
 ---
 
 ## Running Tests
@@ -171,7 +167,9 @@ make test
 ```
 
 **Test Screenshot Example:**
+---
 ![Test run on Bash](images/test_runner.png)
+---
 
 ### Docker
 
@@ -182,7 +180,11 @@ docker run --rm gmailish-test
 ```
 
 **Docker Test Screenshot Example:**
-![Test run on Docker](images/docker_test_runner.png)
+![Test run on Docker](images/docker_13.png)
+---
+![Test run on Docker](images/docker_14.png)
+---
+![Test run on Docker](images/docker_15.png)
 
 ---
 
