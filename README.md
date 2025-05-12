@@ -224,7 +224,6 @@ The server was run via Docker rather than locally. Therefore the addition of the
 
 ```
 make test
-./test_runner
 ```
 
 ![Bash Test](images/test_runner.png)
