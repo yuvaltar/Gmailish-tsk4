@@ -201,10 +201,10 @@ This project was refactored to improve maintainability, modularity, and separati
 
 | Change Type                                       | Did It Require Code Change? | Why or Why Not?                                                                                                 |
 |--------------------------------------------------|------------------------------|------------------------------------------------------------------------------------------------------------------|
-| **Command names changed (e.g., `1` to `POST`)**  | ✅ Yes                       | Originally hardcoded in `main.cpp`. In Task 2, parsing was abstracted into `CommandManager` for flexibility.    |
-| **New commands added (e.g., `DELETE`)**          | ✅ Yes                       | Required expanding `CommandManager` with new logic. Modular design now allows easier addition of new commands. |
-| **Response formatting changed**                  | ✅ Yes                       | Previously printed directly in `main.cpp`. Now formatted consistently inside `CommandManager::execute()`.       |
-| **Switched from console I/O to sockets**         | ✅ Yes                       | Required full redesign: input/output now handled in `SessionHandler`, with blocking socket reads and sends.     |
+| **Command names changed (e.g., `1` to `POST`)**  |  Yes                         | Originally hardcoded in `main.cpp`. In Task 2, parsing was abstracted into `CommandManager` for flexibility.    |
+| **New commands added (e.g., `DELETE`)**          |  Yes                         | Required expanding `CommandManager` with new logic. Modular design now allows easier addition of new commands. |
+| **Response formatting changed**                  |  Yes                         | Previously printed directly in `main.cpp`. Now formatted consistently inside `CommandManager::execute()`.       |
+| **Switched from console I/O to sockets**         |  Yes                         | Required full redesign: input/output now handled in `SessionHandler`, with blocking socket reads and sends.     |
 
 ---
 
