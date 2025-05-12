@@ -148,7 +148,7 @@ These files are loaded once when the first client session initializes.
 
 ```
 make clean
-make
+make server
 ```
 
 ### Run Server
