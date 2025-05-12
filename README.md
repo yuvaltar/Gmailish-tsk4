@@ -116,6 +116,8 @@ You can also build and run the project using Docker.
 
 This command builds a Docker image and names it "gmailish-server1".
 
+![Example docker_build](images/docker_10.png)
+---
 
 ### Run Server
 
@@ -126,8 +128,7 @@ This command builds a Docker image and names it "gmailish-server1".
 - `gmailish-server1` is the image name.
 - `54321 256 8 16` are arguments passed to your ./server program.
 
-![Example docker_build](images/docker_10.png)
----
+
 
 ### Dockerfile Setup (for reference)
 
