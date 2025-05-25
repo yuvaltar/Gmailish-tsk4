@@ -1,8 +1,13 @@
+// creates your Node.js HTTP server and Load the Express library
 const express = require('express');
+// Create an instance of the Express app
 const app = express();
+//Choose the port to listen on. If there's an environment variable PORT,
+// use that. Otherwise use 3000.
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON request bodies
+// Middleware to parse JSON request bodies into java script
+//  obect called req.body
 app.use(express.json());
 
 // Route registration
@@ -17,7 +22,7 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Launch the server
+// Launch the server -> so users can talk to us
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

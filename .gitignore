@@ -50,3 +50,5 @@ main.exe
 # Ignore editor/IDE settings
 .vscode/
 .idea/
+# ignoring mouduls
+node_modules/

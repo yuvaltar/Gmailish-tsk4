@@ -4,8 +4,9 @@ const mailsController = require('../controllers/mailsController');
 const requireAuth = require('../middleware/auth');
 
 // All mail routes require authentication
+// meaning: he who calls /api/mails, must use requireAuth and pass it
 router.use(requireAuth);
-
+// if and only if i pass auth.js i can continie to the (get,post,pach,delete)
 // GET /api/mails - get 50 most recent mails
 router.get('/', mailsController.getInbox);
 
@@ -25,3 +26,6 @@ router.delete('/:id', mailsController.deleteMail);
 router.get('/search/:query', mailsController.searchMails);
 
 module.exports = router;
+
+// optional - if i only want post to use auth.js
+// router.post('/', requireAuth, mailsController.sendMail);

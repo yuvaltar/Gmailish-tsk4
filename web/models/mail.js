@@ -25,9 +25,9 @@ function deleteMailById(id) {
 }
 
 function getInboxForUser(userId) {
-  return mails.filter(m => m.senderId === userId || m.recipientId === userId)
-              .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-              .slice(0, 50);
+  return mails.filter(m => m.senderId === userId || m.recipientId === userId) //// include only user's mails
+              .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))  //// sort from newest to oldest
+              .slice(0, 50);                                                  // take the 50 most recent
 }
 
 function searchMails(userId, query) {

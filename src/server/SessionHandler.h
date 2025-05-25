@@ -15,7 +15,7 @@ public:
 
 private:
     int clientSocket;                      // Client socket
-    BloomFilter bloom;                    // Copy of server's BloomFilter (per session)
+    BloomFilter& bloom;                    // Copy of server's BloomFilter (per session)
 
     std::string receiveLine();            // Read command from client
     void sendResponse(const std::string& response);  // Send response

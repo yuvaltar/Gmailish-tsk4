@@ -1,77 +1,29 @@
-const { createMail, getMailById, deleteMailById, getInboxForUser, searchMails } = require('../models/mail');
-const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
 
-// POST /api/mails
-exports.sendMail = async (req, res) => {
-  const { to, subject, content } = req.body;
-  const sender = req.user;
+// Add a URL to the blacklist
+exports.addToBlacklist = async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: 'Missing URL' });
 
-  if (!to || !subject || !content) {
-    return res.status(400).json({ error: 'Missing fields' });
+  const result = await sendToCpp(`POST ${id}`);
+
+  if (result === '201 Created') {
+    return res.status(201).json({ message: 'URL added to blacklist' });
+  }
+  if (result === '409 Conflict') {
+    return res.status(409).json({ error: 'URL already blacklisted' });
   }
 
-  const recipient = users.find(u => u.id === to);
-  if (!recipient) {
-    return res.status(400).json({ error: 'Recipient does not exist' });
-  }
-
-  // Check for blacklisted URLs
-  const urls = content.match(/\bhttps?:\/\/[^\s]+/g) || [];
-  for (const url of urls) {
-    const result = await sendToCpp(`2 ${url}`);
-    if (result === '200 Ok') continue; // Not blacklisted
-    if (result === '404 Not Found') return res.status(400).json({ error: 'URL is blacklisted' });
-  }
-
-  const mail = createMail(sender.id, to, subject, content);
-  res.status(201).json(mail);
+  return res.status(500).json({ error: 'Unexpected response from C++ server' });
 };
 
-// GET /api/mails
-exports.getInbox = (req, res) => {
-  const userId = req.user.id;
-  const inbox = getInboxForUser(userId);
-  res.status(200).json(inbox);
-};
+// Remove a URL from the blacklist
+exports.removeFromBlacklist = async (req, res) => {
+  const { id } = req.params;
+  const result = await sendToCpp(`DELETE ${id}`);
 
-// GET /api/mails/:id
-exports.getMailById = (req, res) => {
-  const mail = getMailById(req.params.id);
-  if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
-    return res.status(404).json({ error: 'Mail not found' });
-  }
-  res.status(200).json(mail);
-};
+  if (result === '200 Ok') return res.status(200).json({ message: 'URL removed from blacklist' });
+  if (result === '404 Not Found') return res.status(404).json({ error: 'URL not found in blacklist' });
 
-// PATCH /api/mails/:id
-exports.updateMail = (req, res) => {
-  const mail = getMailById(req.params.id);
-  if (!mail || mail.senderId !== req.user.id) {
-    return res.status(404).json({ error: 'Mail not found or not owned by you' });
-  }
-
-  const { subject, content } = req.body;
-  if (subject) mail.subject = subject;
-  if (content) mail.content = content;
-  res.status(204).end();
-};
-
-// DELETE /api/mails/:id
-exports.deleteMail = (req, res) => {
-  const mail = getMailById(req.params.id);
-  if (!mail || mail.senderId !== req.user.id) {
-    return res.status(404).json({ error: 'Mail not found or not owned by you' });
-  }
-
-  deleteMailById(req.params.id);
-  res.status(204).end();
-};
-
-// GET /api/mails/search/:query
-exports.searchMails = (req, res) => {
-  const query = req.params.query;
-  const userId = req.user.id;
-  const results = searchMails(userId, query);
-  res.status(200).json(results);
+  return res.status(500).json({ error: 'Unexpected response from C++ server' });
 };

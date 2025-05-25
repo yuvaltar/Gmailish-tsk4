@@ -20,11 +20,27 @@ exports.sendMail = async (req, res) => {
   const urls = content.match(/\bhttps?:\/\/[^\s]+/g) || [];
   for (const url of urls) {
     const result = await sendToCpp(`GET ${url}`);
-    if (result === '200 Ok') continue; // Not blacklisted
-    if (result === '404 Not Found') return res.status(400).json({ error: 'URL is blacklisted' });
+
+    if (result.startsWith('200 Ok')) {
+      const lines = result.split('\n');
+      const statusLine = lines[0].trim();
+      const flags = lines.slice(1).join(' ').trim();
+
+      if (flags === 'true true') {
+        return res.status(400).json({ error: 'URL is blacklisted' });
+      }
+
+      continue; // Not blacklisted
+    }
+
+    if (result.startsWith('404 Not Found')) {
+      return res.status(400).json({ error: 'URL is blacklisted' });
+    }
+
+    return res.status(500).json({ error: 'Unexpected response from C++ server' });
   }
 
-  const mail = createMail(sender.id, to, subject, content);
+  const mail = createMail(sender.id, to, subject.trim(), content.trim());
   res.status(201).json(mail);
 };
 
@@ -52,8 +68,8 @@ exports.updateMail = (req, res) => {
   }
 
   const { subject, content } = req.body;
-  if (subject) mail.subject = subject;
-  if (content) mail.content = content;
+  if (subject) mail.subject = subject.trim();
+  if (content) mail.content = content.trim();
   res.status(204).end();
 };
 

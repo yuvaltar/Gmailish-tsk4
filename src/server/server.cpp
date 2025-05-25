@@ -5,6 +5,7 @@
 #include <netinet/in.h>     // for sockaddr_in
 #include <unistd.h>         // for close()
 #include <string.h>         // for memset()
+#include <thread>
 
 // Constructor: initializes the server socket and BloomFilter reference
 
@@ -55,7 +56,7 @@ void Server::initSocket(int port) {
     }
 
     // Listen for incoming connections (max 1 pending connection in backlog)
-    if (listen(serverSocket, 1) < 0) {
+    if (listen(serverSocket, 50) < 0) {
         exit(1);
     }
 }
@@ -74,8 +75,12 @@ void Server::run() {
             exit(1);
         }
 
-        // Handle communication with the connected client
-        handleClient(clientSocket);
+        /// Launch a new thread for each client
+        std::thread clientThread([this, clientSocket]() {
+            this->handleClient(clientSocket);
+        });
+
+        clientThread.detach();  // Allow thread to run independently
     }
 }
 

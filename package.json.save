@@ -1,0 +1,27 @@
+{
+"scripts": {
+  "start": "node app.js",
+  "dev": "npx nodemon app.js"
+}
+  "name": "gmailish-tsk3",
+  "version": "1.0.0",
+  "description": "https://github.com/yuvaltar/Gmailish-tsk2.git",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  
+
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuvaltar/Gmailish-tsk3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuvaltar/Gmailish-tsk3/issues"
+  },
+  "homepage": "https://github.com/yuvaltar/Gmailish-tsk3#readme"
+}
