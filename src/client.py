@@ -28,7 +28,7 @@ try:
         response = client_socket.recv(4096).decode('utf-8')
         
         # Print the server's response
-        print(response)
+        print(response.strip())
 
 # If the user interrupts the program (Ctrl+C), ignore the error and exit gracefully
 except KeyboardInterrupt:

@@ -21,19 +21,19 @@ std::string CommandManager::execute(const std::string& commandLine) {
     // Extract command and URL; reject malformed input
 
     if (!(iss >> command >> urlStr)) {
-        return "400 Bad Request";
+        return "400 Bad Request\n";
     }
   
     // Ensure there are no extra tokens after the URL
 
     std::string extra;
     if (iss >> extra) {
-        return "400 Bad Request";
+        return "400 Bad Request\n";
     }
 
     // Validate URL format using regex
     if (!std::regex_match(urlStr, urlRegex)) {
-        return "400 Bad Request";
+        return "400 Bad Request\n";
     }
 
 
@@ -46,16 +46,16 @@ std::string CommandManager::execute(const std::string& commandLine) {
             blacklist.addUrl(url);   // Add to exact list
             bloom.add(url);          // Add to probabilistic filter
         }
-        return "201 Created";        // Success response
+        return "201 Created\n";        // Success response
     }
 
     // Handle DELETE command: remove from blacklist if it exists
     else if (command == "DELETE") {
         if (blacklist.contains(url)) {
             blacklist.removeUrl(url);  // Remove from blacklist
-            return "204 No Content";   // Success, no content
+            return "204 No Content\n";   // Success, no content
         } else {
-            return "404 Not Found";    // Cannot remove nonexistent entry
+            return "404 Not Found\n";    // Cannot remove nonexistent entry
         }
     }
 
@@ -71,9 +71,9 @@ std::string CommandManager::execute(const std::string& commandLine) {
             response += (blacklist.contains(url) ? "true" : "false");
         }
 
-        return response;
+        return response + "\n";
     }
 
     // If command is unrecognized, return an error
-    return "400 Bad Request";
+    return "400 Bad Request\n";
 }

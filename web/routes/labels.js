@@ -1,0 +1,24 @@
+const express = require('express');
+const router = express.Router();
+const labelsController = require('../controllers/labelsController');
+const requireAuth = require('../middleware/auth');
+
+// All label routes require authentication
+router.use(requireAuth);
+
+// GET /api/labels - list all labels
+router.get('/', labelsController.getAllLabels);
+
+// POST /api/labels - create new label
+router.post('/', labelsController.createLabel);
+
+// GET /api/labels/:id - get specific label
+router.get('/:id', labelsController.getLabel);
+
+// PATCH /api/labels/:id - update label
+router.patch('/:id', labelsController.updateLabel);
+
+// DELETE /api/labels/:id - delete label
+router.delete('/:id', labelsController.deleteLabel);
+
+module.exports = router;
