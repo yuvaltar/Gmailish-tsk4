@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "dev": "npx nodemon web/app.js"
+    "dev": "npx nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/yuvaltar/Gmailish-tsk3#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "uuid": "^11.1.0"
   }
 }
