@@ -1,9 +1,22 @@
-const { v4: uuidv4 } = require('uuid');
-
+const uuidv4 = require('../utils/uuid');
 const users = [];
 
-function createUser(username, password) {
-  const user = { id: uuidv4(), username, password };
+function createUser({ firstName, lastName, username, gender, password, birthdate }) {
+  // Check for duplicate username
+  if (users.some(user => user.username === username)) {
+    return null; // Username already taken
+  }
+
+  const user = {
+    id: uuidv4(),
+    firstName,
+    lastName,
+    username,
+    gender,
+    password,
+    birthdate
+  };
+
   users.push(user);
   return user;
 }

@@ -1,6 +1,7 @@
 const { createMail, getMailById, deleteMailById, getInboxForUser, searchMails } = require('../models/mail');
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
+const cppServerMutex = require('../utils/serverMutex'); // ✅ Added
 
 // POST /api/mails
 exports.sendMail = async (req, res) => {
@@ -19,7 +20,9 @@ exports.sendMail = async (req, res) => {
   // Check for blacklisted URLs
   const urls = content.match(/\bhttps?:\/\/[^\s]+/g) || [];
   for (const url of urls) {
-    const result = await sendToCpp(`GET ${url}`);
+    const result = await cppServerMutex.runExclusive(async () => {
+      return await sendToCpp(`GET ${url}`);
+    });
 
     if (result.startsWith('200 Ok')) {
       const lines = result.split('\n');
