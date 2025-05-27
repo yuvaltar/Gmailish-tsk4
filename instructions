@@ -160,3 +160,4 @@ curl -i -X DELETE http://localhost:3000/api/labels/0f929f20-6272-435c-8d57-a57ca
 
 ה id של כל url משתנה בהתאם לטבלה למטה כלומר כשרוצים למחוק url אז יש החלפת סימנים
 
+https://docs.google.com/document/d/1enmsuULrVgsJNvKZKfz8c44R5hrBhK52e6OV7HXFNZM/edit?tab=t.0
