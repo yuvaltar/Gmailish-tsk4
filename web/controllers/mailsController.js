@@ -1,7 +1,7 @@
 const { createMail, getMailById, deleteMailById, getInboxForUser, searchMails } = require('../models/mail');
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
-const cppServerMutex = require('../utils/serverMutex'); // ✅ Added
+const cppServerMutex = require('../utils/serverMutex'); 
 
 // POST /api/mails
 exports.sendMail = async (req, res) => {
