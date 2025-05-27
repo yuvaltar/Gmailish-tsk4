@@ -11,11 +11,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Route registration
-app.use('/api/blacklist', require('./routes/blacklist'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/mails', require('./routes/mails'));
-app.use('/api/labels', require('./routes/labels'));
-app.use('/api/tokens', require('./routes/tokens'));
+app.use('/api/blacklist', require('./web/routes/blacklist'));
+app.use('/api/users', require('./web/routes/users'));
+app.use('/api/mails', require('./web/routes/mails'));
+app.use('/api/labels', require('./web/routes/labels'));
+app.use('/api/tokens', require('./web/routes/tokens'));
+
 
 // 404 handler for unknown routes (JSON only)
 app.use((req, res) => {

@@ -1,6 +1,5 @@
 FROM ubuntu:22.04
 
-# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -9,17 +8,16 @@ RUN apt-get update && apt-get install -y \
     libgtest-dev \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Build Google Test
-RUN cd /usr/src/gtest && cmake . && make && cp lib/libgtest*.a /usr/lib
+# OPTIONAL — if your tests use raw gtest directly
+RUN cd /usr/src/gtest && cmake . && make && cp lib/libgtest*.a /usr/lib || true
 
-# Set working directory
+# Fix for build failure: clone googletest
+RUN git clone https://github.com/google/googletest.git third_party/googletest
+
 WORKDIR /app
 
-# Copy all files
 COPY . .
 
-# Build everything using your Makefile
 RUN make clean && make
 
-# This is the fix — always run ./server and allow args
 ENTRYPOINT ["./server"]

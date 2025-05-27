@@ -1,8 +1,8 @@
 #include "server.h"
 #include <iostream>
-#include <cstdlib>
-#include <sstream>
-#include <cmath> // For log2 and floor
+#include <vector>
+#include <memory>
+#include <cmath>
 #include "StdHashFunction.h"
 #include "BloomFilter.h"
 
@@ -11,78 +11,34 @@ bool isPowerOfTwo(int n) {
     return n > 0 && (n & (n - 1)) == 0;
 }
 
-int main(int argc, char* argv[]) {
+int main() {
+    // Docker-safe defaults
+    const int port = 4000;
+    const int filterSize = 1024;
+    const std::vector<int> defaultHashIterations = {3, 5};  // You can change this
 
-    // Ensure the user provides enough arguments
-
-    if (argc < 4) {
-        
-        return 1;
-    }
-
-    int port;
-    try {
-
-        port = std::stoi(argv[1]); // Convert port string to integer
-    } catch (...) {
-        return 1; // Exit on conversion failure
-    }
-
-    // Check if port is in valid range (non-privileged port)
-    if (port <= 1024 || port > 65535) {
-        
-        return 1;
-    }
-
-    int filterSize;
-    try {
-
-        // Parse the Bloom filter size
-        filterSize = std::stoi(argv[2]);
-
-    } catch (...) {
-       
-        return 1;
-    }
-
-
-    // Validate that filter size is positive and a power of 2
+    // Validate filter size
     if (filterSize <= 0 || !isPowerOfTwo(filterSize)) {
+        std::cerr << "Invalid Bloom filter size (must be power of 2).\n";
         return 1;
     }
 
-
-    // Collect hash function iteration counts
+    // Create hash function vector
     std::vector<std::shared_ptr<IHashFunction>> hashFns;
-
-    // Parse hash function parameters from arguments
-    for (int i = 3; i < argc; ++i) {
-        int iterCount;
-        try {
-            iterCount = std::stoi(argv[i]); // Convert iteration count
-        } catch (...) {
-            
-            return 1;
-        }
-
-        if (iterCount <= 0) {
-            return 1; // Iteration count must be positive
-        }
-
-        // Create a hash function instance with the given iteration count
-        hashFns.push_back(std::make_shared<StdHashFunction>(iterCount));
+    for (int iter : defaultHashIterations) {
+        if (iter > 0)
+            hashFns.push_back(std::make_shared<StdHashFunction>(iter));
     }
 
-    // Ensure at least one hash function was provided
     if (hashFns.empty()) {
-        return 1; // At least one hash function is required
+        std::cerr << "No valid hash functions configured.\n";
+        return 1;
     }
 
-    // Create BloomFilter instance with configured size and hash functions
+    // Build Bloom filter and server
     BloomFilter bloom(filterSize, hashFns);
-
-    // Launch the server with the specified port and bloom filter
-    Server server(port, bloom);  
+    std::cout << "Starting server on port " << port << std::endl;
+    Server server(port, bloom);
     server.run();
 
     return 0;
