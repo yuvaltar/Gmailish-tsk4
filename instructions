@@ -1,0 +1,163 @@
+web server:        
+make server multy threaded 
+make server mvc style (no view for user)
+make sure use of mutual recourses works good
+make sure server returns jason- not html
+connect web server to bloom filter server
+// (make sure to save users in Jason file - סוף תרגול 7) maybe not necessary
+
+step by step guide ->
+1) create notejs server
+2) make it restfull
+3) loose coupling solid
+4)
+
+login page
+registration page /// only server side not view for server
+Gmail inbox page
+
+make that only registered clients can access certain functionalities
+->
+
+add multy thread 
+
+http://foo.com/api/users 			   do (POST)
+http://foo.com/api/users/:id 		   do (GET)
+http://foo.com/api/tokens 		   do (POST)
+
+http://foo.com/api/mails                 	   do (GET, POST)
+-> go over mail content and check for bad url
+-> create mail for receiver and for sender
+
+http://foo.com/api/mails/:id             	   do (GET, PATCH, DELETE)
+->
+
+http://foo.com/api/labels                              do (GET, POST)
+http://foo.com/api/labels/:id             	   do (GET, PATCH, DELETE)
+http://foo.com/api/blacklist  		   do (POST)
+http://foo.com/api/blacklist/:id 	         	   do (DELETE)
+http://foo.com/api/mails/search/:query/       do (GET)
+
+use curl to talk to web server
+
+add docker file for client
+add docker file for web
+keep docker for bloom server and see that it works with the rest
+add docker compose 
+
+put modules_node in git ignore
+
+open new jira project
+
+
+in register user - mybe add first and last name fields in jason 
+לכל פניה לשרת עליכם לחשוב האם היא יכולה להתבצע על ידי משתמש שאינו מחובר למערכת או היא דורשת משתמש מחובר. בתרגיל הבא תתבקשו לאכוף זאת. בתרגיל זה אתם פשוט מתבקשים להעביר כ header http את מזהה המשתמש של משתמש מחובר לכל בקשה שדורשת התחברות.
+create register user:
+
+curl -X POST http://localhost:3000/api/users \
+-H "Content-Type: application/json" \
+-d '{"username": "yuval", "password": "1234"}'
+
+get user by id:
+
+curl http://localhost:3000/api/users/1be3989a-a48b-42f8-bb1f-a2f6d0c4713a
+
+login user:
+
+	curl -X POST http://localhost:3000/api/tokens \
+  -H "Content-Type: application/json" \
+  -d '{"username": "yuval", "password": "1234"}'
+
+send mail between users:
+
+curl -X POST http://localhost:3000/api/mails \
+-H "Content-Type: application/json" \
+-H "X-User-Id: <SENDER_USER_ID>" \
+-d '{
+  "to": "<RECIPIENT_USER_ID>",
+  "subject": "Hello",
+  "content": "This is the message content"
+}'
+
+get inbox of mails:
+
+curl -X GET http://localhost:3000/api/mails \
+-H "X-User-Id: <USER_ID>"
+
+get mail by id:
+
+curl -X GET http://localhost:3000/api/mails/<MAIL_ID> \
+-H "X-User-Id: <USER_ID>"
+
+
+
+
+
+
+delete mail: 
+
+curl -X DELETE http://localhost:3000/api/mails/<MAIL_ID> \
+-H "X-User-Id: <SENDER_USER_ID>"
+
+add url to blacklist:
+
+curl -X POST http://localhost:3000/api/tokeblacklist   -H "Content-Type: application/json"   -d '{"id": "http://example.com/bad6"}'
+update mail (patch): 
+
+curl -X PATCH http://localhost:3000/api/mails/<MAIL_ID> \
+-H "Content-Type: application/json" \
+-H "X-User-Id: <SENDER_USER_ID>" \
+-d '{"subject": "Updated subject", "content": "Updated content"}'
+
+
+delete url from blacklist:
+
+curl -X DELETE http://localhost:3000/api/blacklist/http%3A%2F%2Fexample.com%2Fbad5
+
+to search for a certain mail of sender/reciever
+a mail must exist in inbox and we can search by any work that the mail contains
+example ”search/bad9",  “search/example.com",  “search/Blacklist" or full version like this:
+
+curl -H "X-User-Id: 48ab88d6-a1c0-466d-af9c-cb084801d877" \
+"http://localhost:3000/api/mails/search/http%3A%2F%2Fexample.com%2Fbad9"
+
+labels:
+see all labels (get):
+
+curl -i -H "X-User-Id: 48ab88d6-a1c0-466d-af9c-cb084801d877" \
+http://localhost:3000/api/labels
+
+create new label (post);
+
+curl -i -X POST http://localhost:3000/api/labels \
+-H "Content-Type: application/json" \
+-H "X-User-Id: 48ab88d6-a1c0-466d-af9c-cb084801d877" \
+-d '{"name": "Work"}'
+
+
+
+
+
+update label name (patch):
+
+curl -i -X PATCH http://localhost:3000/api/labels/0f929f20-6272-435c-8d57-a57cada567fa \
+-H "Content-Type: application/json" \
+-H "X-User-Id: 48ab88d6-a1c0-466d-af9c-cb084801d877" \
+-d '{"name": "Work & Projects"}'
+
+get specific label by id: 
+
+curl -i -H "X-User-Id: 48ab88d6-a1c0-466d-af9c-cb084801d877" \
+http://localhost:3000/api/labels/0f929f20-6272-435c-8d57-a57cada567fa
+
+delete a label:
+
+curl -i -X DELETE http://localhost:3000/api/labels/0f929f20-6272-435c-8d57-a57cada567fa \
+-H "X-User-Id: 48ab88d6-a1c0-466d-af9c-cb084801d877"
+
+
+
+
+ה id של כל url משתנה בהתאם לטבלה למטה כלומר כשרוצים למחוק url אז יש החלפת סימנים
+
+https://docs.google.com/document/d/1enmsuULrVgsJNvKZKfz8c44R5hrBhK52e6OV7HXFNZM/edit?tab=t.0

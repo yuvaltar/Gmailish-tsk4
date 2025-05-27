@@ -1,306 +1,282 @@
-# Gmailish-tsk2: TCP-Based Bloom Filter URL Blacklist
-
+# Gmailish-tsk3: Multi-Service Gmail-Inspired Messaging System
 
 ## GitHub Repository
 
-https://github.com/yuvaltar/Gmailish-tsk2.git
+[https://github.com/yuvaltar/Gmailish-tsk3.git]
 
-
+---
 
 ## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [How It Works](#how-it-works)
-  - [Client (Python 3)](#client-python-3)
-  - [Server (C++)](#server-c)
-- [Supported Commands](#supported-commands)
-- [Persistence](#persistence)
-- [Building and Running](#building-and-running)
-- [Docker Support](#docker-support)
-- [Running Tests](#running-tests)
-- [Code Structure](#code-structure)
-- [SOLID Principles](#solid-and-extensibility-discussion)
-- [Jira Link](#jira-link)
-- [Authors](#authors)
+
+* [Overview](#overview)
+* [Features](#features)
+* [Architecture](#architecture)
+* [How It Works](#how-it-works)
+* [Supported API Routes](#supported-api-routes)
+* [Curl Examples](#curl-examples)
+* [Persistence](#persistence)
+* [Building and Running](#building-and-running)
+* [Docker Setup](#docker-setup)
+* [Code Structure](#code-structure)
+* [Jira Link](#jira-link)
+* [Authors](#authors)
 
 ---
 
 ## Overview
 
-This project implements a TCP-based client-server application for **URL blacklisting** using a **Bloom Filter** — a space-efficient probabilistic data structure that supports fast membership checks with no false negatives.
-
-The client (Python) sends user commands, while the server (C++) maintains a shared Bloom Filter and blacklist. Commands like `POST`, `GET`, and `DELETE` are supported. The state persists across sessions.
+**Gmailish-tsk3** is a RESTful Node.js + Docker-based messaging system inspired by Gmail. It supports user registration/login, inbox management, label-based organization, and spam protection via a Bloom Filter microservice.
 
 ---
 
 ## Features
 
-- ✅ Efficient URL lookup via Bloom Filter  
-- ✅ Shared in-memory state for all client sessions  
-- ✅ TCP-based communication using sockets  
-- ✅ Persistent storage with auto-load support  
-- ✅ Modular C++ design with Python frontend  
-- ✅ Dockerized setup for ease of deployment  
-- ✅ Adheres to **SOLID principles**  
+* ✅ RESTful MVC Node.js backend (no frontend views)
+* ✅ In-memory data store (users, mails, labels)
+* ✅ Blacklist persisted by Bloom Filter server
+* ✅ Multi-thread-style architecture
+* ✅ Mail content filtering using a connected Bloom Filter microservice
+* ✅ Dockerized services: Web, BloomFilter, Client
+* ✅ Modular, SOLID-compliant design
+
+---
+
+## Architecture
+
+* **Web Service (Node.js)**: REST API for users, mails, labels, and blacklist.
+* **BloomFilter Service**: TCP server filtering URLs and saving blacklist data.
+* **Communication**: Internal network via Docker Compose.
 
 ---
 
 ## How It Works
 
-### Client (Python 3)
-
-- Prompts for IP and port.
-- Connects over TCP and remains connected.
-- Sends user commands line-by-line.
-- Prints server responses.
-- Does **not validate or preprocess commands** — simply forwards them.
-
-### Server (C++)
-
-- Accepts port number via command line.
-- Uses `SessionHandler` to manage input/output per session.
-- All sessions share:
-  - **One Bloom Filter**
-  - **One URL blacklist**
-- Data is persisted after every `POST` or `DELETE`.
+1. **User registers** via `/api/users` with details like firstName, lastName, username, password, birthdate, etc.
+2. **Login** generates a token (simulated via ID) using `/api/tokens`.
+3. **Sending mails** validates recipients and checks URLs against the Bloom filter.
+4. **Labels** can be created, edited, and assigned.
+5. **Blacklist** filters malicious URLs and supports POST/DELETE operations via the Bloom server.
 
 ---
 
-## Supported Commands
+## Supported API Routes
 
-### POST  
-Adds a URL to both the Bloom Filter and blacklist.
+### Users
 
-**Format:**  
-`POST www.example.com`  
+* `POST /api/users` — Register a user
+* `GET /api/users/:id` — Get user by ID
 
-**Output:**  
-`201 Created`
+### Tokens
+
+* `POST /api/tokens` — Log in and validate credentials
+
+### Mails
+
+* `GET /api/mails` — Get inbox mails
+* `POST /api/mails` — Send mail (checks URL via Bloom filter)
+* `GET /api/mails/:id` — Get specific mail
+* `PATCH /api/mails/:id` — Update a mail
+* `DELETE /api/mails/:id` — Delete a mail
+* `GET /api/mails/search/:query` — Search mails by content
+
+### Labels
+
+* `GET /api/labels` — List all labels
+* `POST /api/labels` — Create a new label
+* `GET /api/labels/:id` — Get label by ID
+* `PATCH /api/labels/:id` — Rename label
+* `DELETE /api/labels/:id` — Delete label
+
+### Blacklist
+
+* `POST /api/blacklist` — Add URL to blacklist
+* `DELETE /api/blacklist/:id` — Remove URL
 
 ---
 
-### GET  
-Checks if a URL might be blacklisted.
+## Curl Examples
 
-**Format:**  
-`GET www.example.com`  
+### Register User
 
-**Output:**  
+```bash
+curl -X POST http://localhost:3000/api/users \
+-H "Content-Type: application/json" \
+-d '{"firstName": "Yuval", "lastName": "Tarnopolsky", "username": "yuval", "gender": "male", "password": "1234", "birthdate": "2000-05-01"}'
 ```
-200 OK
 
-true true
+### Get User by ID
+
+```bash
+curl http://localhost:3000/api/users/<USER_ID>
 ```
 
-- `true true`: In Bloom filter AND in exact list.  
-- `true false`: In Bloom filter but not in list.  
-- `false`: Definitely not in filter.  
+### Login
 
----
+```bash
+curl -X POST http://localhost:3000/api/tokens \
+-H "Content-Type: application/json" \
+-d '{"username": "yuval", "password": "1234"}'
+```
 
-### DELETE  
-Removes a URL from the exact blacklist only.
+### Send Mail
 
-**Format:**  
-`DELETE www.example.com`  
+```bash
+curl -X POST http://localhost:3000/api/mails \
+-H "Content-Type: application/json" \
+-H "X-User-Id: <SENDER_USER_ID>" \
+-d '{"to": "<RECIPIENT_USER_ID>", "subject": "Hello", "content": "This is the message content"}'
+```
 
-**Output (success):**  
-`204 No Content`  
+### Get Inbox
 
-**Output (not found):**  
-`404 Not Found`  
+```bash
+curl -X GET http://localhost:3000/api/mails \
+-H "X-User-Id: <USER_ID>"
+```
 
----
+### Get Mail by ID
 
-### Invalid Input
+```bash
+curl -X GET http://localhost:3000/api/mails/<MAIL_ID> \
+-H "X-User-Id: <USER_ID>"
+```
 
-Any malformed or invalid command returns:  
-`400 Bad Request`
+### Delete Mail
+
+```bash
+curl -X DELETE http://localhost:3000/api/mails/<MAIL_ID> \
+-H "X-User-Id: <SENDER_USER_ID>"
+```
+
+### Update Mail
+
+```bash
+curl -X PATCH http://localhost:3000/api/mails/<MAIL_ID> \
+-H "Content-Type: application/json" \
+-H "X-User-Id: <SENDER_USER_ID>" \
+-d '{"subject": "Updated subject", "content": "Updated content"}'
+```
+
+### Search Mail
+
+```bash
+curl -H "X-User-Id: <USER_ID>" \
+http://localhost:3000/api/mails/search/<QUERY>
+```
+
+### Add URL to Blacklist
+
+```bash
+curl -X POST http://localhost:3000/api/blacklist \
+-H "Content-Type: application/json" \
+-d '{"id": "http://example.com/bad6"}'
+```
+
+### Remove URL from Blacklist
+
+```bash
+curl -X DELETE http://localhost:3000/api/blacklist/http%3A%2F%2Fexample.com%2Fbad5
+```
+
+### Label Operations
+
+**Get all labels:**
+
+```bash
+curl -i -H "X-User-Id: <USER_ID>" http://localhost:3000/api/labels
+```
+
+**Create label:**
+
+```bash
+curl -i -X POST http://localhost:3000/api/labels \
+-H "Content-Type: application/json" \
+-H "X-User-Id: <USER_ID>" \
+-d '{"name": "Work"}'
+```
+
+**Update label:**
+
+```bash
+curl -i -X PATCH http://localhost:3000/api/labels/<LABEL_ID> \
+-H "Content-Type: application/json" \
+-H "X-User-Id: <USER_ID>" \
+-d '{"name": "Work & Projects"}'
+```
+
+**Get label by ID:**
+
+```bash
+curl -i -H "X-User-Id: <USER_ID>" http://localhost:3000/api/labels/<LABEL_ID>
+```
+
+**Delete label:**
+
+```bash
+curl -i -X DELETE http://localhost:3000/api/labels/<LABEL_ID> \
+-H "X-User-Id: <USER_ID>"
+```
 
 ---
 
 ## Persistence
 
-A **single shared Bloom Filter and Blacklist** are used by all clients. Data is saved to disk after each valid modifying command.
-
-- **Files:**
-  - `data/bloom_shared.bin` — serialized Bloom Filter
-  - `data/blacklist_shared.txt` — plain-text blacklist
-
-- **Behavior:**
-  - Data loads once on the first session's initialization.
-  - Any `POST` or `DELETE` automatically triggers saving.
-
-These files are loaded once when the first client session initializes.
+* All application data (users, mails, labels) is stored **in-memory** on the web server. It is lost upon server restart.
+* The **blacklist** is **persisted** by the Bloom Filter server to disk automatically.
 
 ---
 
 ## Building and Running
 
-### Requirements
+### Run Locally
 
-- C++17
-- Python 3
-- `make`
-- Linux / WSL / MinGW
-
-### Build Server
-
-```
-make clean
-make server
+```bash
+cd web
+npm install
+node app.js
 ```
 
-### Run Server
-
-```
-./server 12345 128 3 7
-```
-
-### Run Client
-
-```
-python3 src/client.py
-```
-
-You’ll be prompted for:
-
-```
-Server IP: 127.0.0.1  
-Server Port: 12345
-```
-
-### Client Example:
-![Client example](images/example_10.png)
-
-### Server Example:
-![Server example](images/example_11.png)
+The server will start on port `3000` by default.
 
 ---
 
-## Docker Support
+## Docker Setup
 
-### Build Server Image
+### Step-by-Step
 
-```
-docker build -t gmailish-server1 .
-```
-![Docker Test 1](images/docker_13.png)  
----
+#### 1. Build the Docker Images
 
-It should create an imae in the docker that looks like this:
-
-![Docker Build](images/docker_10.png)
-
----
-
-### Run Server Container
-
-```
-docker run -p 54321:54321 gmailish-server1 54321 256 8 16
+```bash
+docker-compose build
 ```
 
-- `54321` is the port
-- `256` is Bloom filter size
-- `8` and `16` are hash function seeds
+#### 2. Start All Services
 
-### Run Client (outside Docker)
-
-```
-python3 src/client.py
+```bash
+docker-compose up
 ```
 
-![Client Docker Output](images/docker_16.png)
+This will start:
 
----
+* The Node.js web API service
+* The Bloom Filter TCP service
 
-Explanation:
-
-The server was run via Docker rather than locally. Therefore the addition of the url "url.com" was updated in the data file "blacklist_shared.txt" in the docker and not in the local file where the client was run.
-
-## Running Tests
-
-### Bash
-
-```
-make test
-```
-
-![Bash Test](images/test_runner.png)
-
----
-
-### Docker
-
-```
-docker build -f Dockerfile.test -t gmailish-tests .
-docker run --rm gmailish-test
-```
-
-![Docker Test 2](images/docker_14.png)  
-![Docker Test 3](images/docker_15.png)
-
----
-
-## Code Structure
-
-```
-Gmailish-tsk2/
-├── data/
-├── images/
-├── src/
-│   ├── BloomFilter/
-│   ├── server/
-│   ├── client.py
-│   └── main.cpp
-├── tests/
-│   ├── tests.cpp
-│   └── server_client_tests.cpp
-├── third_party/
-├── .gitignore
-├── .gitmodules
-├── Dockerfile
-├── Makefile
-├── README.md
-├── details.txt
-├── server
-└── test_runner
-```
-
----
-
-## SOLID and Extensibility Discussion
-
-| Change | Required Refactoring? | Justification |
-|--------|------------------------|----------------|
-| `1`, `2`, commands to `POST`, `GET` | ✅ Yes | Now parsed in `CommandManager` using string mapping instead of hardcoded numeric commands. |
-| Added `DELETE` command | ✅ Yes | Required expanding `CommandManager` with new logic. Modular design now allows easier addition of new commands. |
-| New response formatting | ✅ Yes | Now centralized inside `CommandManager::execute()`. |
-| Socket-based I/O | ✅ Yes | I/O logic moved from `main.cpp` to `SessionHandler`. Modular design kept the logic layer unchanged. |
+You may open a new terminal window and use `curl` to interact with the API.
 
 
----
 
-## Future-Proof Design
 
-* All logic modules (BloomFilter, BlackList, CommandManager) are fully decoupled from networking.
-* The code separates data management, protocol parsing, and socket transport.
-* Each component is tested independently.
-
-This ensures we are **closed to changes, but open to extension**.
-
----
 
 ## Jira Link
 
-Project planning and task tracking are managed in Jira.  
-View the board here:  
-**[Jira: GIT2 Project Board](https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT2/boards/67)**
+Project planning and task tracking are managed in Jira.
+**[Jira: GIT3 Project Board](https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT3/boards)**
 
 ---
 
 ## Authors
 
-- Yuval Tarnopolsky  
-- Tal Amitay  
-- Itay Smouha
+* Yuval Tarnopolsky
+* Tal Amitay
+* Itay Smouha
+
