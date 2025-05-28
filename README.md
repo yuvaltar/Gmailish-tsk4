@@ -99,7 +99,7 @@
 ### Register User
 
 ```bash
-curl -X POST http://localhost:3000/api/users \
+curl -i -X POST http://localhost:3000/api/users \
 -H "Content-Type: application/json" \
 -d '{"firstName": "Yuval", "lastName": "Tarnopolsky", "username": "yuval", "gender": "male", "password": "1234", "birthdate": "2000-05-01"}'
 ```
@@ -107,13 +107,13 @@ curl -X POST http://localhost:3000/api/users \
 ### Get User by ID
 
 ```bash
-curl http://localhost:3000/api/users/<USER_ID>
+curl -i http://localhost:3000/api/users/<USER_ID>
 ```
 
 ### Login
 
 ```bash
-curl -X POST http://localhost:3000/api/tokens \
+curl -i -X POST http://localhost:3000/api/tokens \
 -H "Content-Type: application/json" \
 -d '{"username": "yuval", "password": "1234"}'
 ```
@@ -121,7 +121,7 @@ curl -X POST http://localhost:3000/api/tokens \
 ### Send Mail
 
 ```bash
-curl -X POST http://localhost:3000/api/mails \
+curl -i -X POST http://localhost:3000/api/mails \
 -H "Content-Type: application/json" \
 -H "X-User-Id: <SENDER_USER_ID>" \
 -d '{"to": "<RECIPIENT_USER_ID>", "subject": "Hello", "content": "This is the message content"}'
@@ -130,28 +130,28 @@ curl -X POST http://localhost:3000/api/mails \
 ### Get Inbox
 
 ```bash
-curl -X GET http://localhost:3000/api/mails \
+curl -i -X GET http://localhost:3000/api/mails \
 -H "X-User-Id: <USER_ID>"
 ```
 
 ### Get Mail by ID
 
 ```bash
-curl -X GET http://localhost:3000/api/mails/<MAIL_ID> \
+curl -i -X GET http://localhost:3000/api/mails/<MAIL_ID> \
 -H "X-User-Id: <USER_ID>"
 ```
 
 ### Delete Mail
 
 ```bash
-curl -X DELETE http://localhost:3000/api/mails/<MAIL_ID> \
+curl -i -X DELETE http://localhost:3000/api/mails/<MAIL_ID> \
 -H "X-User-Id: <SENDER_USER_ID>"
 ```
 
 ### Update Mail
 
 ```bash
-curl -X PATCH http://localhost:3000/api/mails/<MAIL_ID> \
+curl -i -X PATCH http://localhost:3000/api/mails/<MAIL_ID> \
 -H "Content-Type: application/json" \
 -H "X-User-Id: <SENDER_USER_ID>" \
 -d '{"subject": "Updated subject", "content": "Updated content"}'
@@ -160,14 +160,14 @@ curl -X PATCH http://localhost:3000/api/mails/<MAIL_ID> \
 ### Search Mail
 
 ```bash
-curl -H "X-User-Id: <USER_ID>" \
+curl -i -H "X-User-Id: <USER_ID>" \
 http://localhost:3000/api/mails/search/<QUERY>
 ```
 
 ### Add URL to Blacklist
 
 ```bash
-curl -X POST http://localhost:3000/api/blacklist \
+curl -i -X POST http://localhost:3000/api/blacklist \
 -H "Content-Type: application/json" \
 -d '{"id": "http://example.com/bad6"}'
 ```
@@ -175,7 +175,7 @@ curl -X POST http://localhost:3000/api/blacklist \
 ### Remove URL from Blacklist
 
 ```bash
-curl -X DELETE http://localhost:3000/api/blacklist/http%3A%2F%2Fexample.com%2Fbad5
+curl -i -X DELETE http://localhost:3000/api/blacklist/http%3A%2F%2Fexample.com%2Fbad5
 ```
 
 ### Label Operations

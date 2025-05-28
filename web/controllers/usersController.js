@@ -27,7 +27,7 @@ exports.registerUser = (req, res) => {
     return res.status(409).json({ error: 'Username already exists' });
   }
 
-  res.status(201).json({ id: newUser.id, username: newUser.username });
+  res.status(201).end();
 };
 
 // GET /api/users/:id
