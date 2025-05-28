@@ -2,6 +2,7 @@ const { createMail, getMailById, deleteMailById, getInboxForUser, searchMails } 
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
 
+
 // POST /api/mails
 exports.sendMail = async (req, res) => {
   const { to, subject, content } = req.body;
@@ -20,6 +21,7 @@ exports.sendMail = async (req, res) => {
   const urls = content.match(/\bhttps?:\/\/[^\s]+/g) || [];
   for (const url of urls) {
     const result = await sendToCpp(`GET ${url}`);
+
 
     if (result.startsWith('200 Ok')) {
       const lines = result.split('\n');

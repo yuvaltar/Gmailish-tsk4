@@ -1,37 +1,25 @@
-const net = require('net'); 
-// Import Node.js's built-in networking module to create TCP connections
+const net = require('net');
 
-function sendToCpp(command) {
-  // Define a function that sends a command string to the C++ TCP server
+// Use environment variable if set, otherwise default to 4000
+const CPP_PORT = process.env.CPP_PORT || 4000;
+
+async function sendToCpp(command) {
   return new Promise((resolve, reject) => {
-    // Wrap the whole logic in a Promise so we can use async/await
-    // Call resolve(result) when done, or reject(error) if it fails
-    const client = new net.Socket(); 
-    // Create a new TCP socket client
-    let data = ''; 
-    // This will store the data received from the server
-    client.connect(12345, '127.0.0.1', () => {
-      // Try to connect to the C++ server at localhost:12345
-      client.write(command + '\n'); 
-      // Send the command string with a newline at the end
-      // The newline lets the C++ server know where the message ends
+    const client = new net.Socket();
+
+    client.connect(CPP_PORT, 'server', () => {
+      client.write(command + '\n');
     });
-    client.on('data', chunk => {
-      // When data is received from the C++ server, this event is triggered
-      data += chunk; 
-      // Append the received data chunk to the full data string
-      if (data.includes('\n')) {
-        // Once we detect a newline, we know the full message is received
-        client.destroy(); 
-        // Close the TCP connection immediately (force close)
-        resolve(data.trim()); 
-        // Resolve the promise with the trimmed response (remove newline)
-      }
+
+    client.on('data', (data) => {
+      resolve(data.toString());
+      client.destroy(); // close connection
     });
-    client.on('error', reject); 
-    // If an error occurs (e.g., cannot connect), reject the promise
+
+    client.on('error', (err) => {
+      reject(`Connection error: ${err.message}`);
+    });
   });
-  
 }
-module.exports = { sendToCpp }; 
-// Export the function so other files can import and use it
+
+module.exports = { sendToCpp };
