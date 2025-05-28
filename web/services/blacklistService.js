@@ -1,35 +1,26 @@
-const { sendToCpp } = require('../services/blacklistService');
-const cppServerMutex = require('../utils/serverMutex'); 
+const net = require('net');
 
-// POST /api/blacklist
-exports.addToBlacklist = async (req, res) => {
-  const { id } = req.body;
-  if (!id) return res.status(400).json({ error: 'Missing URL' });
+async function sendToCpp(command) {
+  return new Promise((resolve, reject) => {
+    const client = new net.Socket();
 
-  const result = await cppServerMutex.runExclusive(async () => {
-    return await sendToCpp(`POST ${id}`);
+    client.connect(4000, 'localhost', () => {
+      client.write(command);
+    });
+
+    client.on('data', (data) => {
+      resolve(data.toString());
+      client.destroy(); // close connection
+    });
+
+    client.on('error', (err) => {
+      reject(`Connection error: ${err.message}`);
+    });
+
+    client.on('close', () => {
+      // optional logging
+    });
   });
+}
 
-  if (result === '201 Created') {
-    return res.status(201).json({ message: 'URL added to blacklist' });
-  }
-  if (result === '409 Conflict') {
-    return res.status(409).json({ error: 'URL already blacklisted' });
-  }
-
-  return res.status(500).json({ error: 'Unexpected response from C++ server' });
-};
-
-// DELETE /api/blacklist/:id
-exports.removeFromBlacklist = async (req, res) => {
-  const { id } = req.params;
-
-  const result = await cppServerMutex.runExclusive(async () => {
-    return await sendToCpp(`DELETE ${id}`);
-  });
-
-  if (result === '200 Ok') return res.status(200).json({ message: 'URL removed from blacklist' });
-  if (result === '404 Not Found') return res.status(404).json({ error: 'URL not found in blacklist' });
-
-  return res.status(500).json({ error: 'Unexpected response from C++ server' });
-};
+module.exports = { sendToCpp }; 
