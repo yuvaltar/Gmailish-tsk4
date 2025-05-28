@@ -7,7 +7,7 @@ async function sendToCpp(command) {
   return new Promise((resolve, reject) => {
     const client = new net.Socket();
 
-    client.connect(CPP_PORT, 'localhost', () => {
+    client.connect(CPP_PORT, 'server', () => {
       client.write(command + '\n');
     });
 

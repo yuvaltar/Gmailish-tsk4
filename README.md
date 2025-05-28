@@ -241,7 +241,7 @@ The server will start on port `3000` by default.
 ---
 
 ## Docker Setup
-
+CPP_HOST=localhost CPP_PORT=54321 npm run dev
 ### Step-by-Step
 
 #### 1. Build the Docker Images
