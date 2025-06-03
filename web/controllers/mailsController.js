@@ -1,7 +1,33 @@
-const { createMail, getMailById, deleteMailById, getInboxForUser, searchMails } = require('../models/mail');
+const {
+  createMail,
+  getMailById,
+  deleteMailById,
+  getInboxForUser,
+  searchMails
+} = require('../models/mail');
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
 
+// Helper function to check blacklisted URLs in given text
+async function containsBlacklistedUrl(text) {
+  const urls = text.match(/\bhttps?:\/\/[^\s]+/g) || [];
+  for (const url of urls) {
+    const result = await sendToCpp(`GET ${url}`);
+
+    if (result.startsWith('200 Ok')) {
+      const lines = result.split('\n');
+      const flags = lines.slice(1).join(' ').trim();
+      if (flags === 'true true') {
+        return { blacklisted: true, url };
+      }
+    } else if (result.startsWith('404 Not Found')) {
+      return { blacklisted: true, url };
+    } else {
+      return { error: true, url };
+    }
+  }
+  return { blacklisted: false };
+}
 
 // POST /api/mails
 exports.sendMail = async (req, res) => {
@@ -17,29 +43,12 @@ exports.sendMail = async (req, res) => {
     return res.status(400).json({ error: 'Recipient does not exist' });
   }
 
-  // Check for blacklisted URLs
-  const urls = content.match(/\bhttps?:\/\/[^\s]+/g) || [];
-  for (const url of urls) {
-    const result = await sendToCpp(`GET ${url}`);
-
-
-    if (result.startsWith('200 Ok')) {
-      const lines = result.split('\n');
-      const statusLine = lines[0].trim();
-      const flags = lines.slice(1).join(' ').trim();
-
-      if (flags === 'true true') {
-        return res.status(400).json({ error: 'URL is blacklisted' });
-      }
-
-      continue; // Not blacklisted
-    }
-
-    if (result.startsWith('404 Not Found')) {
-      return res.status(400).json({ error: 'URL is blacklisted' });
-    }
-
-    return res.status(500).json({ error: 'Unexpected response from C++ server' });
+  const check = await containsBlacklistedUrl(`${subject} ${content}`);
+  if (check.error) {
+    return res.status(500).json({ error: `Unexpected response from C++ server for ${check.url}` });
+  }
+  if (check.blacklisted) {
+    return res.status(400).json({ error: `URL is blacklisted: ${check.url}` });
   }
 
   const mail = createMail(sender.id, to, subject.trim(), content.trim());
@@ -63,13 +72,23 @@ exports.getMailById = (req, res) => {
 };
 
 // PATCH /api/mails/:id
-exports.updateMail = (req, res) => {
+exports.updateMail = async (req, res) => {
   const mail = getMailById(req.params.id);
   if (!mail || mail.senderId !== req.user.id) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
 
   const { subject, content } = req.body;
+
+  const textToCheck = `${subject || ''} ${content || ''}`;
+  const check = await containsBlacklistedUrl(textToCheck);
+  if (check.error) {
+    return res.status(500).json({ error: `Unexpected response from C++ server for ${check.url}` });
+  }
+  if (check.blacklisted) {
+    return res.status(400).json({ error: `URL is blacklisted: ${check.url}` });
+  }
+
   if (subject) mail.subject = subject.trim();
   if (content) mail.content = content.trim();
   res.status(204).end();
