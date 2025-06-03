@@ -43,4 +43,3 @@ exports.deleteLabel = (req, res) => {
   labels.splice(index, 1);
   res.status(204).end();
 };
-//Setup: You’ll need a models/user.js like this: why?
