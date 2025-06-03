@@ -270,8 +270,7 @@ You may open a new terminal window and use `curl` to interact with the API.
 ## Jira Link
 
 Project planning and task tracking are managed in Jira.
-[**[Jira: GIT3 Project Board](https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT3/boards)**
-](https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT3/boards/100/timeline)
+https://yuvaltarno1337.atlassian.net/jira/software/projects/GIT3/boards/100/timeline
 ---
 
 ## Authors
