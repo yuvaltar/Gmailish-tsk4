@@ -1,4 +1,3 @@
-// web/middleware/auth.js
 // loads the list of users from memory from models
 const { users } = require('../models/user');
 // function that reads the user id from url and checks to find if exits
