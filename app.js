@@ -6,6 +6,8 @@ const app = express();
 // use that. Otherwise use 3000.
 const PORT = process.env.PORT || 3000;
 
+const cors = require('cors');
+app.use(cors());
 // Middleware to parse JSON request bodies into java script
 //  obect called req.body
 app.use(express.json());
