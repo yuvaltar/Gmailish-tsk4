@@ -297,11 +297,11 @@ Below is a curated list of key scenarios. Each screenshot demonstrates a critica
    *Shows `DELETE /api/labels/<LABEL_ID>` → **204 No Content**, followed by `GET /api/labels/<LABEL_ID>` → **404 Not Found**.*
 
 6. **Listing a URL to Blacklist and Error When Sending a Mail with It**  
-   ![8. Listing a URL to Blacklist and Error When Sending a Mail with It](screenshots/8.%20listing%20a%20url%20to%20black%20list%20and%20eror%20when%20sending%20a%20mail%20with%20it.png).  
+   ![8. Listing a URL to Blacklist and Error When Sending a Mail with It](screenshots/8.%20listing%20a%20url%20to%20black%20list%20and%20error%20sending%20a%20mail%20.png).  
    *Demonstrates `POST /api/blacklist` adding a malicious URL, then `POST /api/mails` failing due to Bloom filter rejection.*
 
 7. **Sending a Mail, Then Trying to Access It Without Proper Permission**  
-   ![9. Sending a Mail, Then Trying to Access It Without Proper Permission](screenshots/9.%20sending%20a%20mail%2C%20then%20trying%20to%20access%20it%20without%20proper%20permission.png).  
+   ![9. Sending a Mail, Then Trying to Access It Without Proper Permission](screenshots/9.%20sending%20a%20mail%2C%20then%20trying%20to%20update%20with%20blacklisted%20url%20.png).  
    *Alice sends a mail to Bob; Bob attempts `PATCH /api/mails/<MAIL_ID>` (which he did not send) → **403 Forbidden**.*
 
 ---
