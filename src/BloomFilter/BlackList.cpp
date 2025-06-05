@@ -1,36 +1,42 @@
-// BlackList.cpp
-#include "BlackList.h"         // Include header for BlackList class and dependencies
-#include <fstream>             // For file I/O (ifstream/ofstream)
-#include <algorithm>           // For std::find
+#include "BlackList.h"
+#include <fstream>
+#include <algorithm>
 
 // Add a URL to the blacklist
 void BlackList::addUrl(const URL& url) {
-    blacklist.push_back(url);  // Append the URL object to the list
+    std::lock_guard<std::mutex> lock(mtx);
+    blacklist.push_back(url);
 }
 
 // Check if the blacklist contains the given URL
 bool BlackList::contains(const URL& url) const {
-    return std::find(blacklist.begin(), blacklist.end(), url) != blacklist.end(); // Return true if found
+    std::lock_guard<std::mutex> lock(mtx);
+    return std::find(blacklist.begin(), blacklist.end(), url) != blacklist.end();
 }
 
 // Save all URLs in the blacklist to a file, one per line
 void BlackList::save(const std::string& path) const {
-    std::ofstream out(path);   // Open file for writing
-    for (const auto& url : blacklist) {    // Iterate over each URL in the blacklist
-        out << url.getURL() << "\n";       // Write URL string to file
+    std::lock_guard<std::mutex> lock(mtx);
+    std::ofstream out(path);
+    for (const auto& url : blacklist) {
+        out << url.getURL() << "\n";
     }
 }
 
 // Load URLs from a file and add them to the blacklist
 void BlackList::load(const std::string& path) {
-    std::ifstream in(path);    // Open file for reading
-    std::string line;          // Temporary string for reading each line
-    while (std::getline(in, line)) {       // Read file line by line
-        if (!line.empty()) {               // Skip empty lines
-            blacklist.emplace_back(line);  // Construct URL from string and add to list
+    std::lock_guard<std::mutex> lock(mtx);
+    std::ifstream in(path);
+    std::string line;
+    while (std::getline(in, line)) {
+        if (!line.empty()) {
+            blacklist.emplace_back(line);
         }
     }
 }
+
+// Remove a URL from the blacklist
 void BlackList::removeUrl(const URL& url) {
-    blacklist.remove(url);  // std::list::remove calls operator== on URL
+    std::lock_guard<std::mutex> lock(mtx);
+    blacklist.remove(url);
 }
