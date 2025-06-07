@@ -1,3 +1,4 @@
+//token controller
 const { findUserByCredentials } = require('../models/user');
 
 // POST /api/tokens
