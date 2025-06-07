@@ -1,20 +1,45 @@
-import React from "react";
-import { Card, Alert } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Card, Spinner, Alert } from "react-bootstrap";
 
-function MailView({ email }) {
-  if (!email) {
-    return <Alert variant="info">No email selected</Alert>;
-  }
+function MailView({ email: emailId }) {
+  const [mailData, setMailData] = useState(null); // will hold the email details
+  const [error, setError] = useState(null);        // if fetch fails
+
+  useEffect(() => {
+    if (!emailId) return;
+
+    // Fetch email by ID from the backend
+    const fetchEmail = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
+          headers: {
+            "X-User-Id": localStorage.getItem("userId") // server expects X-User-Id header
+          }
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch email");
+        const data = await response.json();
+        setMailData(data); // store email data in state
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchEmail();
+  }, [emailId]); // runs every time emailId changes
+
+  if (error) return <Alert variant="danger">Error: {error}</Alert>;
+  if (!mailData) return <Spinner animation="border" />;
 
   return (
     <Card>
       <Card.Header>
-        <strong>From:</strong> {email.from}<br />
-        <strong>Subject:</strong> {email.subject}<br />
-        <strong>Date:</strong> {email.date}
+        <strong>From:</strong> {mailData.senderId}<br />
+        <strong>To:</strong> {mailData.recipientId}<br />
+        <strong>Subject:</strong> {mailData.subject}<br />
       </Card.Header>
       <Card.Body>
-        <p>{email.body}</p>
+        <p>{mailData.content}</p>
       </Card.Body>
     </Card>
   );

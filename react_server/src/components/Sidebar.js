@@ -4,9 +4,12 @@ import { Button, ListGroup } from "react-bootstrap";
 function Sidebar() {
   return (
     <div className="d-flex flex-column h-100 p-2">
+      {/* Placeholder button for sending mail (should navigate to /send) */}
       <Button variant="primary" className="mb-3 w-100">
         Compose
       </Button>
+
+      {/* Sidebar sections */}
       <ListGroup variant="flush">
         <ListGroup.Item action active>Inbox</ListGroup.Item>
         <ListGroup.Item action>Starred</ListGroup.Item>
