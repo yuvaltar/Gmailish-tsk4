@@ -6,6 +6,7 @@ import Inbox from "./pages/Inbox";
 import SendMail from "./pages/SendMail";
 import Search from "./pages/Search";
 
+<h1>Hello</h1>
 function App() {
   return (
     <Router>
