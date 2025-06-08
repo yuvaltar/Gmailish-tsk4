@@ -5,18 +5,20 @@ import { useNavigate } from "react-router-dom";
 function Sidebar({ onComposeClick }) {
   const navigate = useNavigate();
 
+  const handleCompose = () => {
+    if (onComposeClick) onComposeClick();
+    navigate("/send");
+  };
+
   return (
-    <div className="d-flex flex-column h-100 p-2">
-      
+    <div className="d-flex flex-column h-100 p-2" style={{ minWidth: 180 }}>
       <Button
         variant="primary"
         className="mb-3 w-100"
-        onClick={onComposeClick} 
+        onClick={handleCompose}
       >
         Compose
       </Button>
-
-      {/* Sidebar sections with clickable navigation */}
       <ListGroup variant="flush">
         <ListGroup.Item action onClick={() => navigate("/inbox")}>Inbox</ListGroup.Item>
         <ListGroup.Item action onClick={() => navigate("/starred")}>Starred</ListGroup.Item>
