@@ -34,7 +34,7 @@ function Inbox() {
 
      
       {showCompose && (
-        <div style={composeBoxStyle}>
+        <div className="compose-box">
           <Compose onClose={() => setShowCompose(false)} />
         </div>
       )}
