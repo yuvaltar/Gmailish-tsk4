@@ -1,0 +1,17 @@
+/* Optional: Make email table rows more compact */
+.table td {
+  vertical-align: middle;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Optional: Add hover effect to sidebar items */
+.list-group-item:hover {
+  background-color: #e9ecef;
+  cursor: pointer;
+}
+
+/* Optional: Fix overflow in sidebar */
+.sidebar-scroll {
+  overflow-y: auto;
+}
