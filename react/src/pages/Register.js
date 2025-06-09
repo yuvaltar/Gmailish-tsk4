@@ -43,34 +43,34 @@ const Register = () => {
       setError("Please fill in all fields and upload a picture.");
       return;
     }
+    const formData = new FormData();
+    formData.append("firstName", form.firstName);
+    formData.append("lastName",  form.lastName);
+    formData.append("username",  form.username);
+    formData.append("gender",    form.gender);
+    formData.append("birthdate", form.birthdate);
+    formData.append("password",  form.password);
+    formData.append("picture",   form.picture);
 
-    const res = await fetch("http://localhost:3000/api/users", {
+   try {
+    // If you’ve set "proxy":"http://localhost:3000" in your React package.json
+    // you can fetch("/api/users") and CRA will forward to your server.
+     const res = await fetch("http://localhost:3000/api/users", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        username: form.username,
-        gender: form.gender,
-        password: form.password,
-        birthdate: form.birthdate
-      }),
+      body: formData,
     });
 
-    if (res.ok) {
-      const user = await res.json();
-      // user.id is the unique id
-      localStorage.setItem("userId", user.id);
-      // Optionally, store other user fields as needed
-      // localStorage.setItem("username", user.username);
-      // localStorage.setItem("profileImage", ...);
-      window.location.href = "/inbox";
-      navigate('/login');
-    } else {
-      const data = await res.json();
-      setError(data.error || "Registration failed");
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error || "Registration failed");
     }
-  };
+
+    // success! redirect to login for them to pick up a JWT
+    navigate("/login");
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   return (
     <div className="container mt-5">
