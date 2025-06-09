@@ -11,7 +11,14 @@ function Header() {
         className="form-control w-50"
         placeholder="Search mail"
       />
-
+      <button
+        onClick={() =>
+          document.body.classList.toggle("dark-mode")
+        }
+        className="btn btn-sm btn-outline-secondary"
+      >
+        🌓 Dark Mode
+      </button>
       {/* Default profile image (placeholder) */}
       <img
         src="https://www.gravatar.com/avatar?d=mp"
