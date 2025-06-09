@@ -65,6 +65,7 @@ const Register = () => {
       // localStorage.setItem("username", user.username);
       // localStorage.setItem("profileImage", ...);
       window.location.href = "/inbox";
+      navigate('/login');
     } else {
       const data = await res.json();
       setError(data.error || "Registration failed");

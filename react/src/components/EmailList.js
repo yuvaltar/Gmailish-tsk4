@@ -19,9 +19,11 @@ function EmailList({ setSelectedEmail }) {
     // Try to fetch from backend, fallback to mock
     const fetchEmails = async () => {
       try {
+        const token = localStorage.getItem('token');
         const res = await fetch("http://localhost:3000/api/mails", {
           headers: {
-            "X-User-Id": localStorage.getItem("userId") || "demo"
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
         });
         if (!res.ok) throw new Error("Failed to fetch mails");

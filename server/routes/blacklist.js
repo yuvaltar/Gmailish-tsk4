@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const blacklistController = require('../controllers/blacklistController');
+const { authenticate } = require('../middlewares/auth');
+router.use(authenticate); 
 
 // POST /api/blacklist - Add a URL to the blacklist
 router.post('/', blacklistController.addToBlacklist);

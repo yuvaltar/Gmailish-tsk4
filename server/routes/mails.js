@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mailsController = require('../controllers/mailsController');
-const requireAuth = require('../middleware/auth');
+const { authenticate } = require('../middlewares/auth');
+router.use(authenticate); 
 
 // All mail routes require authentication
 // meaning: he who calls /api/mails, must use requireAuth and pass it

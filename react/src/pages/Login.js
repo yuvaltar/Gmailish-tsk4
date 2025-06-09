@@ -7,13 +7,20 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock login logic
-    if (email === "test@gmail.com" && password === "password") {
-      navigate("/inbox");
-    } else {
-      setError("Invalid credentials");
+     try {
+     const res = await fetch(`${process.env.REACT_APP_API_URL}/api/tokens`, {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ username: email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      localStorage.setItem('token', data.token);
+      navigate('/inbox');
+    } catch (err) {
+     setError(err.message);
     }
   };
 

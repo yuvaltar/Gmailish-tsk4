@@ -18,9 +18,11 @@ function MailView({ email: emailId }) {
     if (!emailId) return;
     const fetchEmail = async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
           headers: {
-            "X-User-Id": localStorage.getItem("userId") || "demo"
+            'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
           }
         });
         if (!response.ok) throw new Error("Failed to fetch email");

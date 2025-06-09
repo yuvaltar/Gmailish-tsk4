@@ -1,10 +1,8 @@
-//token controller
+const jwt = require('jsonwebtoken');
 const { findUserByCredentials } = require('../models/user');
 
-// POST /api/tokens
 exports.login = (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password required' });
   }
@@ -14,6 +12,12 @@ exports.login = (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  // Client must send this ID in the header for all future requests
-  res.status(200).json({ userId: user.id });
+  // Create a signed JWT with a 1h expiry
+  const token = jwt.sign(
+    { userId: user.id },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+
+  res.status(200).json({ token });
 };
