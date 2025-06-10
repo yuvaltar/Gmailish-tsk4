@@ -11,6 +11,10 @@ function Inbox() {
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [showCompose, setShowCompose] = useState(false);
 
+  const handleBackToInbox = () => {
+    setSelectedEmail(null);
+  };
+
   return (
     <div className="container-fluid vh-100 d-flex flex-column p-0">
       <Header />
@@ -20,19 +24,15 @@ function Inbox() {
           <Sidebar onComposeClick={() => setShowCompose(true)} />
         </div>
 
-        <div className="col-10 p-0 d-flex">
-          <EmailList setSelectedEmail={setSelectedEmail} />
-          <div className="flex-grow-1 border-start p-3">
-            {selectedEmail ? (
-              <MailView email={selectedEmail} />
-            ) : (
-              <p className="text-muted">Select an email to view</p>
-            )}
-          </div>
+         <div className="col-10 p-0">
+          {selectedEmail ? (
+            <MailView emailId={selectedEmail} onBack={handleBackToInbox} />
+          ) : (
+            <EmailList setSelectedEmail={setSelectedEmail} />
+          )}
         </div>
       </div>
 
-     
       {showCompose && (
         <div className="compose-box">
           <Compose onClose={() => setShowCompose(false)} />

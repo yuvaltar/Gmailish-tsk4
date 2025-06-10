@@ -1,0 +1,10 @@
+.email-subject {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #202124;
+}
+.email-sender {
+  font-weight: 500;   /* Less bold than <strong> (which is 700) */
+  font-size: 0.9rem;  /* Smaller font size */
+  color: #202124;     /* Gmail-style dark text */
+}
