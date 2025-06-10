@@ -24,12 +24,13 @@ exports.registerUser = (req, res) => {
     return res.status(400).json({ error: 'Birthdate must be in YYYY-MM-DD format' });
   }
 
-  const newUser = createUser({ firstName, lastName, username, gender, password, birthdate, });
+  const newUser = createUser({ firstName, lastName, username, gender, password, birthdate,picturePath: picture.filename});
   if (!newUser) {
     return res.status(409).json({ error: 'Username already exists' });
   }
 
-  res.status(201).end();
+  console.log('Created user:', newUser);         // <-- for your server logs
+  res.status(201).json(newUser);                  // <-- send the user back
 };
 
 // GET /api/users/:id

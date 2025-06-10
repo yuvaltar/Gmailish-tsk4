@@ -5,7 +5,9 @@ const router = express.Router();
 const usersController = require('../controllers/usersController');
 
 // POST /api/users - register a new user
-router.post('/', upload.single('picture'), usersController.registerUser);
+router.post('/', 
+    upload.single('picture'),
+    usersController.registerUser);
 
 // GET /api/users/:id - fetch user info
 router.get('/:id', usersController.getUser);

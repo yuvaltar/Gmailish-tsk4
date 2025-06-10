@@ -39,41 +39,50 @@ const Register = () => {
       setError("Passwords do not match");
       return;
     }
-    if (!form.firstName || !form.lastName || !form.username || !form.gender || !form.birthdate || !form.picture) {
+    if (
+      !form.firstName ||
+      !form.lastName ||
+      !form.username ||
+      !form.gender ||
+      !form.birthdate ||
+      !form.picture
+    ) {
       setError("Please fill in all fields and upload a picture.");
       return;
     }
+
+    // Build FormData for multipart upload
     const formData = new FormData();
     formData.append("firstName", form.firstName);
-    formData.append("lastName",  form.lastName);
-    formData.append("username",  form.username);
-    formData.append("gender",    form.gender);
+    formData.append("lastName", form.lastName);
+    formData.append("username", form.username);
+    formData.append("gender", form.gender);
     formData.append("birthdate", form.birthdate);
-    formData.append("password",  form.password);
-    formData.append("picture",   form.picture);
+    formData.append("password", form.password);
+    formData.append("picture", form.picture);
 
-   try {
-    // If you’ve set "proxy":"http://localhost:3000" in your React package.json
-    // you can fetch("/api/users") and CRA will forward to your server.
-     const res = await fetch("http://localhost:3000/api/users", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      // CRA proxy to http://localhost:3000
+      const res = await fetch("/api/users", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (!res.ok) {
-      const { error } = await res.json();
-      throw new Error(error || "Registration failed");
+      if (!res.ok) {
+        const { error } = await res.json();
+        throw new Error(error || "Registration failed");
+      }
+
+      const user = await res.json();
+      alert(`Registration successful! Your email is: ${user.email}`);
+      navigate("/login");
+    } catch (err) {
+      setError(err.message);
     }
-
-    // success! redirect to login for them to pick up a JWT
-    navigate("/login");
-  } catch (err) {
-    setError(err.message);
-  }
-};
+  };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5" style={{ maxWidth: 400 }}>
       <h2>Register for Gmailish</h2>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <input
@@ -111,8 +120,10 @@ const Register = () => {
           required
         >
           <option value="">Select Gender</option>
-          {genders.map(g => (
-            <option key={g} value={g}>{g}</option>
+          {genders.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
           ))}
         </select>
         <input
@@ -151,14 +162,23 @@ const Register = () => {
           required
         />
         {preview && (
-          <div className="mb-2">
-            <img src={preview} alt="Preview" style={{ width: 80, height: 80, borderRadius: "50%" }} />
+          <div className="mb-2 text-center">
+            <img
+              src={preview}
+              alt="Preview"
+              style={{ width: 80, height: 80, borderRadius: "50%" }}
+            />
           </div>
         )}
         {error && <div className="alert alert-danger">{error}</div>}
-        <button className="btn btn-success w-100" type="submit">Register</button>
+        <button className="btn btn-success w-100" type="submit">
+          Register
+        </button>
       </form>
-      <button className="btn btn-link mt-2" onClick={() => navigate("/")}>
+      <button
+        className="btn btn-link mt-2 w-100"
+        onClick={() => navigate("/login")}
+      >
         Already have an account? Login
       </button>
     </div>
