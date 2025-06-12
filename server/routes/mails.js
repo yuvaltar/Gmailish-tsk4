@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const mailsController = require('../controllers/mailsController');
+
 const authenticate = require('../middleware/auth');
 router.use(authenticate); 
+
 
 // GET /api/mails - get 50 most recent mails
 router.get('/', mailsController.getInbox);

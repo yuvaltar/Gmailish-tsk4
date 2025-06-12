@@ -1,3 +1,4 @@
+
 const jwt = require('jsonwebtoken');
 const { getUserById } = require('../models/user');
 
@@ -25,3 +26,4 @@ function authenticate(req, res, next) {
 }
 
 module.exports = authenticate;
+

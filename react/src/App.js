@@ -11,7 +11,9 @@ function App() {
   return (
     <Router>
       <Routes>
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/send" element={<Compose />} />

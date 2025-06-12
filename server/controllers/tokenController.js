@@ -1,3 +1,4 @@
+
 const jwt = require("jsonwebtoken");
 const { findUserByCredentials } = require("../models/user");
 
@@ -20,4 +21,5 @@ exports.login = (req, res) => {
   );
 
   res.status(200).json({ token });
+
 };

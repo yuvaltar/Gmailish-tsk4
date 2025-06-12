@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const labelsController = require('../controllers/labelsController');
+
 const authenticate = require('../middleware/auth');
 router.use(authenticate); 
+
 
 // GET /api/labels - list all labels
 router.get('/', labelsController.getAllLabels);

@@ -7,6 +7,7 @@ import Compose from "../pages/Compose";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Inbox.css";
 
+
 function getUserIdFromToken() {
   try {
     const token = localStorage.getItem("token");
@@ -18,12 +19,15 @@ function getUserIdFromToken() {
   }
 }
 
+
 function Inbox() {
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [showCompose, setShowCompose] = useState(false);
 
+
   const userId = getUserIdFromToken();   
   console.log("Logged-in user:", userId);
+
 
   const handleBackToInbox = () => {
     setSelectedEmail(null);
@@ -70,4 +74,3 @@ const composeBoxStyle = {
 };
 
 export default Inbox;
-

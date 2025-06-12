@@ -14,9 +14,11 @@ function isValidDate(dateStr) {
 exports.registerUser = (req, res) => {
   const { firstName, lastName, username, gender, password, birthdate } = req.body;
 
+
   const picture = req.file;
 
    if (!firstName || !lastName || !username || !gender || !password || !birthdate || !picture) {
+
     return res.status(400).json({ error: 'All fields are required' });
   }
 
@@ -24,13 +26,17 @@ exports.registerUser = (req, res) => {
     return res.status(400).json({ error: 'Birthdate must be in YYYY-MM-DD format' });
   }
 
+
   const newUser = createUser({ firstName, lastName, username, gender, password, birthdate,picturePath: picture.filename});
+
   if (!newUser) {
     return res.status(409).json({ error: 'Username already exists' });
   }
 
+
   console.log('Created user:', newUser);         // <-- for your server logs
   res.status(201).json(newUser);                  // <-- send the user back
+
 };
 
 // GET /api/users/:id
@@ -40,6 +46,8 @@ exports.getUser = (req, res) => {
     return res.status(404).json({ error: 'User not found' });
   }
 
+
   const { id, firstName, lastName, username, gender, birthdate, picture } = user;
   res.status(200).json({ id, firstName, lastName, username, gender, birthdate, picture });
+
 };
