@@ -22,8 +22,9 @@
   },
   "homepage": "https://github.com/yuvaltar/Gmailish-tsk3#readme",
   "dependencies": {
-    "body-parser": "^2.2.0",
     "async-mutex": "^0.5.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
     "express": "^5.1.0"
   }
 }

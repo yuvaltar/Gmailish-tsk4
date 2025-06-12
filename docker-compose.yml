@@ -32,3 +32,14 @@ services:
       - "4000:4000"
     command: ["./server", "4000", "1024", "3", "5"]
     restart: unless-stopped
+
+  react:
+    build:
+      context: ./client-react
+    ports:
+      - "5173:3000"
+    working_dir: /app
+    volumes:
+      - ./client-react:/app
+    stdin_open: true
+    tty: true
