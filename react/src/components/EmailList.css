@@ -3,8 +3,18 @@
   font-weight: 400;
   color: #202124;
 }
+
 .email-sender {
   font-weight: 500;   /* Less bold than <strong> (which is 700) */
   font-size: 0.9rem;  /* Smaller font size */
   color: #202124;     /* Gmail-style dark text */
+}
+
+/* Dark mode styles for EmailList */
+.dark-mode .email-subject {
+  color: #e8eaed !important;
+}
+
+.dark-mode .email-sender {
+  color: #e8eaed !important;
 }

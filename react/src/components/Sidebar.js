@@ -26,25 +26,22 @@ function Sidebar({ onComposeClick }) {
       </Button>
 
       <ListGroup variant="flush">
-        {/* Labels Header */}
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/labels")}
-          className="d-flex justify-content-between align-items-center sidebar-labels-header"
-        >
-          <span className="fw-bold">Labels</span>
-          <Button
-            variant="link"
-            size="sm"
-            className="p-0 m-0 text-decoration-none sidebar-labels-add"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent route navigation
-              setShowLabelModal(true); // 🟢 show modal
-            }}
-          >
-            +
-          </Button>
-        </ListGroup.Item>
+            {/* Labels Header */}
+            <ListGroup.Item className="d-flex justify-content-between align-items-center sidebar-labels-header">
+      <span className="fw-bold">Labels</span>
+      <Button
+        variant="link"
+        size="sm"
+        className="p-0 m-0 text-decoration-none sidebar-labels-add"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowLabelModal(true);
+        }}
+      >
+        +
+      </Button>
+    </ListGroup.Item>
+
 
         {/* Menu Items */}
         <ListGroup.Item action onClick={() => navigate("/inbox")} className="sidebar-item">
