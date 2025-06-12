@@ -1,17 +1,27 @@
-// loads the list of users from memory from models
-const { users } = require('../models/user');
-// function that reads the user id from url and checks to find if exits
-function requireAuth(req, res, next) {
-  const userId = req.header('X-User-Id');
-  const user = users.find(u => u.id === userId);
-// if the user doesn't exist, it sends back a 401 Unauthorized error.
-  if (!user) {
-    return res.status(401).json({ error: 'Unauthorized' });
+const jwt = require('jsonwebtoken');
+const { getUserById } = require('../models/user');
+
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing or malformed Authorization header' });
   }
-// if the user is valid, it attaches that user object to req.user 
-// so that all your controllers can access it.
-  req.user = user; // Attach user object to request
-  next();
+
+  const token = authHeader.split(' ')[1];
+  try {
+    // Verify signature and expiry
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    // Lookup user by ID in payload
+    const user = getUserById(payload.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid token: user not found' });
+    }
+    // Attach full user object for downstream handlers
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 }
 
-module.exports = requireAuth;
+module.exports = authenticate;

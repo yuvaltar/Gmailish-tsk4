@@ -1,8 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const tokenController = require('../controllers/tokenController');
 
-// POST /api/tokens - login
-router.post('/', tokenController.login);
+
+const express         = require("express");
+const { login }       = require("../controllers/tokenController");
+
+const router = express.Router();
+
+// POST /api/tokens — authenticate and receive a JWT
+router.post("/", login);
 
 module.exports = router;

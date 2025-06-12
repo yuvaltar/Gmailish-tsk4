@@ -1,3 +1,4 @@
+
 /* Optional: Make email table rows more compact */
 .table td {
   vertical-align: middle;
@@ -221,4 +222,5 @@ body.dark-mode {
     right: 3vw;
     left: 37vw;
   }
+
 }

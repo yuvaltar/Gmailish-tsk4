@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const labelsController = require('../controllers/labelsController');
-const requireAuth = require('../middleware/auth');
 
-// All label routes require authentication
-router.use(requireAuth);
+const authenticate = require('../middleware/auth');
+router.use(authenticate); 
+
 
 // GET /api/labels - list all labels
 router.get('/', labelsController.getAllLabels);
