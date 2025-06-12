@@ -1,32 +1,50 @@
 const uuidv4 = require('../utils/uuid');
 const users = [];
 
-function createUser({ firstName, lastName, username, gender, password, birthdate }) {
+
+// Create a new user and add them to the in-memory array
+function createUser({ firstName, lastName, username, gender, password, birthdate, picturePath }) {
+
   // Check for duplicate username
   if (users.some(user => user.username === username)) {
     return null; // Username already taken
   }
+
+  
+  const email = `${username}@gmailish.com`;
+
 
   const user = {
     id: uuidv4(),
     firstName,
     lastName,
     username,
+
+    email,
     gender,
     password,
-    birthdate
+    birthdate,
+    picture: picturePath  // store the filename/path from Multer
+
   };
 
   users.push(user);
   return user;
 }
 
+
+// Find a user by their ID
+
 function getUserById(id) {
   return users.find(user => user.id === id);
 }
 
-function findUserByCredentials(username, password) {
-  return users.find(user => user.username === username && user.password === password);
+
+// Find a user by login credentials
+function findUserByCredentials(email, password) {
+  return users.find(user => user.email === email && user.password === password);
 }
+
+// Export everything
 
 module.exports = { users, createUser, getUserById, findUserByCredentials };

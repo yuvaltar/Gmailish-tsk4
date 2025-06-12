@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Table, Form } from "react-bootstrap";
 import './EmailList.css';
@@ -67,10 +68,12 @@ function EmailList({ setSelectedEmail }) {
             <th colSpan="3">Primary</th>
           </tr>
         </thead>
+
         <tbody>
           {emails.map((email) => (
             <tr
               key={email.id}
+
               onClick={() => setSelectedEmail(email.id)}
               style={{ cursor: "pointer" }}
               className={checkedEmails.has(email.id) ? 'table-primary' : ''}
@@ -88,6 +91,7 @@ function EmailList({ setSelectedEmail }) {
               <td className="email-sender">{email.senderId}</td>
               <td>{email.subject}</td>
               <td className="text-end pe-3">{new Date(email.timestamp).toLocaleDateString()}</td>
+
             </tr>
           ))}
         </tbody>

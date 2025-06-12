@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import { Card, Spinner, Alert, Button } from "react-bootstrap";
 
 // Mock database of email content
@@ -30,10 +31,12 @@ const mockEmailDatabase = [
 ];
 
 function MailView({ emailId, onBack }) {
+
   const [mailData, setMailData] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+
     // Reset state when emailId changes
     setMailData(null);
     setError(null);
@@ -73,6 +76,7 @@ function MailView({ emailId, onBack }) {
             </Card.Body>
         </Card>
     </div>
+
   );
 }
 

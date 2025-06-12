@@ -7,9 +7,27 @@ import Compose from "../pages/Compose";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Inbox.css";
 
+
+function getUserIdFromToken() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1])); // decode JWT payload
+    return payload.userId;
+  } catch (err) {
+    return null;
+  }
+}
+
+
 function Inbox() {
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [showCompose, setShowCompose] = useState(false);
+
+
+  const userId = getUserIdFromToken();   
+  console.log("Logged-in user:", userId);
+
 
   const handleBackToInbox = () => {
     setSelectedEmail(null);

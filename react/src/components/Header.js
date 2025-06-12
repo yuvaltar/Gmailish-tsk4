@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 
 function Header() {
@@ -14,10 +15,12 @@ function Header() {
       <h5 className="m-0">📧 Gmailish</h5>
 
       {/* Search bar (not yet connected) */}
+
       <input
         type="text"
         className="form-control w-50"
         placeholder="Search mail"
+
       />
       <button
         onClick={() => setDarkMode(!darkMode)}
@@ -25,6 +28,7 @@ function Header() {
       >
         {darkMode ? "🌓 Dark Mode" : "🌓 Light Mode"}
       </button>
+
       {/* Default profile image (placeholder) */}
       <img
         src="https://www.gravatar.com/avatar?d=mp"

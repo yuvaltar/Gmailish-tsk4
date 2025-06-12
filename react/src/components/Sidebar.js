@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import './Sidebar.css';
 import NewLabelModal from "./NewLabelModal";
@@ -80,8 +81,11 @@ function Sidebar({ onComposeClick }) {
 
       {/* Label Modal component (mounted once here) */}
       <NewLabelModal show={showLabelModal} onClose={() => setShowLabelModal(false)} />
+
     </div>
   );
 }
 
+
 export default Sidebar;
+
