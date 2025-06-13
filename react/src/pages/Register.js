@@ -62,7 +62,6 @@ const Register = () => {
     formData.append("picture", form.picture);
 
     try {
-      // CRA proxy to http://localhost:3000
       const res = await fetch("/api/users", {
         method: "POST",
         body: formData,
