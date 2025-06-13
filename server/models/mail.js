@@ -42,9 +42,15 @@ function getInboxForUser(userId) {
 function searchMails(userId, query) {
   return mails.filter(m =>
     (m.senderId === userId || m.recipientId === userId) &&
-    Object.values(m).some(val => typeof val === 'string' && val.includes(query))
+    (
+      (m.senderName && m.senderName.includes(query)) ||
+      (m.recipientName && m.recipientName.includes(query)) ||
+      (m.subject && m.subject.includes(query)) ||
+      (m.content && m.content.includes(query))
+    )
   );
 }
+
 
 function getEmailsByLabelName(labelName, userId) {
   return mails.filter(email =>
