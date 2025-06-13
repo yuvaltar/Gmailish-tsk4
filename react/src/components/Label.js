@@ -1,15 +1,35 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { isTokenValid } from "../utils/auth";
 
-function NewLabelModal({ show, onClose }) {
+function Label({ show, onClose, onCreate }) {
   const [labelName, setLabelName] = useState("");
 
-  const handleCreate = () => {
-    if (labelName.trim()) {
-      console.log("New label created:", labelName);
-      // TODO: send to backend or store state
+const handleCreate = async () => {
+  if (!isTokenValid()) {
+    alert("You must be logged in to create a label.");
+    return;
+  }
+
+  if (!labelName.trim()) return;
+
+  try {
+    const res = await fetch("/api/labels", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ name: labelName.trim() })
+      });
+
+      if (!res.ok) throw new Error("Label creation failed");
+
+      onCreate(labelName.trim());
       setLabelName("");
       onClose();
+    }catch (err) {
+      alert("Failed to create label: " + err.message);
     }
   };
 
@@ -51,4 +71,4 @@ function NewLabelModal({ show, onClose }) {
   );
 }
 
-export default NewLabelModal;
+export default Label;

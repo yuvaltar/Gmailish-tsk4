@@ -1,9 +1,9 @@
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './Sidebar.css';
-import NewLabelModal from "./NewLabelModal";
+import Label from "./Label";
 import { Button, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { isTokenValid } from "../utils/auth";
 import {
   BsInbox,
   BsStar,
@@ -14,7 +14,30 @@ import {
 
 function Sidebar({ onComposeClick }) {
   const navigate = useNavigate();
-  const [showLabelModal, setShowLabelModal] = useState(false); // 🟢 control modal
+  const [showLabelModal, setShowLabelModal] = useState(false);
+  const [customLabels, setCustomLabels] = useState([]); 
+
+  useEffect(() => {
+  const fetchLabels = async () => {
+    try {
+      const res = await fetch("/api/labels", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      const data = await res.json();
+      setCustomLabels(data.map((label) => label.name));
+    } catch (err) {
+      console.error("Failed to load labels:", err);
+    }
+  };
+
+  fetchLabels();
+}, []);
+
+  const addLabel = (newLabel) => {
+    setCustomLabels((prev) => [...prev, newLabel]);
+  };
 
   return (
     <div className="d-flex flex-column h-100 p-2 custom-sidebar">
@@ -39,15 +62,19 @@ function Sidebar({ onComposeClick }) {
             size="sm"
             className="p-0 m-0 text-decoration-none sidebar-labels-add"
             onClick={(e) => {
-              e.stopPropagation(); // Prevent route navigation
-              setShowLabelModal(true); // 🟢 show modal
+              e.stopPropagation();
+              if (!isTokenValid()) {
+                alert("Invalid JWT – please log in again.");
+                return;
+              }
+              setShowLabelModal(true);
             }}
           >
             +
           </Button>
         </ListGroup.Item>
 
-        {/* Menu Items */}
+        {/* Built-in menu items */}
         <ListGroup.Item action onClick={() => navigate("/inbox")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Inbox</span> <BsInbox />
@@ -77,15 +104,24 @@ function Sidebar({ onComposeClick }) {
             <span>Spam</span> <BsExclamationCircle />
           </div>
         </ListGroup.Item>
+
+        {/* Custom labels go here */}
+        {customLabels.map((label, index) => (
+          <ListGroup.Item key={index} className="sidebar-item">
+            <div className="d-flex align-items-center justify-content-between w-100">
+              <span>{label}</span>
+            </div>
+          </ListGroup.Item>
+        ))}
       </ListGroup>
 
-      {/* Label Modal component (mounted once here) */}
-      <NewLabelModal show={showLabelModal} onClose={() => setShowLabelModal(false)} />
-
+      {/* Label Modal */}
+      <Label
+        show={showLabelModal}
+        onClose={() => setShowLabelModal(false)}
+        onCreate={addLabel} // 🟢 pass the callback
+      />
     </div>
   );
 }
-
-
 export default Sidebar;
-
