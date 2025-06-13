@@ -4,21 +4,16 @@ import Register from "./pages/Register";
 import Inbox from "./pages/Inbox";
 import Search from "./pages/Search";
 import Compose from "./pages/Compose";
+import LabelPage from "./pages/LabelPage"; // ✅ new import
 import RequireAuth from "./components/RequireAuth";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* ✅ This line now dynamically checks token every render */}
         <Route
           path="/"
-          element={
-            <Navigate
-              to={localStorage.getItem("token") ? "/inbox" : "/login"}
-              replace
-            />
-          }
+          element= {<Login />}
         />
 
         {/* Public Routes */}
@@ -47,6 +42,16 @@ function App() {
           element={
             <RequireAuth>
               <Search />
+            </RequireAuth>
+          }
+        />
+
+        {/* ✅ New dynamic label route */}
+        <Route
+          path="/label/:labelName"
+          element={
+            <RequireAuth>
+              <LabelPage />
             </RequireAuth>
           }
         />

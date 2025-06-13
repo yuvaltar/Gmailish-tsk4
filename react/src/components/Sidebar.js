@@ -21,9 +21,7 @@ function Sidebar({ onComposeClick }) {
   const fetchLabels = async () => {
     try {
       const res = await fetch("/api/labels", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
+        credentials: "include"
       });
       const data = await res.json();
       setCustomLabels(data.map((label) => label.name));
@@ -63,10 +61,6 @@ function Sidebar({ onComposeClick }) {
             className="p-0 m-0 text-decoration-none sidebar-labels-add"
             onClick={(e) => {
               e.stopPropagation();
-              if (!isTokenValid()) {
-                alert("Invalid JWT – please log in again.");
-                return;
-              }
               setShowLabelModal(true);
             }}
           >
@@ -107,7 +101,12 @@ function Sidebar({ onComposeClick }) {
 
         {/* Custom labels go here */}
         {customLabels.map((label, index) => (
-          <ListGroup.Item key={index} className="sidebar-item">
+          <ListGroup.Item
+            key={index}
+            action
+            onClick={() => navigate(`/labels/${encodeURIComponent(label)}`)}
+            className="sidebar-item"
+          >
             <div className="d-flex align-items-center justify-content-between w-100">
               <span>{label}</span>
             </div>

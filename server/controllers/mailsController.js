@@ -5,7 +5,9 @@ const {
   getInboxForUser,
   searchMails
 } = require('../models/mail');
+const { mails } = require ('../models/mail');
 const { users } = require('../models/user');
+const uuidv4 = require('../utils/uuid');
 const { sendToCpp } = require('../services/blacklistService');
 
 // Helper function to check blacklisted URLs in given text
@@ -51,7 +53,19 @@ exports.sendMail = async (req, res) => {
     return res.status(400).json({ error: `URL is blacklisted: ${check.url}` });
   }
 
-  const mail = createMail(sender.id, to, subject.trim(), content.trim());
+  const mail = {
+  id: uuidv4(),
+  senderId: sender.id,
+  senderName: `${sender.firstName} ${sender.lastName}`,
+  recipientId: to,
+  recipientName: `${recipient.firstName} ${recipient.lastName}`,
+  subject: subject.trim(),
+  content: content.trim(),
+  timestamp: new Date().toISOString(),
+  labels: ["sent"] 
+};
+
+  mails.push(mail)
   res.status(201).json(mail);
 };
 
@@ -111,4 +125,34 @@ exports.searchMails = (req, res) => {
   const userId = req.user.id;
   const results = searchMails(userId, query);
   res.status(200).json(results);
+};
+
+exports.addLabelToEmail = (req, res) => {
+  const mailId = req.params.id;
+  const { label } = req.body;
+
+  if (!label || typeof label !== "string" || !label.trim()) {
+    return res.status(400).json({ error: "Label must be a non-empty string" });
+  }
+
+  const mail = getMailById(mailId);
+  if (!mail) {
+    return res.status(404).json({ error: "Email not found" });
+  }
+
+  // Only the sender or recipient can modify labels
+  const userId = req.user.id;
+  if (mail.senderId !== userId && mail.recipientId !== userId) {
+    return res.status(403).json({ error: "You are not authorized to label this email" });
+  }
+
+  if (!mail.labels) {
+    mail.labels = [];
+  }
+
+  if (!mail.labels.includes(label)) {
+    mail.labels.push(label);
+  }
+
+  res.status(200).json({ message: `Label '${label}' added`, mail });
 };
