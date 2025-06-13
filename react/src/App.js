@@ -1,22 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Inbox from "./pages/Inbox";
 import Search from "./pages/Search";
 import Compose from "./pages/Compose";
-import LabelPage from "./pages/LabelPage"; // ✅ new import
-import RequireAuth from "./components/RequireAuth";
+import LabelPage from "./pages/LabelPage";
+import ProtectedRoute from "./utils/ProtectedRoute"; // Use your utils/ProtectedRoute
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element= {<Login />}
-        />
-
         {/* Public Routes */}
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -24,35 +20,33 @@ function App() {
         <Route
           path="/inbox"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <Inbox />
-            </RequireAuth>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/send"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <Compose />
-            </RequireAuth>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/search"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <Search />
-            </RequireAuth>
+            </ProtectedRoute>
           }
         />
-
-        {/* ✅ New dynamic label route */}
         <Route
           path="/label/:labelName"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <LabelPage />
-            </RequireAuth>
+            </ProtectedRoute>
           }
         />
       </Routes>
