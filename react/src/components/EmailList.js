@@ -2,34 +2,33 @@ import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
 import './EmailList.css';
 
-function EmailList({ setSelectedEmail }) {
+function EmailList({ setSelectedEmail, emails: propEmails }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
 
   useEffect(() => {
+    // If emails are passed as a prop (e.g., search results), use them
+    if (propEmails) {
+      setEmails(propEmails);
+      return;
+    }
+    // Otherwise, fetch inbox as usual
     const fetchEmails = async () => {
       try {
-        const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:3000/api/mails", {
           credentials: "include"
         });
-
-        // ✅ If request fails (e.g. 401), throw
         if (!res.ok) throw new Error("Unauthorized");
-
         const data = await res.json();
-
-        // ✅ Ensure we only set emails if the data is an array
         if (!Array.isArray(data)) throw new Error("Invalid data type");
-
         setEmails(data);
       } catch (err) {
         console.error("Failed to fetch mails:", err.message);
-        setEmails([]); // 🛡️ fallback to empty to avoid .map crash
+        setEmails([]);
       }
     };
     fetchEmails();
-  }, []);
+  }, [propEmails]);
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);

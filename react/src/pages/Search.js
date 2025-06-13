@@ -1,50 +1,150 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { BsSearch } from "react-icons/bs";
+import '../components/Header.css';
 
-const mockEmails = [
-  { id: 1, subject: "Welcome!", sender: "admin@gmail.com", body: "Hello and welcome!" },
-  { id: 2, subject: "React Project", sender: "team@gmail.com", body: "Let's build something great." },
-  // ...add more mock emails as needed
-];
-
-const Search = () => {
+function Header() {
+  const [darkMode, setDarkMode] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [user, setUser] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef();
+  const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Simple search in mock emails
-    const filtered = mockEmails.filter(
-      email =>
-        email.subject.toLowerCase().includes(query.toLowerCase()) ||
-        email.sender.toLowerCase().includes(query.toLowerCase()) ||
-        email.body.toLowerCase().includes(query.toLowerCase())
-    );
-    setResults(filtered);
+  useEffect(() => {
+    document.body.classList.toggle("dark-mode", darkMode);
+  }, [darkMode]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/tokens/me", {
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => setUser(data))
+      .catch(err => console.error("User fetch error", err));
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
   };
 
+  // NEW: Call backend and navigate to /search with results
+  const performSearch = async () => {
+    if (!query.trim()) return;
+    try {
+      const res = await fetch(`http://localhost:3000/api/mails/search/${encodeURIComponent(query)}`, {
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Search failed");
+      const results = await res.json();
+      navigate("/search", { state: { results, query } });
+    } catch (err) {
+      alert("Search failed: " + err.message);
+    }
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      performSearch();
+    }
+  };
+
+  const gmailishEmail = user?.username ? `${user.username}@gmailish.com` : "";
+
   return (
-    <div className="container mt-5">
-      <h2>Search Emails</h2>
-      <form onSubmit={handleSearch}>
+    <div className="d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-white">
+      <h5
+        className="m-0"
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate("/inbox")}
+        title="Go to Inbox"
+      >
+        📧 Gmailish
+      </h5>
+
+      <div className="search-bar-container position-relative w-50 me-3">
+        <button
+          className="search-icon-btn"
+          onClick={performSearch}
+          type="button"
+        >
+          <BsSearch />
+        </button>
         <input
           type="text"
-          placeholder="Search by subject, sender, or body"
-          className="form-control mb-2"
+          className="form-control ps-5"
+          placeholder="Search mail"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleSearch}
         />
-        <button className="btn btn-primary" type="submit">Search</button>
-      </form>
-      <ul className="list-group mt-3">
-        {results.map(email => (
-          <li key={email.id} className="list-group-item">
-            <strong>{email.subject}</strong> from {email.sender}
-            <div>{email.body}</div>
-          </li>
-        ))}
-      </ul>
+      </div>
+
+      <button
+        onClick={() => setDarkMode(!darkMode)}
+        className={`btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"}`}
+      >
+        {darkMode ? "🌓 Dark Mode" : "🌓 Light Mode"}
+      </button>
+
+      <div
+        className="position-relative ms-3"
+        ref={menuRef}
+        style={{ display: "inline-block" }}
+      >
+        <img
+          src={
+            user?.picture
+              ? `http://localhost:3000/uploads/${user.picture}`
+              : "https://www.gravatar.com/avatar?d=mp"
+          }
+          alt="Profile"
+          className="rounded-circle"
+          style={{ width: "32px", height: "32px", cursor: "pointer" }}
+          onClick={() => setShowMenu((show) => !show)}
+        />
+        {showMenu && (
+          <div
+            className="dropdown-menu show"
+            style={{
+              position: "absolute",
+              right: 0,
+              top: "110%",
+              minWidth: "180px",
+              zIndex: 1000
+            }}
+          >
+            <div className="dropdown-item-text text-muted small">
+              {gmailishEmail}
+            </div>
+            <button
+              className="dropdown-item"
+              onClick={() => {
+                setShowMenu(false);
+                navigate("/register");
+              }}
+            >
+              Register
+            </button>
+            <button className="dropdown-item" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
+}
 
-export default Search;
+export default Header;
