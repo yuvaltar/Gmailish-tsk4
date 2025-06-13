@@ -11,9 +11,7 @@ function EmailList({ setSelectedEmail }) {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:3000/api/mails", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          credentials: "include"
         });
 
         // ✅ If request fails (e.g. 401), throw

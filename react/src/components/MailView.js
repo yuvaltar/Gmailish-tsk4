@@ -13,11 +13,8 @@ function MailView({ emailId, onBack }) {
 
     const fetchMail = async () => {
       try {
-        const token = localStorage.getItem("token");
         const res = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include"
         });
 
         if (!res.ok) {

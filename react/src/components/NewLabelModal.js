@@ -4,12 +4,27 @@ import { Modal, Button, Form } from "react-bootstrap";
 function NewLabelModal({ show, onClose }) {
   const [labelName, setLabelName] = useState("");
 
-  const handleCreate = () => {
-    if (labelName.trim()) {
-      console.log("New label created:", labelName);
-      // TODO: send to backend or store state
+  const handleCreate = async () => {
+    if (!labelName.trim()) return;
+
+    try {
+      const res = await fetch("http://localhost:3000/api/labels", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({ name: labelName.trim() })
+      });
+
+      if (!res.ok) throw new Error("Failed to create label");
+
+      console.log("Label created successfully");
       setLabelName("");
       onClose();
+    } catch (err) {
+      console.error("Label creation error:", err);
+      alert("Failed to create label");
     }
   };
 

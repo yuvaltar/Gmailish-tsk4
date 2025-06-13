@@ -10,15 +10,13 @@ function Compose({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
 
     try {
       // STEP 1: Fetch user ID by email
       const userRes = await fetch(`http://localhost:3000/api/users/by-email/${encodeURIComponent(to)}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        credentials: "include"
       });
+
       if (!userRes.ok) throw new Error("Recipient not found");
       const { id: recipientId } = await userRes.json();
 
@@ -26,9 +24,9 @@ function Compose({ onClose }) {
       const mailRes = await fetch("http://localhost:3000/api/mails", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({ to: recipientId, subject, content: body })
       });
 
