@@ -1,3 +1,5 @@
+const auth = require('../middleware/auth');
+
 const express = require('express');
 const multer  = require('multer');
 const router = express.Router();
@@ -8,6 +10,7 @@ const upload = multer({ dest: 'uploads/' });
 router.post('/', upload.single('picture'), usersController.registerUser);
 router.get('/:id', usersController.getUser);
 
+router.get("/by-email/:email", auth, usersController.getUserIdByEmail);
 router.get('/:id/picture', usersController.getUserPicture);
 
 module.exports = router;
