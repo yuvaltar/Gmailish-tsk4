@@ -60,4 +60,20 @@ exports.getUserIdByEmail = (req, res) => {
   res.json({ id: user.id });
 
 };
+// GET /api/users/:id/picture
+exports.getUserPicture = (req, res) => {
+  const user = getUserById(req.params.id);
+  if (!user || !user.picturePath) {
+    return res.status(404).json({ error: "User or picture not found" });
+  }
 
+  const picturePath = path.join(__dirname, "../uploads", user.picturePath);
+
+  // Check if file exists before sending
+  fs.access(picturePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).json({ error: "Picture file not found" });
+    }
+    res.sendFile(picturePath);
+  });
+};

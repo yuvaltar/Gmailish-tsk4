@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
 import './Header.css';
-import axios from "axios";
+
 
 function Header({ onSearch }) {
   const [darkMode, setDarkMode] = useState(false);
@@ -15,9 +15,12 @@ function Header({ onSearch }) {
   }, [darkMode]);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/api/users/${userId}`)
-      .then(res => setUser(res.data))
-      .catch(err => console.error("User fetch error", err));
+  fetch(`http://localhost:3000/api/users/${userId}`, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => setUser(data))
+    .catch((err) => console.error("User fetch error", err));
   }, [userId]);
 
   const handleSearch = (e) => {
