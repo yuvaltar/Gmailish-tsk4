@@ -1,4 +1,3 @@
-
 const jwt = require("jsonwebtoken");
 const { findUserByCredentials } = require("../models/user");
 
@@ -13,8 +12,7 @@ exports.login = (req, res) => {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  // Sign a JWT valid for 1 hour
-const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
     expiresIn: "2h",
   });
 
@@ -26,8 +24,7 @@ const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
       maxAge: 2 * 60 * 60 * 1000,
     })
     .json({ message: "Login successful" });
-
-  res.status(200).json({ token });
+};
 
 exports.getCurrentUser = (req, res) => {
   if (!req.user) {

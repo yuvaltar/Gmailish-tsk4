@@ -1,5 +1,5 @@
 .custom-sidebar .list-group-item {
-    color: rgba(0, 0, 0, 0.87);
+  color: rgba(0, 0, 0, 0.87);
   display: flex;
   align-items: center;
   font-size: 0.95rem;
@@ -7,7 +7,6 @@
   border: none;
   background-color: transparent;
   transition: background-color 0.2s ease;
-  
 }
 
 .custom-sidebar .list-group-item:hover {
@@ -19,25 +18,29 @@
 .custom-sidebar .list-group-item svg {
   font-size: 1.1rem;
 }
+
 .sidebar-labels-header {
   font-size: 0.95rem;
   font-weight: 500;
   background-color: transparent !important;
   border-bottom: 1px solid #ddd;
-  cursor: pointer;
+  cursor: default !important;
 }
 
 .sidebar-labels-add {
   font-size: 1.3rem;
   color: #007bff;
 }
+
 .modal-content {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
 .modal-title {
   font-size: 1.1rem;
 }
+
 .sidebar-labels-add {
   width: 25px;
   height: 25px;
@@ -51,7 +54,7 @@
   transition: background-color 0.2s ease;
   cursor: pointer;
   line-height: 1;
-  margin-left: 6px; /* אופציונלי – כדי לרווח מהטקסט */
+  margin-left: 6px;
   vertical-align: middle; /* אם זה בתוך שורת טקסט */
 }
 
@@ -59,3 +62,34 @@
   background-color: #e0e0e0;
 }
 
+/* Dark mode styles */
+.dark-mode .custom-sidebar .list-group-item {
+  color: #e8eaed;
+}
+
+.dark-mode .custom-sidebar .list-group-item:hover {
+  background-color: #3c4043 !important;
+  color: #e8eaed !important;
+}
+
+.dark-mode .sidebar-labels-header {
+  color: #e8eaed;
+  border-bottom: 1px solid #5f6368;
+}
+
+.dark-mode .sidebar-labels-add {
+  color: #8ab4f8;
+}
+
+.dark-mode .sidebar-labels-add:hover {
+  background-color: #3c4043;
+}
+
+.dark-mode .modal-content {
+  background-color: #2b2c2e;
+  color: #e8eaed;
+  border-color: #5f6368;
+}
+.dark-mode .sidebar-labels-header:hover {
+  background-color: transparent !important;
+}

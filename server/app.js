@@ -1,38 +1,41 @@
-// Load Express and create a server
+require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
 
-require('dotenv').config();
-
-const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const usersRouter = require('./routes/users');
 
+app.use(cors({
+  origin: "http://localhost:3001",  // React frontend
+  credentials: true
+}));
 
-const cors = require('cors');
-app.use(cors());
-
-// Middleware to parse JSON request bodies
+app.use(cookieParser());
 app.use(express.json());
 
-// Route registration
-app.use('/api/blacklist', require('./routes/blacklist'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/mails', require('./routes/mails'));
-app.use('/api/labels', require('./routes/labels'));
-app.use('/api/tokens', require('./routes/tokens'));
-app.use("/api", usersRouter);
+// 🔥 Fix: serve static files from uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Routes
+app.use("/api/blacklist", require("./routes/blacklist"));
+app.use("/api/users", require("./routes/users"));
+app.use("/api/mails", require("./routes/mails"));
+app.use("/api/labels", require("./routes/labels"));
+app.use("/api/tokens", require("./routes/tokens"));
 
-// 404 handler for unknown routes (JSON only)
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// Static React build (optional)
+app.use(express.static(path.join(__dirname, "../react/build")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../react/build/index.html"));
 });
 
-app.get('/ping', (req, res) => {
-  res.json({ msg: 'pong' });
+app.get("/ping", (req, res) => {
+  res.json({ msg: "pong" });
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

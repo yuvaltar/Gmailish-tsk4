@@ -1,9 +1,10 @@
 const uuidv4 = require('../utils/uuid');
+
 const users = [];
 
 
 // Create a new user and add them to the in-memory array
-function createUser({ firstName, lastName, username, gender, password, birthdate, picturePath }) {
+function createUser({ firstName, lastName, username, gender, password, birthdate, picture }) {
 
   // Check for duplicate username
   if (users.some(user => user.username === username)) {
@@ -24,7 +25,7 @@ function createUser({ firstName, lastName, username, gender, password, birthdate
     gender,
     password,
     birthdate,
-    picture: picturePath  // store the filename/path from Multer
+    picture: picture  // store the filename/path from Multer
 
   };
 

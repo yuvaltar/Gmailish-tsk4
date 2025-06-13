@@ -1,3 +1,4 @@
+
 /* Optional: Make email table rows more compact */
 .table td {
   vertical-align: middle;
@@ -15,6 +16,7 @@
 .sidebar-scroll {
   overflow-y: auto;
 }
+
 .compose-box {
   position: fixed;
   bottom: 20px;
@@ -26,6 +28,7 @@
   z-index: 1050;
   width: 40vw; /* Default for xl+ */
 }
+
 .compose-popup {
   position: fixed;
   bottom: 20px;
@@ -46,6 +49,7 @@
   border-top-right-radius: 10px;
   font-size: 0.95rem;
 }
+
 .compose-expanded {
   top: 50px;
   left: 50%;
@@ -69,6 +73,8 @@
   flex-grow: 1;
   resize: none;
 }
+
+/* Dark mode styles */
 body.dark-mode {
   background-color: #202124;
   color: #e8eaed;
@@ -92,6 +98,7 @@ body.dark-mode {
   color: #e8eaed;
   border: 1px solid #5f6368;
 }
+
 .dark-mode .bg-light {
   background-color: #2b2c2e !important;
 }
@@ -108,6 +115,7 @@ body.dark-mode {
 .dark-mode .list-group-item:hover {
   background-color: #3c4043;
 }
+
 .dark-mode .navbar,
 .dark-mode .bg-white {
   background-color: #2b2c2e !important;
@@ -120,7 +128,79 @@ body.dark-mode {
   border: 1px solid #5f6368;
 }
 
+.dark-mode .card {
+  background-color: #2b2c2e;
+  color: #e8eaed;
+  border-color: #5f6368;
+}
 
+.dark-mode .card-header {
+  background-color: #3c4043;
+  border-bottom: 1px solid #5f6368;
+  color: #e8eaed;
+}
+
+.dark-mode .card-body {
+  color: #e8eaed;
+}
+
+.dark-mode .btn-light {
+  background-color: #3c4043;
+  color: #e8eaed;
+  border: 1px solid #5f6368;
+}
+
+/* Dark mode styles for EmailList table */
+.dark-mode .table {
+  background-color: #202124;
+  color: #e8eaed;
+}
+
+.dark-mode .table th {
+  background-color: #2b2c2e;
+  color: #e8eaed;
+  border-color: #5f6368;
+}
+
+.dark-mode .table td {
+  background-color: #202124;
+  color: #e8eaed;
+  border-color: #5f6368;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+  background-color: #3c4043 !important;
+}
+
+.dark-mode .table-primary {
+  background-color: #1a73e8 !important;
+  color: white !important;
+}
+
+.dark-mode .email-sender {
+  color: #e8eaed !important;
+}
+
+.dark-mode .email-subject {
+  color: #e8eaed !important;
+}
+
+/* Fix for MailView background in dark mode */
+.dark-mode .col-10 {
+  background-color: #202124 !important;
+}
+
+/* Alternative: Add a specific class for mail view container */
+.mail-view-container {
+  background-color: white;
+  min-height: 100%;
+}
+
+.dark-mode .mail-view-container {
+  background-color: #202124 !important;
+}
+
+/* Media queries */
 /* Large (≥992px and <1200px) */
 @media (max-width: 1199.98px) {
   .compose-box {
@@ -142,4 +222,5 @@ body.dark-mode {
     right: 3vw;
     left: 37vw;
   }
+
 }
