@@ -5,9 +5,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-
-
+const usersRouter = require('./routes/users');
 
 
 const cors = require('cors');
@@ -22,6 +20,8 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/mails', require('./routes/mails'));
 app.use('/api/labels', require('./routes/labels'));
 app.use('/api/tokens', require('./routes/tokens'));
+app.use("/api", usersRouter);
+
 
 // 404 handler for unknown routes (JSON only)
 app.use((req, res) => {

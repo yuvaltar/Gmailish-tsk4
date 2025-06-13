@@ -1,0 +1,39 @@
+.search-bar-container {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #757575;
+  font-size: 1.1rem;
+  z-index: 2;
+}
+.search-bar-container {
+  position: relative;
+}
+
+.search-icon-btn {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s ease;
+}
+
+.search-icon-btn:hover {
+  background-color: #f1f3f4; /* Gmail-like light gray */
+}
+
+.search-icon-btn svg {
+  color: #5f6368;
+  font-size: 1.2rem;
+}

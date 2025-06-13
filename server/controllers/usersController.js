@@ -1,4 +1,7 @@
 const { createUser, getUserById } = require('../models/user');
+const path = require('path');
+const fs = require("fs");
+
 
 function isValidDate(dateStr) {
   // Check format YYYY-MM-DD using regex
@@ -51,3 +54,19 @@ exports.getUser = (req, res) => {
   res.status(200).json({ id, firstName, lastName, username, gender, birthdate, picture });
 
 };
+exports.getUserPicture = (req, res) => {
+  const user = getUserById(req.params.id);
+  if (!user || !user.picturePath) {
+    return res.status(404).json({ error: "User or picture not found" });
+  }
+
+  const picturePath = path.join(__dirname, "../uploads", user.picture);
+
+  // Check if file exists before sending
+  fs.access(picturePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).json({ error: "Picture file not found" });
+    }
+    res.sendFile(picturePath);
+  });
+}
