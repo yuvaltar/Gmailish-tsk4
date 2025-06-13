@@ -30,7 +30,7 @@ exports.registerUser = (req, res) => {
   }
 
 
-  const newUser = createUser({ firstName, lastName, username, gender, password, birthdate,picturePath: picture.filename});
+  const newUser = createUser({ firstName, lastName, username, gender, password, birthdate,picture: picture.filename});
 
   if (!newUser) {
     return res.status(409).json({ error: 'Username already exists' });
@@ -54,9 +54,17 @@ exports.getUser = (req, res) => {
   res.status(200).json({ id, firstName, lastName, username, gender, birthdate, picture });
 
 };
+
+exports.getUserIdByEmail = (req, res) => {
+  const { users } = require('../models/user');
+  const user = users.find(u => u.email === req.params.email);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json({ id: user.id });
+};
+
 exports.getUserPicture = (req, res) => {
   const user = getUserById(req.params.id);
-  if (!user || !user.picturePath) {
+  if (!user || !user.picture) {
     return res.status(404).json({ error: "User or picture not found" });
   }
 
