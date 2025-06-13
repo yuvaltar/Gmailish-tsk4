@@ -1,38 +1,38 @@
-// Load Express and create a server
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
 
-require('dotenv').config();
-
-const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Keep port 3000 for serving both backend and React
 
-
-
-
-
-const cors = require('cors');
+// Enable CORS and JSON parsing
 app.use(cors());
-
-// Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Route registration
-app.use('/api/blacklist', require('./routes/blacklist'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/mails', require('./routes/mails'));
-app.use('/api/labels', require('./routes/labels'));
-app.use('/api/tokens', require('./routes/tokens'));
+// API route registration
+app.use("/api/blacklist", require("./routes/blacklist"));
+app.use("/api/users", require("./routes/users"));
+app.use("/api/mails", require("./routes/mails"));
+app.use("/api/labels", require("./routes/labels"));
+app.use("/api/tokens", require("./routes/tokens"));
 
-// 404 handler for unknown routes (JSON only)
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// Serve static React build
+app.use(express.static(path.join(__dirname, "../react/build")));
+
+// Root path serves React app (React will redirect based on token)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../react/build/index.html"));
 });
 
-app.get('/ping', (req, res) => {
-  res.json({ msg: 'pong' });
+
+
+// Optional: remove or keep this
+app.get("/ping", (req, res) => {
+  res.json({ msg: "pong" });
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

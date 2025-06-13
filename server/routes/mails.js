@@ -11,6 +11,8 @@ router.get('/', mailsController.getInbox);
 
 // POST /api/mails - send a new mail
 router.post('/', mailsController.sendMail);
+// GET /api/mails/search/:query - search mails
+router.get('/search/:query', mailsController.searchMails);
 
 // GET /api/mails/:id - get specific mail
 router.get('/:id', mailsController.getMailById);
@@ -21,8 +23,7 @@ router.patch('/:id', mailsController.updateMail);
 // DELETE /api/mails/:id - delete mail
 router.delete('/:id', mailsController.deleteMail);
 
-// GET /api/mails/search/:query - search mails
-router.get('/search/:query', mailsController.searchMails);
+
 
 module.exports = router;
 

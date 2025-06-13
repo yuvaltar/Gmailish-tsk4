@@ -1,3 +1,5 @@
+const auth = require('../middleware/auth');
+
 const express = require('express');
 
 const multer  = require('multer');
@@ -15,5 +17,7 @@ router.post('/',
 
 // GET /api/users/:id - fetch user info
 router.get('/:id', usersController.getUser);
+
+router.get("/by-email/:email", auth, usersController.getUserIdByEmail);
 
 module.exports = router;

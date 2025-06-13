@@ -1,30 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
 import './EmailList.css';
 
 function EmailList({ setSelectedEmail }) {
-  const [emails] = useState([
-    {
-      id: '1',
-      senderId: 'Google Photos',
-      subject: 'A new highlight video for you',
-      timestamp: new Date(2025, 5, 10, 10, 44, 0).toISOString(),
-    },
-    {
-      id: '2',
-      senderId: 'GitHub',
-      subject: '[GitHub] A personal access token was added to your account',
-      timestamp: new Date(2025, 5, 9, 11, 20, 0).toISOString(),
-    },
-    {
-      id: '3',
-      senderId: 'Figma',
-      subject: 'Your weekly team updates and new files',
-      timestamp: new Date(2025, 5, 8, 16, 5, 0).toISOString(),
-    },
-  ]);
-
+  const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3000/api/mails", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        // ✅ If request fails (e.g. 401), throw
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const data = await res.json();
+
+        // ✅ Ensure we only set emails if the data is an array
+        if (!Array.isArray(data)) throw new Error("Invalid data type");
+
+        setEmails(data);
+      } catch (err) {
+        console.error("Failed to fetch mails:", err.message);
+        setEmails([]); // 🛡️ fallback to empty to avoid .map crash
+      }
+    };
+    fetchEmails();
+  }, []);
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
@@ -68,7 +75,7 @@ function EmailList({ setSelectedEmail }) {
                   onChange={() => handleCheckboxChange(email.id)}
                 />
               </td>
-              <td className="email-sender">{email.senderId}</td>
+              <td className="email-sender">{email.senderName || email.senderId}</td>
               <td className="email-subject">{email.subject}</td>
               <td className="text-end pe-3">
                 {new Date(email.timestamp).toLocaleDateString()}
@@ -82,4 +89,3 @@ function EmailList({ setSelectedEmail }) {
 }
 
 export default EmailList;
-
