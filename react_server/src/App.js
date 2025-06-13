@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Inbox from "./pages/Inbox";
-import SendMail from "./pages/SendMail";
 import Search from "./pages/Search";
+import Compose from './pages/Compose';
+
 
 function App() {
   return (
@@ -13,8 +14,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/inbox" element={<Inbox />} />
-        <Route path="/send" element={<SendMail />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/send" element={<Compose />} />
+        <Route path="/search" element={<Search />} /> 
       </Routes>
     </Router>
   );

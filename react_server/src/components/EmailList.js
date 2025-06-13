@@ -1,59 +1,62 @@
+// React core hooks
 import React, { useState, useEffect } from "react";
-import { Table } from "react-bootstrap";
+import { Table, Spinner, Alert } from "react-bootstrap";
 
-console.log(" EmailList.js is being used ");
+// fallback mock data
+const mockEmails = [
+  { id: 1, senderId: "admin@gmail.com", subject: "Welcome!", timestamp: Date.now() },
+  { id: 2, senderId: "team@gmail.com", subject: "React Project", timestamp: Date.now() - 86400000 },
+];
 
 function EmailList({ setSelectedEmail }) {
+  // useState to store emails fetched from the backend
   const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
+  // useEffect runs once when the component loads
   useEffect(() => {
-    // For now, simulate a "fetch" with dummy data:
-    const dummyEmails = [
-      {
-        id: 1,
-        from: "GitHub",
-        subject: "Update",
-        body: "Your pull request was merged successfully!",
-        date: "Jun 5"
-      },
-      {
-        id: 2,
-        from: "GitHub",
-        subject: "Update",
-        body: "Your pull request was merged successfully!",
-        date: "Jun 5"
-      },
-      {
-        id: 3,
-        from: "McAfee",
-        subject: "You're at risk!",
-        body: "Your antivirus subscription has expired.",
-        date: "Jun 5"
+    // Try to fetch from backend, fallback to mock
+    const fetchEmails = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/mails", {
+          headers: {
+            "X-User-Id": localStorage.getItem("userId") || "demo"
+          }
+        });
+        if (!res.ok) throw new Error("Failed to fetch mails");
+        const data = await res.json();
+        setEmails(data);
+      } catch (err) {
+        setEmails(mockEmails);
+        setError("Showing mock emails (backend not available)");
+      } finally {
+        setLoading(false);
       }
-    ];
-    setEmails(dummyEmails);
-  }, []); // empty dependency array = run once on mount
+    };
+    fetchEmails();
+  }, []);
 
+  if (loading) return <Spinner animation="border" />;
   return (
-    <div className="w-50 p-3">
-    <h1 style={{ color: "red" }}>🔥 THIS IS A TEST 🔥</h1>
-    <div className="w-50 p-3">
+    <div className="w-100 p-3">
+      <h3>Inbox</h3>
+      {error && <Alert variant="warning">{error}</Alert>}
       <Table hover>
         <tbody>
           {emails.map((email) => (
             <tr
               key={email.id}
-              onClick={() => setSelectedEmail(email.id)}
+              onClick={() => setSelectedEmail && setSelectedEmail(email.id)}
               style={{ cursor: "pointer" }}
             >
-              <td><strong>{email.from}</strong></td>
+              <td><strong>{email.senderId}</strong></td>
               <td>{email.subject}</td>
-              <td className="text-end">{email.date}</td>
+              <td className="text-end">{new Date(email.timestamp).toLocaleDateString()}</td>
             </tr>
           ))}
         </tbody>
       </Table>
-    </div>
     </div>
   );
 }
