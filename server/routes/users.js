@@ -1,19 +1,13 @@
 const express = require('express');
-
 const multer  = require('multer');
-const upload  = multer({ dest: 'uploads/' });
-
 const router = express.Router();
 const usersController = require('../controllers/usersController');
 
-// POST /api/users - register a new user
+const upload = multer({ dest: 'uploads/' });
 
-router.post('/', 
-    upload.single('picture'),
-    usersController.registerUser);
-
-
-// GET /api/users/:id - fetch user info
+router.post('/', upload.single('picture'), usersController.registerUser);
 router.get('/:id', usersController.getUser);
+
+router.get('/:id/picture', usersController.getUserPicture);
 
 module.exports = router;
