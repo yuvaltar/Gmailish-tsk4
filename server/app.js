@@ -15,7 +15,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-// 🔥 Fix: serve static files from uploads
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes

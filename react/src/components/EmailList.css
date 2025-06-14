@@ -18,3 +18,37 @@
 .dark-mode .email-sender {
   color: #e8eaed !important;
 }
+.email-toolbar .gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 26px;
+  height: 26px;
+  font-size: 1.3rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.email-toolbar .gmail-icon-btn:hover {
+  background-color: rgba(60, 64, 67, 0.1); /* light gray for light mode */
+}
+
+.email-toolbar .gmail-icon-btn svg {
+  color: #5f6368; /* icon color in light mode */
+}
+
+/* Dark mode override */
+body.dark-mode .email-toolbar .gmail-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* transparent white in dark mode */
+}
+
+body.dark-mode .email-toolbar .gmail-icon-btn svg {
+  color: #e8eaed; /* icon color in dark mode */
+}
+/* Force native checkbox to show correctly */
+input[type="checkbox"] {
+  all: revert;
+}

@@ -224,3 +224,33 @@ body.dark-mode {
   }
 
 }
+.gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.gmail-icon-btn:hover {
+  background-color: rgba(60, 64, 67, 0.1); /* light gray circle */
+}
+
+.gmail-icon-btn i {
+  color: #5f6368;
+  pointer-events: none;
+}
+
+.dark-mode .gmail-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .gmail-icon-btn i {
+  color: #e8eaed;
+}
