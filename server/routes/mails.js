@@ -20,6 +20,10 @@ router.get('/:id', mailsController.getMailById);
 // PATCH /api/mails/:id - edit mail
 router.patch('/:id', mailsController.updateMail);
 
+// route to assign a label to an email
+
+router.patch('/:id/label', mailsController.addLabelToEmail);
+
 // DELETE /api/mails/:id - delete mail
 router.delete('/:id', mailsController.deleteMail);
 
@@ -27,5 +31,3 @@ router.delete('/:id', mailsController.deleteMail);
 
 module.exports = router;
 
-// optional - if i only want post to use auth.js
-// router.post('/', requireAuth, mailsController.sendMail);

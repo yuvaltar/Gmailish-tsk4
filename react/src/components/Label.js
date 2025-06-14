@@ -1,30 +1,36 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
-function NewLabelModal({ show, onClose }) {
+function Label({ show, onClose, onCreate }) {
   const [labelName, setLabelName] = useState("");
 
   const handleCreate = async () => {
     if (!labelName.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:3000/api/labels", {
+      const res = await fetch("/api/labels", {
         method: "POST",
+        credentials: "include", // ✅ Send cookie
         headers: {
           "Content-Type": "application/json"
         },
-        credentials: "include",
         body: JSON.stringify({ name: labelName.trim() })
       });
 
-      if (!res.ok) throw new Error("Failed to create label");
+      if (!res.ok) {
+        if (res.status === 401) {
+          alert("You must be logged in to create a label.");
+        } else {
+          throw new Error("Label creation failed");
+        }
+        return;
+      }
 
-      console.log("Label created successfully");
+      onCreate(labelName.trim());
       setLabelName("");
       onClose();
     } catch (err) {
-      console.error("Label creation error:", err);
-      alert("Failed to create label");
+      alert("Failed to create label: " + err.message);
     }
   };
 
@@ -66,4 +72,4 @@ function NewLabelModal({ show, onClose }) {
   );
 }
 
-export default NewLabelModal;
+export default Label;

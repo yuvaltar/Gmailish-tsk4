@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -11,15 +10,31 @@ import "./Inbox.css";
 function Inbox() {
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [showCompose, setShowCompose] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
 
-  const handleBackToInbox = () => {
-    setSelectedEmail(null);
+  // This function is passed to Header and called on search
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults(null); // Show inbox if search is empty
+      return;
+    }
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/mails/search/${encodeURIComponent(query)}`,
+        { credentials: "include" }
+      );
+      if (!res.ok) throw new Error("Search failed");
+      const results = await res.json();
+      setSearchResults(results);
+    } catch (err) {
+      alert("Search failed: " + err.message);
+      setSearchResults([]); // Show empty results on error
+    }
   };
 
   return (
     <div className="container-fluid vh-100 d-flex flex-column p-0">
-      {/* Search bar still visible for now, but not functional */}
-      <Header onSearch={() => {}} />
+      <Header onSearch={handleSearch} />
 
       <div className="row flex-grow-1 m-0">
         <div className="col-2 border-end p-0 bg-light">
@@ -28,9 +43,13 @@ function Inbox() {
 
         <div className="col-10 p-0">
           {selectedEmail ? (
-            <MailView emailId={selectedEmail} onBack={handleBackToInbox} />
+            <MailView emailId={selectedEmail} onBack={() => setSelectedEmail(null)} />
           ) : (
-            <EmailList setSelectedEmail={setSelectedEmail} />
+            // Pass searchResults to EmailList if present, otherwise let EmailList fetch inbox
+            <EmailList
+              setSelectedEmail={setSelectedEmail}
+              emails={searchResults}
+            />
           )}
         </div>
       </div>

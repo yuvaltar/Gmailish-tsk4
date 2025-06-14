@@ -1,18 +1,21 @@
-.email-subject {
-  font-size: 0.9rem;
-  font-weight: 400;
-  color: #202124;
+.email-list-table {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(60,64,67,0.07);
+  margin-top: 1.5rem;
+  width: 100%;
+  overflow: hidden;
 }
 
-.email-sender {
-  font-weight: 500;   /* Less bold than <strong> (which is 700) */
-  font-size: 0.9rem;  /* Smaller font size */
-  color: #202124;     /* Gmail-style dark text */
+.email-list-table th, .email-list-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
 }
 
-/* Dark mode styles for EmailList */
-.dark-mode .email-subject {
-  color: #e8eaed !important;
+.email-list-table tr:hover {
+  background: #f1f3f4;
+  cursor: pointer;
 }
 
 .dark-mode .email-sender {
@@ -51,4 +54,5 @@ body.dark-mode .email-toolbar .gmail-icon-btn svg {
 /* Force native checkbox to show correctly */
 input[type="checkbox"] {
   all: revert;
+
 }

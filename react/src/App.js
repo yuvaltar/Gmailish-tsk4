@@ -1,27 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Inbox from "./pages/Inbox";
 import Search from "./pages/Search";
 import Compose from "./pages/Compose";
-import RequireAuth from "./components/RequireAuth";
+import LabelPage from "./pages/LabelPage";
+import ProtectedRoute from "./utils/ProtectedRoute"; // Use your utils/ProtectedRoute
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* ✅ This line now dynamically checks token every render */}
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to={localStorage.getItem("token") ? "/inbox" : "/login"}
-              replace
-            />
-          }
-        />
-
         {/* Public Routes */}
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -29,25 +20,33 @@ function App() {
         <Route
           path="/inbox"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <Inbox />
-            </RequireAuth>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/send"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <Compose />
-            </RequireAuth>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/search"
           element={
-            <RequireAuth>
+            <ProtectedRoute>
               <Search />
-            </RequireAuth>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/label/:labelName"
+          element={
+            <ProtectedRoute>
+              <LabelPage />
+            </ProtectedRoute>
           }
         />
       </Routes>

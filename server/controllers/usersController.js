@@ -78,3 +78,4 @@ exports.getUserPicture = (req, res) => {
     res.sendFile(picturePath);
   });
 }
+
