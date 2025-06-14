@@ -9,7 +9,9 @@ import {
   BsStar,
   BsSend,
   BsFileEarmarkText,
-  BsExclamationCircle
+  BsExclamationCircle,
+  BsArchive,
+  BsTrash
 } from "react-icons/bs";
 
 function Sidebar({ onComposeClick }) {
@@ -75,11 +77,7 @@ function Sidebar({ onComposeClick }) {
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item action onClick={() => navigate("/starred")} className="sidebar-item">
-          <div className="d-flex align-items-center justify-content-between w-100">
-            <span>Starred</span> <BsStar />
-          </div>
-        </ListGroup.Item>
+        
 
         <ListGroup.Item action onClick={() => navigate("/sent")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
@@ -92,10 +90,25 @@ function Sidebar({ onComposeClick }) {
             <span>Drafts</span> <BsFileEarmarkText />
           </div>
         </ListGroup.Item>
+        <ListGroup.Item action onClick={() => navigate("/Archive")} className="sidebar-item">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Arcive</span> <BsArchive />
+          </div>
+        </ListGroup.Item>
+        <ListGroup.Item action onClick={() => navigate("/starred")} className="sidebar-item">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Starred</span> <BsStar />
+          </div>
+        </ListGroup.Item>
 
         <ListGroup.Item action onClick={() => navigate("/spam")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Spam</span> <BsExclamationCircle />
+          </div>
+        </ListGroup.Item>
+        <ListGroup.Item action onClick={() => navigate("/trash")} className="sidebar-item">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>trash</span> <BsTrash />
           </div>
         </ListGroup.Item>
 

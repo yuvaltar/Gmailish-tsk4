@@ -254,3 +254,10 @@ body.dark-mode {
 .dark-mode .gmail-icon-btn i {
   color: #e8eaed;
 }
+.gmail-icon-btn svg {
+  color: #5f6368;
+}
+
+.dark-mode .gmail-icon-btn svg {
+  color: #e8eaed;
+}
