@@ -63,17 +63,17 @@ function MailView({ emailId, onBack }) {
       <button className="gmail-icon-btn" onClick={handleArchive} title="Archive">
         <BsArchive size={18} />
       </button>
-      <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
-        <BsExclamationCircle size={18} />
-      </button>
-      <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
-        <BsTrash size={18} />
+      <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
+        <BsTag size={18} />
       </button>
       <button className="gmail-icon-btn" onClick={handleStar} title="Star">
         <BsStar size={18} />
       </button>
-      <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
-        <BsTag size={18} />
+       <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
+        <BsExclamationCircle size={18} />
+      </button>
+      <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
+        <BsTrash size={18} />
       </button>
     </div>
 
