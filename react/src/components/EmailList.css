@@ -1,7 +1,7 @@
 .email-list-table {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(60,64,67,0.07);
+  box-shadow: 0 2px 8px rgba(60, 64, 67, 0.07);
   margin-top: 1.5rem;
   width: 100%;
   overflow: hidden;
@@ -18,15 +18,19 @@
   cursor: pointer;
 }
 
-.dark-mode .email-sender {
-  color: #e8eaed !important;
+.email-toolbar {
+  gap: 6px;
+  padding: 0.25rem 0.5rem;
+  background-color: #fff;
+  border-bottom: 1px solid #dadce0;
 }
+
 .email-toolbar .gmail-icon-btn {
   background: none;
   border: none;
-  width: 26px;
-  height: 26px;
-  font-size: 1.3rem;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -36,23 +40,101 @@
 }
 
 .email-toolbar .gmail-icon-btn:hover {
-  background-color: rgba(60, 64, 67, 0.1); /* light gray for light mode */
+  background-color: rgba(60, 64, 67, 0.1);
 }
 
 .email-toolbar .gmail-icon-btn svg {
-  color: #5f6368; /* icon color in light mode */
+  color: #5f6368;
 }
 
-/* Dark mode override */
+body.dark-mode .email-toolbar {
+  background-color: #202124;
+  border-bottom-color: #3c4043;
+}
+
 body.dark-mode .email-toolbar .gmail-icon-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* transparent white in dark mode */
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 body.dark-mode .email-toolbar .gmail-icon-btn svg {
-  color: #e8eaed; /* icon color in dark mode */
+  color: #e8eaed;
 }
-/* Force native checkbox to show correctly */
+
 input[type="checkbox"] {
   all: revert;
+}
 
+.star-cell {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.star-filled {
+  color: #fbbc04;
+  font-size: 1rem;
+}
+
+.star-empty {
+  color: #c0c0c0;
+  font-size: 1rem;
+}
+
+.star-cell:hover .star-empty {
+  color: #888;
+}
+
+body.dark-mode .star-empty {
+  color: #888;
+}
+
+body.dark-mode .star-filled {
+  color: #fbbc04;
+}
+
+body.dark-mode .table-primary td {
+  background-color: #3a3d42 !important;
+  color: #e8eaed !important;
+}
+
+/* Snippet Cell Styles */
+.email-snippet-cell {
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sender-name,
+.subject-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.sender-name {
+  font-weight: 500;
+  color: #202124;
+  font-size: 0.95rem;
+  max-width: 200px;
+}
+
+.subject-line {
+  font-size: 0.85rem;
+  color: #5f6368;
+  max-width: 360px;
+}
+
+body.dark-mode .sender-name {
+  color: #e8eaed;
+}
+
+body.dark-mode .subject-line {
+  color: #9aa0a6;
+}
+
+/* Align end cells */
+.text-end {
+  vertical-align: middle;
 }

@@ -105,25 +105,27 @@ function MailView({ emailId, onBack }) {
     <div className="p-3 mail-view-container" style={{ position: "relative" }}>
       {/* Gmail-style top toolbar */}
       <div className="mail-toolbar d-flex align-items-center gap-2 mb-3">
-        <button className="gmail-icon-btn" onClick={onBack} title="Back to Inbox">
-          <BsArrowLeft size={18} />
-        </button>
-        <button className="gmail-icon-btn" onClick={handleArchive} title="Archive">
-          <BsArchive size={18} />
-        </button>
-        <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
-          <BsExclamationCircle size={18} />
-        </button>
-        <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
-          <BsTrash size={18} />
-        </button>
-        <button className="gmail-icon-btn" onClick={handleStar} title="Star">
-          <BsStar size={18} />
-        </button>
-        <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
-          <BsTag size={18} />
-        </button>
-      </div>
+
+      <button className="gmail-icon-btn" onClick={onBack} title="Back to Inbox">
+        <BsArrowLeft size={18} />
+      </button>
+      <button className="gmail-icon-btn" onClick={handleArchive} title="Archive">
+        <BsArchive size={18} />
+      </button>
+      <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
+        <BsTag size={18} />
+      </button>
+      <button className="gmail-icon-btn" onClick={handleStar} title="Star">
+        <BsStar size={18} />
+      </button>
+       <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
+        <BsExclamationCircle size={18} />
+      </button>
+      <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
+        <BsTrash size={18} />
+      </button>
+    </div>
+
 
       {/* Label Picker Dropdown */}
       {showLabels && (

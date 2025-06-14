@@ -27,10 +27,31 @@
 .sidebar-item,
 .sidebar-labels-header {
   color: #444;
-  border-radius: 0 24px 24px 0;
+  border-radius: 0 24px 24px 0;  /* Keep this for all items */
   margin-bottom: 4px;
   padding: 0.6rem 1.5rem;
   transition: background 0.2s, color 0.2s;
+}
+.custom-sidebar .list-group .list-group-item:first-child {
+  border-radius: 24px !important; /* All corners rounded */
+}
+
+.custom-sidebar .list-group .list-group-item:last-child {
+  border-radius: 0 24px 24px 0 !important; /* ✨ Only right side rounded */
+}
+/* Dark mode border line under Labels */
+body.dark-mode .sidebar-labels-header {
+  background: #fcfdfd !important;
+  border: 1px solid #c6ccd1 !important; /* 🔥 full white-ish border */
+  border-radius: 24px !important;       /* keeps pill shape */
+  padding: 0.6rem 1.5rem;
+  margin-bottom: 4px;
+}
+
+
+/* Dark mode border line under Spam */
+body.dark-mode .sidebar-item:last-child {
+  border-bottom: 1px solid #fcfdfd !important;
 }
 
 .sidebar-item:hover,

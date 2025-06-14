@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, ArrowsFullscreen } from "react-bootstrap-icons";
+import "./Compose.css";
 
 function Compose({ onClose }) {
   const [minimized, setMinimized] = useState(false);
@@ -82,33 +83,30 @@ function Compose({ onClose }) {
       </div>
 
       {!minimized && (
-        <form className="p-3 pt-0" onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Recipients (email)"
-            className="form-control mb-2"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Subject"
-            className="form-control mb-2"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            required
-          />
-          <textarea
-            className="form-control mb-2"
-            placeholder="Body"
-            rows="6"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            required
-          />
-          <button type="submit" className="btn btn-sm btn-primary">Send</button>
-        </form>
+        <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
+  <input
+    type="email"
+    placeholder="To"
+    value={to}
+    onChange={(e) => setTo(e.target.value)}
+  />
+  <input
+    type="text"
+    placeholder="Subject"
+    value={subject}
+    onChange={(e) => setSubject(e.target.value)}
+  />
+  <textarea
+    placeholder="Write your message..."
+    value={body}
+    onChange={(e) => setBody(e.target.value)}
+  ></textarea>
+  <div className="compose-footer">
+    <button type="submit" className="btn-send">Send</button>
+    {/* Optionally add icons like attach, emoji etc */}
+  </div>
+</form>
+
       )}
     </div>
   );
