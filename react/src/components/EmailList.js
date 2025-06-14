@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+
 import { Table, Form, Button } from "react-bootstrap";
 import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
 import "./EmailList.css";
+
 
 function EmailList({ setSelectedEmail, emails: propEmails }) {
   const [emails, setEmails] = useState([]);
@@ -30,23 +32,6 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
     fetchEmails();
   }, [propEmails]);
 
-  const handleDelete = async (emailId) => {
-    if (!window.confirm("Are you sure you want to delete this email?")) return;
-    try {
-      const res = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (res.status === 204) {
-        setEmails(emails.filter((email) => email.id !== emailId));
-      } else {
-        const data = await res.json();
-        alert(data.error || "Failed to delete email.");
-      }
-    } catch (err) {
-      alert("Failed to delete email: " + err.message);
-    }
-  };
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
@@ -55,7 +40,9 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
   };
 
   const handleSelectAll = (e) => {
+
     setCheckedEmails(e.target.checked ? new Set(emails.map((e) => e.id)) : new Set());
+
   };
 
   const handleMarkAllAsRead = async () => {
@@ -82,13 +69,16 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
 
   return (
     <div className="w-100 p-0">
+
       <div className="email-toolbar d-flex align-items-center ps-1 py-0.1 border-bottom">
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
           <Form.Check
+
             type="checkbox"
             checked={isAllSelected}
             onChange={handleSelectAll}
           />
+
           <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh inbox">
             <BsArrowClockwise size={18} />
           </button>
@@ -99,6 +89,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
       </div>
 
       <Table hover className="mb-0">
+
         <tbody>
           {emails.map((email) => (
             <tr
@@ -107,6 +98,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
               className={checkedEmails.has(email.id) ? "table-primary" : ""}
               style={{ cursor: "pointer" }}
             >
+
               <td className="ps-3" onClick={(e) => e.stopPropagation()}>
                 <div className="email-checkbox-star d-flex align-items-center gap-2">
                   <Form.Check
@@ -145,7 +137,9 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
                 >
                   Delete
                 </Button>
+
               </td>
+              {/* Delete button removed */}
             </tr>
           ))}
         </tbody>

@@ -5,7 +5,7 @@ const {
   getInboxForUser,
   searchMails
 } = require('../models/mail');
-const { mails } = require ('../models/mail');
+const { mails } = require('../models/mail');
 const { users } = require('../models/user');
 const uuidv4 = require('../utils/uuid');
 const { sendToCpp } = require('../services/blacklistService');
@@ -54,18 +54,18 @@ exports.sendMail = async (req, res) => {
   }
 
   const mail = {
-  id: uuidv4(),
-  senderId: sender.id,
-  senderName: `${sender.firstName} ${sender.lastName}`,
-  recipientId: to,
-  recipientName: `${recipient.firstName} ${recipient.lastName}`,
-  subject: subject.trim(),
-  content: content.trim(),
-  timestamp: new Date().toISOString(),
-  labels: ["sent"] 
-};
+    id: uuidv4(),
+    senderId: sender.id,
+    senderName: `${sender.firstName} ${sender.lastName}`,
+    recipientId: to,
+    recipientName: `${recipient.firstName} ${recipient.lastName}`,
+    subject: subject.trim(),
+    content: content.trim(),
+    timestamp: new Date().toISOString(),
+    labels: ["sent"]
+  };
 
-  mails.push(mail)
+  mails.push(mail);
   res.status(201).json(mail);
 };
 
@@ -111,7 +111,8 @@ exports.updateMail = async (req, res) => {
 // DELETE /api/mails/:id
 exports.deleteMail = (req, res) => {
   const mail = getMailById(req.params.id);
-  if (!mail || mail.senderId !== req.user.id) {
+  // ALLOW BOTH SENDER AND RECIPIENT TO DELETE
+  if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
 

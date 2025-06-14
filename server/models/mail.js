@@ -3,21 +3,24 @@ const { users } = require('./user'); // 👈 make sure this is present
 
 const mails = [];
 
+// Create a mail with both "sent" and "inbox" labels for sender and recipient filtering
 function createMail(senderId, recipientId, subject, content) {
   const sender = users.find(u => u.id === senderId);
   const recipient = users.find(u => u.id === recipientId);
 
-  const mail = {
-    id: uuidv4(),
-    senderId,
-    senderName: sender ? `${sender.firstName} ${sender.lastName}` : "Unknown",
-    recipientId,
-    recipientName: recipient ? `${recipient.firstName} ${recipient.lastName}` : "Unknown",
-    subject,
-    content,
-    timestamp: new Date().toISOString(),
-    labels: [senderId ? "sent" : "inbox"],
-  };
+const mail = {
+  id: uuidv4(),
+  senderId,
+  senderName: sender ? sender.username : "Unknown", // Use username only
+  recipientId,
+  recipientName: recipient ? recipient.username : "Unknown", // Use username only
+  subject,
+  content,
+  timestamp: new Date().toISOString(),
+  labels: ["sent", "inbox"],
+};
+
+
 
   mails.push(mail);
   return mail;
@@ -51,10 +54,11 @@ function searchMails(userId, query) {
   );
 }
 
-
+// Fix: getEmailsByLabelName should return mails for user as sender or recipient
 function getEmailsByLabelName(labelName, userId) {
   return mails.filter(email =>
-    email.labels?.includes(labelName) && email.userId === userId
+    email.labels?.includes(labelName) &&
+    (email.senderId === userId || email.recipientId === userId)
   );
 }
 
