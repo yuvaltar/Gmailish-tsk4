@@ -1,95 +1,98 @@
-.custom-sidebar .list-group-item {
-  color: rgba(0, 0, 0, 0.87);
-  display: flex;
-  align-items: center;
-  font-size: 0.95rem;
-  padding: 10px 12px;
-  border: none;
-  background-color: transparent;
-  transition: background-color 0.2s ease;
+/* Light mode (default) */
+.custom-sidebar {
+  background: #f6f8fc;
+  color: #444;
+  border-right: 1px solid #e0e0e0;
+  min-width: 220px;
+  height: 100vh;
+  padding: 1rem 0;
 }
 
-.custom-sidebar .list-group-item:hover {
-  background-color: #f1f3f4;
+.compose-btn, .btn-primary {
+  background: #1a73e8 !important;
+  color: #fff !important;
+  border-radius: 24px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: bold !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 1px 4px rgba(26,115,232,0.1);
+  border: none !important;
+  transition: background 0.2s;
+}
+
+.compose-btn:hover, .btn-primary:hover {
+  background: #1765c1 !important;
+}
+
+.sidebar-item,
+.sidebar-labels-header {
+  color: #444;
+  border-radius: 0 24px 24px 0;
+  margin-bottom: 4px;
+  padding: 0.6rem 1.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-item:hover,
+.sidebar-labels-header:hover {
+  background: #e8f0fe;
+  color: #1a73e8;
   cursor: pointer;
-  border-radius: 20px;
-}
-
-.custom-sidebar .list-group-item svg {
-  font-size: 1.1rem;
 }
 
 .sidebar-labels-header {
-  font-size: 0.95rem;
-  font-weight: 500;
-  background-color: transparent !important;
-  border-bottom: 1px solid #ddd;
-  cursor: default !important;
+  font-weight: bold;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .sidebar-labels-add {
-  font-size: 1.3rem;
-  color: #007bff;
+  color: #1a73e8 !important;
+  font-size: 1.3em;
+  margin-left: 0.5em;
 }
 
-.modal-content {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.sidebar-item.active {
+  background: #e8f0fe;
+  color: #1a73e8;
 }
 
-.modal-title {
-  font-size: 1.1rem;
+/* --- DARK MODE --- */
+body.dark-mode .custom-sidebar {
+  background: #181a1b;
+  color: #fff;
+  border-right: 1px solid #23272a;
 }
 
-.sidebar-labels-add {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background-color: transparent;
-  color: #007bff;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
-  line-height: 1;
-  margin-left: 6px;
-  vertical-align: middle; /* אם זה בתוך שורת טקסט */
+body.dark-mode .sidebar-item,
+body.dark-mode .sidebar-labels-header {
+  color: #bbb !important;
+  background: transparent !important;
 }
 
-.sidebar-labels-add:hover {
-  background-color: #e0e0e0;
+body.dark-mode .sidebar-item:hover,
+body.dark-mode .sidebar-labels-header:hover {
+  background: #23272a !important;
+  color: #fff !important;
 }
 
-/* Dark mode styles */
-.dark-mode .custom-sidebar .list-group-item {
-  color: #e8eaed;
+body.dark-mode .sidebar-labels-header {
+  background: #181a1b !important;
+  border-bottom: 1px solid #23272a;
 }
 
-.dark-mode .custom-sidebar .list-group-item:hover {
-  background-color: #3c4043 !important;
-  color: #e8eaed !important;
+body.dark-mode .sidebar-labels-add {
+  color: #8ab4f8 !important;
 }
 
-.dark-mode .sidebar-labels-header {
-  color: #e8eaed;
-  border-bottom: 1px solid #5f6368;
+body.dark-mode .compose-btn,
+body.dark-mode .btn-primary {
+  background: #1a73e8 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 4px rgba(26,115,232,0.18);
 }
 
-.dark-mode .sidebar-labels-add {
-  color: #8ab4f8;
-}
-
-.dark-mode .sidebar-labels-add:hover {
-  background-color: #3c4043;
-}
-
-.dark-mode .modal-content {
-  background-color: #2b2c2e;
-  color: #e8eaed;
-  border-color: #5f6368;
-}
-.dark-mode .sidebar-labels-header:hover {
-  background-color: transparent !important;
+body.dark-mode .sidebar-item.active {
+  background: #23272a !important;
+  color: #8ab4f8 !important;
 }

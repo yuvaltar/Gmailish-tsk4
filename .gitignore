@@ -52,3 +52,6 @@ main.exe
 .idea/
 # ignoring mouduls
 node_modules/
+
+# ignore picture uploads    
+server/uploads/

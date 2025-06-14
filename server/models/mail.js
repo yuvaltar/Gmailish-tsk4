@@ -16,6 +16,7 @@ function createMail(senderId, recipientId, subject, content) {
     subject,
     content,
     timestamp: new Date().toISOString(),
+    labels: [senderId ? "sent" : "inbox"],
   };
 
   mails.push(mail);
@@ -33,7 +34,7 @@ function deleteMailById(id) {
 
 function getInboxForUser(userId) {
   return mails
-    .filter(m => m.senderId === userId || m.recipientId === userId)
+    .filter(m => m.recipientId === userId)
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
@@ -41,7 +42,19 @@ function getInboxForUser(userId) {
 function searchMails(userId, query) {
   return mails.filter(m =>
     (m.senderId === userId || m.recipientId === userId) &&
-    Object.values(m).some(val => typeof val === 'string' && val.includes(query))
+    (
+      (m.senderName && m.senderName.includes(query)) ||
+      (m.recipientName && m.recipientName.includes(query)) ||
+      (m.subject && m.subject.includes(query)) ||
+      (m.content && m.content.includes(query))
+    )
+  );
+}
+
+
+function getEmailsByLabelName(labelName, userId) {
+  return mails.filter(email =>
+    email.labels?.includes(labelName) && email.userId === userId
   );
 }
 
@@ -51,5 +64,6 @@ module.exports = {
   getMailById,
   deleteMailById,
   getInboxForUser,
-  searchMails
+  searchMails,
+  getEmailsByLabelName
 };

@@ -51,3 +51,4 @@ exports.getCurrentUser = (req, res) => {
     picture: picture || null  // 🛡️ fallback if missing
   });
 };
+
