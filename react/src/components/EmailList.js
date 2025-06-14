@@ -120,19 +120,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
 
       {/* Inbox table */}
       <Table hover className="mb-0">
-        <thead>
-          <tr>
-            <th className="ps-3" style={{ width: '50px' }}>
-              <Form.Check 
-                type="checkbox"
-                checked={isAllSelected}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th colSpan="3">Primary</th>
-            <th style={{ width: "80px" }}>Actions</th>
-          </tr>
-        </thead>
+        
         <tbody>
           {emails.map((email) => (
             <tr
