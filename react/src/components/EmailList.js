@@ -1,10 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form, Button } from "react-bootstrap";
+import { BsArrowClockwise, BsEnvelopeOpen } from "react-icons/bs";
+
 import './EmailList.css';
 
 function EmailList({ setSelectedEmail, emails: propEmails }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
+
+  const fetchEmails = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3000/api/mails", {
+        credentials: "include"
+      });
+
+      if (!res.ok) throw new Error("Unauthorized");
+
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Invalid data");
+
+      setEmails(data);
+    } catch (err) {
+      console.error("Failed to fetch mails:", err.message);
+      setEmails([]);
+    }
+  };
 
   useEffect(() => {
     if (propEmails) {
@@ -54,13 +75,50 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
   };
 
   const handleSelectAll = (e) => {
-    setCheckedEmails(e.target.checked ? new Set(emails.map(e => e.id)) : new Set());
+  if (e.target.checked) {
+    setCheckedEmails(new Set(emails.map(e => e.id)));
+  } else {
+    setCheckedEmails(new Set());
+  }
+};
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await fetch("http://localhost:3000/api/mails/markAllRead", {
+        method: "PATCH",
+        credentials: "include",
+      });
+      fetchEmails();
+    } catch (err) {
+      console.error("Mark all as read failed", err.message);
+    }
   };
 
   const isAllSelected = checkedEmails.size > 0 && checkedEmails.size === emails.length;
 
   return (
     <div className="w-100 p-0">
+      {/* Gmail-style toolbar */}
+      <div className="email-toolbar d-flex align-items-center gap-2 ps-1 py-0.1 border-bottom">
+  <div style={{ padding: '1rem' }}>
+  <input
+  type="checkbox"
+  checked={isAllSelected}
+  onChange={handleSelectAll}
+/>
+
+</div>
+
+  <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh inbox">
+    <BsArrowClockwise size={18} />
+  </button>
+  <button className="gmail-icon-btn" onClick={handleMarkAllAsRead} title="Mark all as read">
+    <BsEnvelopeOpen size={18} />
+  </button>
+</div>
+
+
+      {/* Inbox table */}
       <Table hover className="mb-0">
         <thead>
           <tr>

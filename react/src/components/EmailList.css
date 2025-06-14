@@ -18,21 +18,41 @@
   cursor: pointer;
 }
 
-.email-list-table tr.table-primary {
-  background: #e8f0fe !important;
+.dark-mode .email-sender {
+  color: #e8eaed !important;
+}
+.email-toolbar .gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 26px;
+  height: 26px;
+  font-size: 1.3rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
 }
 
-.email-sender, .email-subject {
-  font-weight: 500;
+.email-toolbar .gmail-icon-btn:hover {
+  background-color: rgba(60, 64, 67, 0.1); /* light gray for light mode */
 }
 
-.email-date {
-  color: #5f6368;
-  font-size: 0.92em;
-  text-align: right;
+.email-toolbar .gmail-icon-btn svg {
+  color: #5f6368; /* icon color in light mode */
 }
 
-.btn-danger {
-  border-radius: 18px !important;
-  font-size: 0.95em !important;
+/* Dark mode override */
+body.dark-mode .email-toolbar .gmail-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* transparent white in dark mode */
+}
+
+body.dark-mode .email-toolbar .gmail-icon-btn svg {
+  color: #e8eaed; /* icon color in dark mode */
+}
+/* Force native checkbox to show correctly */
+input[type="checkbox"] {
+  all: revert;
+
 }
