@@ -5,6 +5,8 @@ import Inbox from "./pages/Inbox";
 import Search from "./pages/Search";
 import Compose from "./pages/Compose";
 import LabelPage from "./pages/LabelPage";
+import Drafts from "./pages/Draft";
+import Sent from "./pages/Sent";
 import ProtectedRoute from "./utils/ProtectedRoute"; // Use your utils/ProtectedRoute
 
 function App() {
@@ -26,12 +28,20 @@ function App() {
           }
         />
         <Route
-          path="/send"
+          path="/sent"
           element={
             <ProtectedRoute>
-              <Compose />
+              <Sent />
             </ProtectedRoute>
           }
+        />
+        <Route
+        path="/drafts"
+        element={
+          <ProtectedRoute>
+            <Drafts />
+          </ProtectedRoute>
+        }
         />
         <Route
           path="/search"

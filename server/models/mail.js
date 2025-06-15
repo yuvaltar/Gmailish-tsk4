@@ -51,6 +51,12 @@ function searchMails(userId, query) {
   );
 }
 
+function getDraftsForUser(userId) {
+  return mails.filter(m =>
+    m.senderId === userId &&
+    (!m.labels || m.labels.includes("draft"))
+  );
+}
 
 function getEmailsByLabelName(labelName, userId) {
   return mails.filter(email =>

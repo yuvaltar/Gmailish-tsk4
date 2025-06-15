@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
+import EmailList from "../components/EmailList";
+import MailView from "../components/MailView";
+import { Spinner, Alert } from "react-bootstrap";
 
 function Sent() {
-  const [sentEmails, setSentEmails] = useState([]);
+  const [emails, setEmails] = useState([]);
+  const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -9,18 +13,13 @@ function Sent() {
     const fetchSentEmails = async () => {
       try {
         const res = await fetch("/api/labels/sent/emails", {
-          credentials: "include",
+          credentials: "include"
         });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch sent emails");
-        }
-
+        if (!res.ok) throw new Error("Failed to load sent emails");
         const data = await res.json();
-        setSentEmails(data);
+        setEmails(data);
       } catch (err) {
-        console.error(err);
-        setError(err.message || "Something went wrong");
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -29,26 +28,26 @@ function Sent() {
     fetchSentEmails();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center h-100">
+        <Spinner animation="border" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <Alert variant="danger">Error: {error}</Alert>;
+  }
+
   return (
-    <div className="container mt-4">
-      <h2>Sent Emails</h2>
-
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-danger">{error}</p>}
-
-      {!loading && sentEmails.length === 0 && (
-        <p>You haven't sent any emails yet.</p>
+    <div className="p-3">
+      <h2 className="mb-4">📤 Sent Mail</h2>
+      {selectedEmailId ? (
+        <MailView emailId={selectedEmailId} onBack={() => setSelectedEmailId(null)} />
+      ) : (
+        <EmailList emails={emails} setSelectedEmail={setSelectedEmailId} />
       )}
-
-      <ul className="list-group">
-        {sentEmails.map((email) => (
-          <li key={email.id} className="list-group-item">
-            <strong>To:</strong> {email.recipientName} <br />
-            <strong>Subject:</strong> {email.subject} <br />
-            <small className="text-muted">{new Date(email.timestamp).toLocaleString()}</small>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

@@ -8,6 +8,26 @@ function Compose({ onClose }) {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
+
+  const handleClose = async () => {
+  if (subject.trim() || body.trim()) {
+    try {
+      await fetch("http://localhost:3000/api/mails/drafts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({ subject, content: body })
+      });
+      console.log("Draft saved.");
+    } catch (err) {
+      console.error("Failed to save draft:", err.message);
+    }
+  }
+  if (onClose) onClose();
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -75,7 +95,7 @@ function Compose({ onClose }) {
           >
             <ArrowsFullscreen size={14} />
           </button>
-          <button className="btn btn-sm btn-light" onClick={onClose} title="Close">
+          <button className="btn btn-sm btn-light" onClick={handleClose} title="Close">
             <X size={14} />
           </button>
         </div>
