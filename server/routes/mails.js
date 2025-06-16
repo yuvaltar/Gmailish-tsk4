@@ -27,6 +27,10 @@ router.patch('/:id/label', mailsController.addLabelToEmail);
 // DELETE /api/mails/:id - delete mail
 router.delete('/:id', mailsController.deleteMail);
 
+// PATCH /api/mails/:id/markRead - mark as read
+router.patch('/:id/markRead', mailsController.markMailAsRead);
+
+
 
 
 module.exports = router;

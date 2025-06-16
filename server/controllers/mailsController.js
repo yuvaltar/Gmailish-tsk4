@@ -128,6 +128,20 @@ exports.searchMails = (req, res) => {
   res.status(200).json(results);
 };
 
+// PATCH /api/mails/:id/markRead
+exports.markMailAsRead = (req, res) => {
+  
+  const mail = getMailById(req.params.id);
+  // Only the recipient can mark as read
+  if (!mail || mail.recipientId !== req.user.id) {
+    return res.status(404).json({ error: 'Mail not found or not owned by you' });
+  }
+  mail.read = true;
+  res.status(200).json({ message: 'Mail marked as read', mail });
+};
+
+
+
 exports.addLabelToEmail = (req, res) => {
   const mailId = req.params.id;
   const { label } = req.body;
