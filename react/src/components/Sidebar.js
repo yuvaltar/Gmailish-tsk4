@@ -1,5 +1,6 @@
+// react/src/components/Sidebar.js
 import React, { useEffect, useState } from "react";
-import './Sidebar.css';
+import "./Sidebar.css";
 import Label from "./Label";
 import { Button, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -17,23 +18,22 @@ import {
 function Sidebar({ onComposeClick }) {
   const navigate = useNavigate();
   const [showLabelModal, setShowLabelModal] = useState(false);
-  const [customLabels, setCustomLabels] = useState([]); 
+  const [customLabels, setCustomLabels] = useState([]);
 
   useEffect(() => {
-  const fetchLabels = async () => {
-    try {
-      const res = await fetch("/api/labels", {
-        credentials: "include"
-      });
-      const data = await res.json();
-      setCustomLabels(data.map((label) => label.name));
-    } catch (err) {
-      console.error("Failed to load labels:", err);
-    }
-  };
-
-  fetchLabels();
-}, []);
+    const fetchLabels = async () => {
+      try {
+        const res = await fetch("/api/labels", {
+          credentials: "include"
+        });
+        const data = await res.json();
+        setCustomLabels(data.map((label) => label.name));
+      } catch (err) {
+        console.error("Failed to load labels:", err);
+      }
+    };
+    fetchLabels();
+  }, []);
 
   const addLabel = (newLabel) => {
     setCustomLabels((prev) => [...prev, newLabel]);
@@ -71,51 +71,80 @@ function Sidebar({ onComposeClick }) {
         </ListGroup.Item>
 
         {/* Built-in menu items */}
-        <ListGroup.Item action onClick={() => navigate("/inbox")} className="sidebar-item">
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/inbox")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Inbox</span> <BsInbox />
           </div>
         </ListGroup.Item>
 
-        
-
-        <ListGroup.Item action onClick={() => navigate("/sent")} className="sidebar-item">
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/sent")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Sent</span> <BsSend />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item action onClick={() => navigate("/drafts")} className="sidebar-item">
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/drafts")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Drafts</span> <BsFileEarmarkText />
           </div>
         </ListGroup.Item>
-        <ListGroup.Item action onClick={() => navigate("/Archive")} className="sidebar-item">
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/Archive")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
-            <span>Arcive</span> <BsArchive />
+            <span>Archive</span> <BsArchive />
           </div>
         </ListGroup.Item>
-        <ListGroup.Item action onClick={() => navigate("/starred")} className="sidebar-item">
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/starred")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Starred</span> <BsStar />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item action onClick={() => navigate("/spam")} className="sidebar-item">
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/spam")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Spam</span> <BsExclamationCircle />
           </div>
         </ListGroup.Item>
-        <ListGroup.Item action onClick={() => navigate("/trash")} className="sidebar-item">
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/trash")}
+          className="sidebar-item"
+        >
           <div className="d-flex align-items-center justify-content-between w-100">
-            <span>trash</span> <BsTrash />
+            <span>Trash</span> <BsTrash />
           </div>
         </ListGroup.Item>
 
-        {/* Custom labels go here */}
-        {customLabels.map((label, index) => (
+        {/* Custom labels */}
+        {customLabels.map((label, idx) => (
           <ListGroup.Item
-            key={index}
+            key={idx}
             action
             onClick={() => navigate(`/labels/${encodeURIComponent(label)}`)}
             className="sidebar-item"
@@ -131,9 +160,10 @@ function Sidebar({ onComposeClick }) {
       <Label
         show={showLabelModal}
         onClose={() => setShowLabelModal(false)}
-        onCreate={addLabel} // 🟢 pass the callback
+        onCreate={addLabel}
       />
     </div>
   );
 }
+
 export default Sidebar;

@@ -1,21 +1,26 @@
+// controllers/mailsController.js
 const {
+  mails,
   createMail,
   getMailById,
   deleteMailById,
   getInboxForUser,
-  searchMails
+  searchMails,
+  getEmailsByLabelName
 } = require('../models/mail');
-const { mails } = require('../models/mail');
 const { users } = require('../models/user');
 const uuidv4 = require('../utils/uuid');
 const { sendToCpp } = require('../services/blacklistService');
 
-// Helper function to check blacklisted URLs in given text
-async function containsBlacklistedUrl(text) {
-  const urls = text.match(/\bhttps?:\/\/[^\s]+/g) || [];
-  for (const url of urls) {
-    const result = await sendToCpp(`GET ${url}`);
+// Regex for robust URL matching (based on C++ URL regex)
+const URL_REGEX = /(?:(?:file:\/\/(?:[A-Za-z]:)?(?:\/[^\s]*)?)|(?:[A-Za-z][A-Za-z0-9+.\-]*:\/\/)?(?:localhost|(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:\/[^\s]*)?)/g;
 
+// Helper to detect blacklisted URLs for send/edit flows
+async function containsBlacklistedUrl(text) {
+  // extract all matches using matchAll
+  const matches = Array.from(text.matchAll(URL_REGEX), m => m[0]);
+  for (const url of matches) {
+    const result = await sendToCpp(`GET ${url}`);
     if (result.startsWith('200 Ok')) {
       const lines = result.split('\n');
       const flags = lines.slice(1).join(' ').trim();
@@ -31,11 +36,45 @@ async function containsBlacklistedUrl(text) {
   return { blacklisted: false };
 }
 
-// POST /api/mails
+// POST /api/mails/:id/spam ⇒ mark mail as spam + blacklist its URLs
+exports.markAsSpam = async (req, res) => {
+  const mail = getMailById(req.params.id);
+  if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
+    return res.status(404).json({ error: 'Mail not found or not owned by you' });
+  }
+
+  const text = `${mail.subject} ${mail.content}`;
+  const matches = Array.from(text.matchAll(URL_REGEX), m => m[0]);
+  for (const url of matches) {
+    const result = (await sendToCpp(`POST ${url}`)).trim();
+    if (!['201 Created', '409 Conflict'].includes(result)) {
+      return res.status(500).json({ error: `Failed to blacklist ${url}: ${result}` });
+    }
+  }
+
+  if (!mail.labels.includes('spam')) mail.labels.push('spam');
+  res.status(200).json({ message: 'Marked as spam', mail });
+};
+
+// GET /api/mails/spam ⇒ list spam mails
+exports.getSpam = (req, res) => {
+  const userId = req.user.id;
+  const spamMails = getEmailsByLabelName('spam', userId);
+  res.status(200).json(spamMails);
+};
+
+// GET /api/mails ⇒ inbox (excludes spam)
+exports.getInbox = (req, res) => {
+  const userId = req.user.id;
+  let inbox = getInboxForUser(userId);
+  inbox = inbox.filter(m => !m.labels.includes('spam'));
+  res.status(200).json(inbox);
+};
+
+// POST /api/mails ⇒ send new mail (runs blacklist check)
 exports.sendMail = async (req, res) => {
   const { to, subject, content } = req.body;
   const sender = req.user;
-
   if (!to || !subject || !content) {
     return res.status(400).json({ error: 'Missing fields' });
   }
@@ -62,21 +101,14 @@ exports.sendMail = async (req, res) => {
     subject: subject.trim(),
     content: content.trim(),
     timestamp: new Date().toISOString(),
-    labels: ["sent"]
+    labels: ['sent']
   };
 
   mails.push(mail);
   res.status(201).json(mail);
 };
 
-// GET /api/mails
-exports.getInbox = (req, res) => {
-  const userId = req.user.id;
-  const inbox = getInboxForUser(userId);
-  res.status(200).json(inbox);
-};
-
-// GET /api/mails/:id
+// GET /api/mails/:id ⇒ fetch a single mail
 exports.getMailById = (req, res) => {
   const mail = getMailById(req.params.id);
   if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
@@ -85,7 +117,7 @@ exports.getMailById = (req, res) => {
   res.status(200).json(mail);
 };
 
-// PATCH /api/mails/:id
+// PATCH /api/mails/:id ⇒ update mail (runs blacklist check)
 exports.updateMail = async (req, res) => {
   const mail = getMailById(req.params.id);
   if (!mail || mail.senderId !== req.user.id) {
@@ -93,9 +125,7 @@ exports.updateMail = async (req, res) => {
   }
 
   const { subject, content } = req.body;
-
-  const textToCheck = `${subject || ''} ${content || ''}`;
-  const check = await containsBlacklistedUrl(textToCheck);
+  const check = await containsBlacklistedUrl(`${subject || ''} ${content || ''}`);
   if (check.error) {
     return res.status(500).json({ error: `Unexpected response from C++ server for ${check.url}` });
   }
@@ -108,19 +138,17 @@ exports.updateMail = async (req, res) => {
   res.status(204).end();
 };
 
-// DELETE /api/mails/:id
+// DELETE /api/mails/:id ⇒ delete mail
 exports.deleteMail = (req, res) => {
   const mail = getMailById(req.params.id);
-  // ALLOW BOTH SENDER AND RECIPIENT TO DELETE
   if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
-
   deleteMailById(req.params.id);
   res.status(204).end();
 };
 
-// GET /api/mails/search/:query
+// GET /api/mails/search/:query ⇒ search mails
 exports.searchMails = (req, res) => {
   const query = req.params.query;
   const userId = req.user.id;
@@ -128,32 +156,26 @@ exports.searchMails = (req, res) => {
   res.status(200).json(results);
 };
 
+// PATCH /api/mails/:id/label ⇒ add arbitrary label
 exports.addLabelToEmail = (req, res) => {
   const mailId = req.params.id;
   const { label } = req.body;
-
-  if (!label || typeof label !== "string" || !label.trim()) {
-    return res.status(400).json({ error: "Label must be a non-empty string" });
+  if (!label || typeof label !== 'string' || !label.trim()) {
+    return res.status(400).json({ error: 'Label must be a non-empty string' });
   }
 
-  const mail = getMailById(mailId);
-  if (!mail) {
-    return res.status(404).json({ error: "Email not found" });
+  const mailInst = getMailById(mailId);
+  if (!mailInst) {
+    return res.status(404).json({ error: 'Email not found' });
   }
 
-  // Only the sender or recipient can modify labels
   const userId = req.user.id;
-  if (mail.senderId !== userId && mail.recipientId !== userId) {
-    return res.status(403).json({ error: "You are not authorized to label this email" });
+  if (mailInst.senderId !== userId && mailInst.recipientId !== userId) {
+    return res.status(403).json({ error: 'You are not authorized to label this email' });
   }
 
-  if (!mail.labels) {
-    mail.labels = [];
-  }
+  if (!mailInst.labels) mailInst.labels = [];
+  if (!mailInst.labels.includes(label)) mailInst.labels.push(label);
 
-  if (!mail.labels.includes(label)) {
-    mail.labels.push(label);
-  }
-
-  res.status(200).json({ message: `Label '${label}' added`, mail });
+  res.status(200).json({ message: `Label '${label}' added`, mail: mailInst });
 };

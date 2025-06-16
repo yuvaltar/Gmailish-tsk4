@@ -1,20 +1,24 @@
+// react/src/App.js
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Inbox from "./pages/Inbox";
-import Search from "./pages/Search";
-import Compose from "./pages/Compose";
-import LabelPage from "./pages/LabelPage";
-import ProtectedRoute from "./utils/ProtectedRoute"; // Use your utils/ProtectedRoute
+
+import Login        from "./pages/Login";
+import Register     from "./pages/Register";
+import Inbox        from "./pages/Inbox";
+import SpamList     from "./components/SpamList";
+import Search       from "./pages/Search";
+import Compose      from "./pages/Compose";
+import LabelPage    from "./pages/LabelPage";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/"        element={<Login />} />
+        <Route path="/login"   element={<Login />} />
+        <Route path="/register"element={<Register />} />
 
         {/* Protected Routes */}
         <Route
@@ -22,6 +26,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Inbox />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/spam"
+          element={
+            <ProtectedRoute>
+              <SpamList />
             </ProtectedRoute>
           }
         />

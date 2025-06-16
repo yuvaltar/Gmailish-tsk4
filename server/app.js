@@ -1,3 +1,4 @@
+// server/app.js
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const express = require("express");
@@ -15,17 +16,16 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes
+// API routes
 app.use("/api/blacklist", require("./routes/blacklist"));
-app.use("/api/users", require("./routes/users"));
-app.use("/api/mails", require("./routes/mails"));
-app.use("/api/labels", require("./routes/labels"));
-app.use("/api/tokens", require("./routes/tokens"));
+app.use("/api/users",     require("./routes/users"));
+app.use("/api/mails",     require("./routes/mails"));
+app.use("/api/labels",    require("./routes/labels"));
+app.use("/api/tokens",    require("./routes/tokens"));
 
-// Static React build (optional)
+// Serve React static assets
 app.use(express.static(path.join(__dirname, "../react/build")));
 
 app.get("/", (req, res) => {
@@ -34,6 +34,12 @@ app.get("/", (req, res) => {
 
 app.get("/ping", (req, res) => {
   res.json({ msg: "pong" });
+});
+
+// React Router fallback without using a literal "*"
+// Matches any path that does NOT start with "/api"
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../react/build/index.html"));
 });
 
 app.listen(PORT, () => {
