@@ -10,9 +10,7 @@ function Draft() {
   useEffect(() => {
     const fetchDrafts = async () => {
       try {
-        const res = await fetch("/api/mails?draftsOnly=true", {
-          credentials: "include"
-        });
+        const res = await fetch("http://localhost:3000/api/mails/drafts", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to fetch drafts");
         const data = await res.json();
         setDrafts(data);

@@ -14,6 +14,11 @@ router.post('/', mailsController.sendMail);
 // GET /api/mails/search/:query - search mails
 router.get('/search/:query', mailsController.searchMails);
 
+//Draft
+router.post('/drafts', mailsController.saveDraft);
+
+router.get('/drafts', mailsController.getDrafts);
+
 // GET /api/mails/:id - get specific mail
 router.get('/:id', mailsController.getMailById);
 
@@ -26,6 +31,8 @@ router.patch('/:id/label', mailsController.addLabelToEmail);
 
 // DELETE /api/mails/:id - delete mail
 router.delete('/:id', mailsController.deleteMail);
+
+
 
 
 

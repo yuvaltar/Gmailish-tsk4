@@ -12,13 +12,13 @@ function Compose({ onClose }) {
   const handleClose = async () => {
   if (subject.trim() || body.trim()) {
     try {
-      await fetch("http://localhost:3000/api/mails/drafts", {
+      await fetch("/api/mails/drafts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         credentials: "include",
-        body: JSON.stringify({ subject, content: body })
+        body: JSON.stringify({ to, subject, content: body })
       });
       console.log("Draft saved.");
     } catch (err) {
@@ -109,7 +109,6 @@ function Compose({ onClose }) {
             className="form-control mb-2"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            required
           />
           <input
             type="text"
@@ -117,7 +116,6 @@ function Compose({ onClose }) {
             className="form-control mb-2"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            required
           />
           <textarea
             className="form-control mb-2"
@@ -125,7 +123,6 @@ function Compose({ onClose }) {
             rows="6"
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            required
           />
           <button type="submit" className="btn btn-sm btn-primary">Send</button>
         </form>

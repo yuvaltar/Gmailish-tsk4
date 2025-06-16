@@ -71,5 +71,6 @@ module.exports = {
   deleteMailById,
   getInboxForUser,
   searchMails,
-  getEmailsByLabelName
+  getEmailsByLabelName,
+  getDraftsForUser,
 };

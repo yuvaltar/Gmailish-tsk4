@@ -8,7 +8,7 @@ function LabelPage() {
   useEffect(() => {
     const fetchLabelEmails = async () => {
       try {
-        const res = await fetch(`/api/labels/${labelName}/emails`, {
+        const res = await fetch(`/api/label/${labelName}/emails`, {
           credentials: "include"
         });
         if (!res.ok) throw new Error("Failed to fetch label emails");
