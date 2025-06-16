@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-
 import { Table, Form, Button } from "react-bootstrap";
 import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
 import "./EmailList.css";
-
 
 function EmailList({ setSelectedEmail, emails: propEmails }) {
   const [emails, setEmails] = useState([]);
@@ -32,7 +30,6 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
     fetchEmails();
   }, [propEmails]);
 
-
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
     newChecked.has(emailId) ? newChecked.delete(emailId) : newChecked.add(emailId);
@@ -40,9 +37,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
   };
 
   const handleSelectAll = (e) => {
-
     setCheckedEmails(e.target.checked ? new Set(emails.map((e) => e.id)) : new Set());
-
   };
 
   const handleMarkAllAsRead = async () => {
@@ -69,16 +64,13 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
 
   return (
     <div className="w-100 p-0">
-
       <div className="email-toolbar d-flex align-items-center ps-1 py-0.1 border-bottom">
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
           <Form.Check
-
             type="checkbox"
             checked={isAllSelected}
             onChange={handleSelectAll}
           />
-
           <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh inbox">
             <BsArrowClockwise size={18} />
           </button>
@@ -89,7 +81,6 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
       </div>
 
       <Table hover className="mb-0">
-
         <tbody>
           {emails.map((email) => (
             <tr
@@ -98,15 +89,26 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
               className={checkedEmails.has(email.id) ? "table-primary" : ""}
               style={{ cursor: "pointer" }}
             >
-
-              <td className="ps-3" onClick={(e) => e.stopPropagation()}>
+              <td className="ps-3">
                 <div className="email-checkbox-star d-flex align-items-center gap-2">
                   <Form.Check
                     type="checkbox"
                     checked={checkedEmails.has(email.id)}
-                    onChange={() => handleCheckboxChange(email.id)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleCheckboxChange(email.id);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
                   />
-                  <span onClick={() => toggleStar(email.id)} className="star-cell">
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleStar(email.id);
+                    }}
+                    className="star-cell"
+                  >
                     {email.starred ? (
                       <BsStarFill className="star-filled" size={14} />
                     ) : (
@@ -128,18 +130,6 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
               <td className="text-end pe-3">
                 {new Date(email.timestamp).toLocaleDateString()}
               </td>
-
-              <td onClick={(e) => e.stopPropagation()}>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => handleDelete(email.id)}
-                >
-                  Delete
-                </Button>
-
-              </td>
-              {/* Delete button removed */}
             </tr>
           ))}
         </tbody>
