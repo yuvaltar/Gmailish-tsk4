@@ -1,4 +1,6 @@
+// react/src/components/Sidebar.js
 import React, { useEffect, useState } from "react";
+import "./Sidebar.css";
 import "./Sidebar.css";
 import Label from "./Label";
 import { Button, ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -12,9 +14,23 @@ function Sidebar({ onComposeClick, collapsed }) {
   const navigate = useNavigate();
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [customLabels,  setCustomLabels]    = useState([]);
+  const [customLabels, setCustomLabels] = useState([]);
 
   /* fetch labels once */
   useEffect(() => {
+    const fetchLabels = async () => {
+      try {
+        const res = await fetch("/api/labels", {
+          credentials: "include"
+        });
+        const data = await res.json();
+        setCustomLabels(data.map((label) => label.name));
+      } catch (err) {
+        console.error("Failed to load labels:", err);
+      }
+    };
+    fetchLabels();
+  }, []);
     (async () => {
       try {
         const r   = await fetch("/api/labels", { credentials: "include" });
@@ -83,6 +99,90 @@ function Sidebar({ onComposeClick, collapsed }) {
           </Button>
         </ListGroup.Item>
 
+        {/* Built-in menu items */}
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/inbox")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Inbox</span> <BsInbox />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/sent")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Sent</span> <BsSend />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/drafts")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Drafts</span> <BsFileEarmarkText />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/Archive")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Archive</span> <BsArchive />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/starred")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Starred</span> <BsStar />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/spam")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Spam</span> <BsExclamationCircle />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item
+          action
+          onClick={() => navigate("/trash")}
+          className="sidebar-item"
+        >
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Trash</span> <BsTrash />
+          </div>
+        </ListGroup.Item>
+
+        {/* Custom labels */}
+        {customLabels.map((label, idx) => (
+          <ListGroup.Item
+            key={idx}
+            action
+            onClick={() => navigate(`/labels/${encodeURIComponent(label)}`)}
+            className="sidebar-item"
+          >
+            <div className="d-flex align-items-center justify-content-between w-100">
+              <span>{label}</span>
+            </div>
+          </ListGroup.Item>
+        ))}
         {/* built-in folders */}
         {Item("/inbox",   BsInbox,             "Inbox")}
         {Item("/sent",    BsSend,              "Sent")}
@@ -103,9 +203,11 @@ function Sidebar({ onComposeClick, collapsed }) {
         show={showLabelModal}
         onClose={() => setShowLabelModal(false)}
         onCreate={addLabel}
+        onCreate={addLabel}
       />
     </div>
   );
 }
+
 
 export default Sidebar;
