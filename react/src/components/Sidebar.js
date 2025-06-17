@@ -1,10 +1,8 @@
-// react/src/components/Sidebar.js
 import React, { useEffect, useState } from "react";
 import "./Sidebar.css";
 import Label from "./Label";
 import { Button, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { isTokenValid } from "../utils/auth";
 import {
   BsInbox,
   BsStar,
@@ -50,10 +48,8 @@ function Sidebar({ onComposeClick }) {
       </Button>
 
       <ListGroup variant="flush">
-        {/* Labels Header */}
+        {/* Labels Header (no navigation) */}
         <ListGroup.Item
-          action
-          onClick={() => navigate("/labels")}
           className="d-flex justify-content-between align-items-center sidebar-labels-header"
         >
           <span className="fw-bold">Labels</span>
@@ -71,71 +67,43 @@ function Sidebar({ onComposeClick }) {
         </ListGroup.Item>
 
         {/* Built-in menu items */}
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/inbox")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/inbox")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Inbox</span> <BsInbox />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/sent")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/sent")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Sent</span> <BsSend />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/drafts")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/drafts")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Drafts</span> <BsFileEarmarkText />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/Archive")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/archive")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Archive</span> <BsArchive />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/starred")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/starred")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Starred</span> <BsStar />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/spam")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/spam")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Spam</span> <BsExclamationCircle />
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item
-          action
-          onClick={() => navigate("/trash")}
-          className="sidebar-item"
-        >
+        <ListGroup.Item action onClick={() => navigate("/trash")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Trash</span> <BsTrash />
           </div>
@@ -146,7 +114,7 @@ function Sidebar({ onComposeClick }) {
           <ListGroup.Item
             key={idx}
             action
-            onClick={() => navigate(`/labels/${encodeURIComponent(label)}`)}
+            onClick={() => navigate(`/${encodeURIComponent(label)}`)}
             className="sidebar-item"
           >
             <div className="d-flex align-items-center justify-content-between w-100">

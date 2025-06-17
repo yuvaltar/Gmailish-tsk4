@@ -1,43 +1,62 @@
 import React, { useState, useEffect } from "react";
-import { Table, Form, Button } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
+import PropTypes from "prop-types";
 import "./EmailList.css";
 
-function EmailList({ setSelectedEmail, emails: propEmails }) {
+/**
+ * EmailList component displays a list of emails, optionally filtered by label.
+ *
+ * Props:
+ * - setSelectedEmail(emailId): callback for when a row is clicked
+ * - propEmails: array of emails from a search result (optional)
+ * - labelFilter: string matching the current label (e.g. "inbox", "starred", "spam")
+ */
+function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
 
+  // Build fetch URL based on optional labelFilter
   const fetchEmails = async () => {
+    let url = "http://localhost:3000/api/mails";
+    if (labelFilter) {
+      url += `?label=${encodeURIComponent(labelFilter)}`;
+    }
+
     try {
-      const res = await fetch("http://localhost:3000/api/mails", {
-        credentials: "include",
-      });
+      const res = await fetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Invalid data");
       setEmails(data);
+      // Reset any checks when folder changes
+      setCheckedEmails(new Set());
     } catch (err) {
       console.error("Failed to fetch mails:", err.message);
       setEmails([]);
     }
   };
 
+  // Whenever either propEmails (search results) OR labelFilter changes, reload
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
       return;
     }
     fetchEmails();
-  }, [propEmails]);
+  }, [propEmails, labelFilter]);
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
-    newChecked.has(emailId) ? newChecked.delete(emailId) : newChecked.add(emailId);
+    if (newChecked.has(emailId)) newChecked.delete(emailId);
+    else newChecked.add(emailId);
     setCheckedEmails(newChecked);
   };
 
   const handleSelectAll = (e) => {
-    setCheckedEmails(e.target.checked ? new Set(emails.map((e) => e.id)) : new Set());
+    setCheckedEmails(
+      e.target.checked ? new Set(emails.map((e) => e.id)) : new Set()
+    );
   };
 
   const handleMarkAllAsRead = async () => {
@@ -60,7 +79,8 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
     );
   };
 
-  const isAllSelected = checkedEmails.size > 0 && checkedEmails.size === emails.length;
+  const isAllSelected =
+    emails.length > 0 && checkedEmails.size === emails.length;
 
   return (
     <div className="w-100 p-0">
@@ -71,10 +91,18 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
             checked={isAllSelected}
             onChange={handleSelectAll}
           />
-          <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh inbox">
+          <button
+            className="gmail-icon-btn"
+            onClick={fetchEmails}
+            title="Refresh"
+          >
             <BsArrowClockwise size={18} />
           </button>
-          <button className="gmail-icon-btn" onClick={handleMarkAllAsRead} title="Mark all as read">
+          <button
+            className="gmail-icon-btn"
+            onClick={handleMarkAllAsRead}
+            title="Mark all as read"
+          >
             <BsEnvelopeOpen size={18} />
           </button>
         </div>
@@ -86,7 +114,9 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
             <tr
               key={email.id}
               onClick={() => setSelectedEmail(email.id)}
-              className={checkedEmails.has(email.id) ? "table-primary" : ""}
+              className={
+                checkedEmails.has(email.id) ? "table-primary" : ""
+              }
               style={{ cursor: "pointer" }}
             >
               <td className="ps-3">
@@ -98,9 +128,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
                       e.stopPropagation();
                       handleCheckboxChange(email.id);
                     }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <span
                     onClick={(e) => {
@@ -119,11 +147,16 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
               </td>
 
               <td className="email-snippet-cell">
-                <div className="sender-name" title={email.senderName || email.senderId}>
+                <div
+                  className="sender-name"
+                  title={email.senderName || email.senderId}
+                >
                   {email.senderName || email.senderId}
                 </div>
                 <div className="subject-line" title={email.subject}>
-                  {email.subject.length > 80 ? email.subject.slice(0, 77) + "..." : email.subject}
+                  {email.subject.length > 80
+                    ? email.subject.slice(0, 77) + "..."
+                    : email.subject}
                 </div>
               </td>
 
@@ -137,5 +170,16 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
     </div>
   );
 }
+
+EmailList.propTypes = {
+  setSelectedEmail: PropTypes.func.isRequired,
+  propEmails: PropTypes.array,
+  labelFilter: PropTypes.string,
+};
+
+EmailList.defaultProps = {
+  propEmails: null,
+  labelFilter: "inbox",
+};
 
 export default EmailList;

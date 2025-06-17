@@ -1,64 +1,105 @@
 const uuidv4 = require('../utils/uuid');
-const { users } = require('./user'); // 👈 make sure this is present
+const { users } = require('./user');  // Ensure this imports your user list
 
+// In-memory storage of all mail records
 const mails = [];
 
-// Create a mail with both "sent" and "inbox" labels for sender and recipient filtering
+/**
+ * Create a mail entry in both sender's "sent" and recipient's "inbox".
+ * Returns an object with the two created mail records.
+ */
 function createMail(senderId, recipientId, subject, content) {
-  const sender = users.find(u => u.id === senderId);
-  const recipient = users.find(u => u.id === recipientId);
+  const sender = users.find(u => u.id === senderId) || {};
+  const recipient = users.find(u => u.id === recipientId) || {};
+  const timestamp = new Date().toISOString();
 
-const mail = {
-  id: uuidv4(),
-  senderId,
-  senderName: sender ? sender.username : "Unknown", // Use username only
-  recipientId,
-  recipientName: recipient ? recipient.username : "Unknown", // Use username only
-  subject,
-  content,
-  timestamp: new Date().toISOString(),
-  labels: ["sent", "inbox"],
-};
+  const senderName = sender.username || 'Unknown';
+  const recipientName = recipient.username || 'Unknown';
 
+  // Recipient's copy (inbox)
+  const inboxMail = {
+    id: uuidv4(),
+    senderId,
+    senderName,
+    recipientId,
+    recipientName,
+    subject,
+    content,
+    timestamp,
+    labels: ['inbox']
+  };
 
+  // Sender's copy (sent)
+  const sentMail = {
+    id: uuidv4(),
+    senderId,
+    senderName,
+    recipientId,
+    recipientName,
+    subject,
+    content,
+    timestamp,
+    labels: ['sent']
+  };
 
-  mails.push(mail);
-  return mail;
+  // Store both copies
+  mails.push(inboxMail, sentMail);
+
+  return { inboxMail, sentMail };
 }
 
+/**
+ * Find a mail by its ID.
+ */
 function getMailById(id) {
   return mails.find(m => m.id === id);
 }
 
+/**
+ * Delete a mail record by its ID.
+ */
 function deleteMailById(id) {
-  const index = mails.findIndex(m => m.id === id);
-  if (index !== -1) mails.splice(index, 1);
+  const idx = mails.findIndex(m => m.id === id);
+  if (idx !== -1) mails.splice(idx, 1);
 }
 
+/**
+ * Get up to the 50 newest inbox mails for a user.
+ * Only includes mails received by the user (not sent by them).
+ */
 function getInboxForUser(userId) {
   return mails
-    .filter(m => m.recipientId === userId)
+    .filter(m => m.recipientId === userId && m.labels.includes('inbox'))
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
 
-function searchMails(userId, query) {
-  return mails.filter(m =>
-    (m.senderId === userId || m.recipientId === userId) &&
-    (
-      (m.senderName && m.senderName.includes(query)) ||
-      (m.recipientName && m.recipientName.includes(query)) ||
-      (m.subject && m.subject.includes(query)) ||
-      (m.content && m.content.includes(query))
+/**
+ * Get mails by any label (sent, spam, starred, custom, etc.).
+ */
+function getEmailsByLabelName(labelName, userId) {
+  return mails
+    .filter(m =>
+      m.labels.includes(labelName) &&
+      (
+        (labelName === 'sent' && m.senderId === userId) ||
+        (labelName !== 'sent' && m.recipientId === userId)
+      )
     )
-  );
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
-// Fix: getEmailsByLabelName should return mails for user as sender or recipient
-function getEmailsByLabelName(labelName, userId) {
-  return mails.filter(email =>
-    email.labels?.includes(labelName) &&
-    (email.senderId === userId || email.recipientId === userId)
+/**
+ * Search mails by subject or content for a user.
+ * Searches both sent and received mails.
+ */
+function searchMails(userId, query) {
+  const q = query.toLowerCase();
+  return mails.filter(m =>
+    (m.senderId === userId || m.recipientId === userId) && (
+      (m.subject && m.subject.toLowerCase().includes(q)) ||
+      (m.content && m.content.toLowerCase().includes(q))
+    )
   );
 }
 
@@ -68,6 +109,6 @@ module.exports = {
   getMailById,
   deleteMailById,
   getInboxForUser,
-  searchMails,
-  getEmailsByLabelName
+  getEmailsByLabelName,
+  searchMails
 };
