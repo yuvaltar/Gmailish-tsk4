@@ -1,51 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
 import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
-import PropTypes from "prop-types";
 import "./EmailList.css";
 
-function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
+function EmailList({ setSelectedEmail, emails: propEmails }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
 
   const fetchEmails = async () => {
-    let url = "http://localhost:3000/api/mails";
-    if (labelFilter) {
-      url += `?label=${encodeURIComponent(labelFilter)}`;
-    }
+  try {
+    const res = await fetch("http://localhost:3000/api/mails", {
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error("Unauthorized");
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("Invalid data");
+    setEmails(data);
+    console.log("Fetched emails:", data); // Debug: log fetched emails
+  } catch (err) {
+    console.error("Failed to fetch mails:", err.message);
+    setEmails([]);
+  }
+};
 
-    try {
-      const res = await fetch(url, { credentials: "include" });
-      if (!res.ok) throw new Error("Unauthorized");
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error("Invalid data");
-      setEmails(data);
-      setCheckedEmails(new Set()); // Reset checks
-    } catch (err) {
-      console.error("Failed to fetch mails:", err.message);
-      setEmails([]);
-    }
-  };
 
   useEffect(() => {
-    if (propEmails) {
-      setEmails(propEmails);
-      return;
-    }
-    fetchEmails();
-  }, [propEmails, labelFilter]);
+  if (propEmails) {
+    setEmails(propEmails);
+    console.log("Loaded propEmails:", propEmails); // Debug: log propEmails
+    return;
+  }
+  fetchEmails();
+}, [propEmails]);
+
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
-    if (newChecked.has(emailId)) newChecked.delete(emailId);
-    else newChecked.add(emailId);
+    newChecked.has(emailId) ? newChecked.delete(emailId) : newChecked.add(emailId);
     setCheckedEmails(newChecked);
   };
 
   const handleSelectAll = (e) => {
-    setCheckedEmails(
-      e.target.checked ? new Set(emails.map((e) => e.id)) : new Set()
-    );
+    setCheckedEmails(e.target.checked ? new Set(emails.map((e) => e.id)) : new Set());
   };
 
   const handleMarkAllAsRead = async () => {
@@ -60,56 +56,42 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
     }
   };
 
-  const toggleStar = async (emailId) => {
-    try {
-      const email = emails.find((e) => e.id === emailId);
-      if (!email) return;
-      const isStarred = email.labels?.includes("starred");
-
-      const res = await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ label: "starred", action: isStarred ? "remove" : "add" }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update label");
-
-      setEmails((prev) =>
-        prev.map((e) =>
-          e.id === emailId
-            ? {
-                ...e,
-                labels: isStarred
-                  ? e.labels.filter((l) => l !== "starred")
-                  : [...(e.labels || []), "starred"],
-              }
-            : e
-        )
-      );
-    } catch (err) {
-      console.error("Failed to toggle star label:", err.message);
-    }
+  const toggleStar = (emailId) => {
+    setEmails((prev) =>
+      prev.map((email) =>
+        email.id === emailId ? { ...email, starred: !email.starred } : email
+      )
+    );
   };
 
   const handleRowClick = async (email) => {
-    setSelectedEmail(email.id);
-    if (!email.read) {
-      try {
-        await fetch(`http://localhost:3000/api/mails/${email.id}/markRead`, {
-          method: "PATCH",
-          credentials: "include",
-        });
-        setEmails((prev) =>
-          prev.map((m) => (m.id === email.id ? { ...m, read: true } : m))
-        );
-      } catch (err) {
-        console.error("Failed to mark as read:", err.message);
-      }
+  console.log("Row clicked:", email); // Debug: log clicked email
+  setSelectedEmail(email.id);
+  if (!email.read) {
+    try {
+      console.log("Marking as read:", email.id); // Debug: log marking as read
+      const response = await fetch(`http://localhost:3000/api/mails/${email.id}/markRead`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      const result = await response.json();
+      console.log("Backend response:", result); // Debug: log backend response
+      setEmails((prev) =>
+        prev.map((m) =>
+          m.id === email.id ? { ...m, read: true } : m
+        )
+      );
+      console.log("Emails after marking as read:", emails); // Debug: log updated emails state
+    } catch (err) {
+      console.error("Failed to mark as read:", err.message);
     }
-  };
+  } else {
+    console.log("Email already read, skipping API call.");
+  }
+};
 
-  const isAllSelected = emails.length > 0 && checkedEmails.size === emails.length;
+
+  const isAllSelected = checkedEmails.size > 0 && checkedEmails.size === emails.length;
 
   return (
     <div className="w-100 p-0">
@@ -120,14 +102,10 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
             checked={isAllSelected}
             onChange={handleSelectAll}
           />
-          <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh">
+          <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh inbox">
             <BsArrowClockwise size={18} />
           </button>
-          <button
-            className="gmail-icon-btn"
-            onClick={handleMarkAllAsRead}
-            title="Mark all as read"
-          >
+          <button className="gmail-icon-btn" onClick={handleMarkAllAsRead} title="Mark all as read">
             <BsEnvelopeOpen size={18} />
           </button>
         </div>
@@ -154,7 +132,9 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
                       e.stopPropagation();
                       handleCheckboxChange(email.id);
                     }}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
                   />
                   <span
                     onClick={(e) => {
@@ -163,7 +143,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
                     }}
                     className="star-cell"
                   >
-                    {email.labels?.includes("starred") ? (
+                    {email.starred ? (
                       <BsStarFill className="star-filled" size={14} />
                     ) : (
                       <BsStar className="star-empty" size={14} />
@@ -176,9 +156,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
                   {email.senderName || email.senderId}
                 </div>
                 <div className="subject-line" title={email.subject}>
-                  {email.subject.length > 80
-                    ? email.subject.slice(0, 77) + "..."
-                    : email.subject}
+                  {email.subject.length > 80 ? email.subject.slice(0, 77) + "..." : email.subject}
                 </div>
               </td>
               <td className="text-end pe-3">
@@ -191,16 +169,5 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
     </div>
   );
 }
-
-EmailList.propTypes = {
-  setSelectedEmail: PropTypes.func.isRequired,
-  propEmails: PropTypes.array,
-  labelFilter: PropTypes.string,
-};
-
-EmailList.defaultProps = {
-  propEmails: null,
-  labelFilter: "inbox",
-};
 
 export default EmailList;

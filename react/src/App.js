@@ -1,44 +1,66 @@
-// src/App.js
+// react/src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Login          from "./pages/Login";
-import Register       from "./pages/Register";
-import Compose        from "./pages/Compose";
-import Search         from "./pages/Search";
-import EmailPage      from "./pages/EmailPage";
+import Login        from "./pages/Login";
+import Register     from "./pages/Register";
+import Inbox        from "./pages/Inbox";
+import SpamList     from "./components/SpamList";
+import Search       from "./pages/Search";
+import Compose      from "./pages/Compose";
+import LabelPage    from "./pages/LabelPage";
 import ProtectedRoute from "./utils/ProtectedRoute";
-import Layout         from "./components/Layout";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/"        element={<Login />} />
+        <Route path="/login"   element={<Login />} />
+        <Route path="/register"element={<Register />} />
 
-        {/* Public */}
-        <Route path="/"         element={<Login />} />
-        <Route path="/login"    element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        {/* All mail views share the same Layout */}
+        {/* Protected Routes */}
         <Route
-          path="/"
+          path="/inbox"
           element={
             <ProtectedRoute>
-              <Layout />
+              <Inbox />
             </ProtectedRoute>
           }
-        >
-          {/* default = / → inbox */}
-          <Route index            element={<EmailPage />} />
-
-          {/* /spam, /starred, /MyCustomLabel, etc. */}
-          <Route path=":labelName" element={<EmailPage />} />
-
-          {/* Compose & Search */}
-          <Route path="send"      element={<Compose />} />
-          <Route path="search"    element={<Search />} />
-        </Route>
+        />
+        <Route
+          path="/spam"
+          element={
+            <ProtectedRoute>
+              <SpamList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/send"
+          element={
+            <ProtectedRoute>
+              <Compose />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <Search />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/label/:labelName"
+          element={
+            <ProtectedRoute>
+              <LabelPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
