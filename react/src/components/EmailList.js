@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Form } from "react-bootstrap";
+import { Table, Form, Button } from "react-bootstrap";
 import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
 import "./EmailList.css";
 
@@ -8,31 +8,27 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
   const [checkedEmails, setCheckedEmails] = useState(new Set());
 
   const fetchEmails = async () => {
-  try {
-    const res = await fetch("http://localhost:3000/api/mails", {
-      credentials: "include",
-    });
-    if (!res.ok) throw new Error("Unauthorized");
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error("Invalid data");
-    setEmails(data);
-    console.log("Fetched emails:", data); // Debug: log fetched emails
-  } catch (err) {
-    console.error("Failed to fetch mails:", err.message);
-    setEmails([]);
-  }
-};
-
+    try {
+      const res = await fetch("http://localhost:3000/api/mails", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Unauthorized");
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Invalid data");
+      setEmails(data);
+    } catch (err) {
+      console.error("Failed to fetch mails:", err.message);
+      setEmails([]);
+    }
+  };
 
   useEffect(() => {
-  if (propEmails) {
-    setEmails(propEmails);
-    console.log("Loaded propEmails:", propEmails); // Debug: log propEmails
-    return;
-  }
-  fetchEmails();
-}, [propEmails]);
-
+    if (propEmails) {
+      setEmails(propEmails);
+      return;
+    }
+    fetchEmails();
+  }, [propEmails]);
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
@@ -64,33 +60,6 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
     );
   };
 
-  const handleRowClick = async (email) => {
-  console.log("Row clicked:", email); // Debug: log clicked email
-  setSelectedEmail(email.id);
-  if (!email.read) {
-    try {
-      console.log("Marking as read:", email.id); // Debug: log marking as read
-      const response = await fetch(`http://localhost:3000/api/mails/${email.id}/markRead`, {
-        method: "PATCH",
-        credentials: "include",
-      });
-      const result = await response.json();
-      console.log("Backend response:", result); // Debug: log backend response
-      setEmails((prev) =>
-        prev.map((m) =>
-          m.id === email.id ? { ...m, read: true } : m
-        )
-      );
-      console.log("Emails after marking as read:", emails); // Debug: log updated emails state
-    } catch (err) {
-      console.error("Failed to mark as read:", err.message);
-    }
-  } else {
-    console.log("Email already read, skipping API call.");
-  }
-};
-
-
   const isAllSelected = checkedEmails.size > 0 && checkedEmails.size === emails.length;
 
   return (
@@ -111,16 +80,13 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
         </div>
       </div>
 
-      <Table hover className="mb-0 email-list-table">
+      <Table hover className="mb-0">
         <tbody>
           {emails.map((email) => (
             <tr
               key={email.id}
-              onClick={() => handleRowClick(email)}
-              className={`
-                ${checkedEmails.has(email.id) ? "table-primary" : ""}
-                ${email.read ? "email-read" : "email-unread"}
-              `}
+              onClick={() => setSelectedEmail(email.id)}
+              className={checkedEmails.has(email.id) ? "table-primary" : ""}
               style={{ cursor: "pointer" }}
             >
               <td className="ps-3">
@@ -151,6 +117,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
                   </span>
                 </div>
               </td>
+
               <td className="email-snippet-cell">
                 <div className="sender-name" title={email.senderName || email.senderId}>
                   {email.senderName || email.senderId}
@@ -159,6 +126,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
                   {email.subject.length > 80 ? email.subject.slice(0, 77) + "..." : email.subject}
                 </div>
               </td>
+
               <td className="text-end pe-3">
                 {new Date(email.timestamp).toLocaleDateString()}
               </td>

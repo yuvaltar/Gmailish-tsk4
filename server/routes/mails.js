@@ -33,6 +33,4 @@ router.patch('/:id/label', mailsController.addLabelToEmail);
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
 
-
-
 module.exports = router;

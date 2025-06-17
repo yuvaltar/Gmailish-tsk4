@@ -2,56 +2,29 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(60, 64, 67, 0.07);
-  margin-top: 0; /* No top margin */
+  margin-top: 1.5rem;
   width: 100%;
   overflow: hidden;
 }
-.email-toolbar {
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
-.email-list-table th,
-.email-list-table td {
+
+.email-list-table th, .email-list-table td {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   vertical-align: middle;
 }
-/* --- FIX for Read/Unread styles --- */
-/* Use high-specificity selectors to override Bootstrap */
-.email-list-table > tbody > tr.email-read {
-  background-color: #f5f5f5 !important;
-  color: #888 !important;
+
+.email-list-table tr:hover {
+  background: #f1f3f4;
+  cursor: pointer;
 }
-.email-list-table > tbody > tr.email-unread {
-  background-color: #fff !important;
-  font-weight: bold;
-  color: #202124 !important;
-}
-.email-list-table > tbody > tr.email-read .sender-name {
-  color: #888 !important;
-}
-.email-list-table > tbody > tr.email-read .subject-line {
-  color: #999 !important;
-}
-.email-list-table > tbody > tr.email-unread .sender-name {
-  color: #202124 !important;
-}
-.email-list-table > tbody > tr.email-unread .subject-line {
-  color: #5f6368 !important;
-}
-/* Hover effects with high specificity */
-.email-list-table > tbody > tr.email-read:hover {
-  background-color: #e9ecef !important;
-}
-.email-list-table > tbody > tr.email-unread:hover {
-  background-color: #f8f9fa !important;
-}
+
 .email-toolbar {
   gap: 6px;
   padding: 0.25rem 0.5rem;
   background-color: #fff;
   border-bottom: 1px solid #dadce0;
 }
+
 .email-toolbar .gmail-icon-btn {
   background: none;
   border: none;
@@ -65,51 +38,65 @@
   justify-content: center;
   transition: background-color 0.2s ease;
 }
+
 .email-toolbar .gmail-icon-btn:hover {
   background-color: rgba(60, 64, 67, 0.1);
 }
+
 .email-toolbar .gmail-icon-btn svg {
   color: #5f6368;
 }
+
 body.dark-mode .email-toolbar {
   background-color: #202124;
   border-bottom-color: #3c4043;
 }
+
 body.dark-mode .email-toolbar .gmail-icon-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
+
 body.dark-mode .email-toolbar .gmail-icon-btn svg {
   color: #e8eaed;
 }
+
 input[type="checkbox"] {
   all: revert;
 }
+
 .star-cell {
   cursor: pointer;
   display: flex;
   align-items: center;
 }
+
 .star-filled {
   color: #fbbc04;
   font-size: 1rem;
 }
+
 .star-empty {
   color: #c0c0c0;
   font-size: 1rem;
 }
+
 .star-cell:hover .star-empty {
   color: #888;
 }
+
 body.dark-mode .star-empty {
   color: #888;
 }
+
 body.dark-mode .star-filled {
   color: #fbbc04;
 }
+
 body.dark-mode .table-primary td {
   background-color: #3a3d42 !important;
   color: #e8eaed !important;
 }
+
 /* Snippet Cell Styles */
 .email-snippet-cell {
   max-width: 100%;
@@ -117,6 +104,7 @@ body.dark-mode .table-primary td {
   display: flex;
   flex-direction: column;
 }
+
 .sender-name,
 .subject-line {
   white-space: nowrap;
@@ -124,44 +112,29 @@ body.dark-mode .table-primary td {
   text-overflow: ellipsis;
   display: block;
 }
+
 .sender-name {
   font-weight: 500;
+  color: #202124;
   font-size: 0.95rem;
   max-width: 200px;
 }
+
 .subject-line {
   font-size: 0.85rem;
+  color: #5f6368;
   max-width: 360px;
 }
+
+body.dark-mode .sender-name {
+  color: #e8eaed;
+}
+
+body.dark-mode .subject-line {
+  color: #9aa0a6;
+}
+
 /* Align end cells */
 .text-end {
   vertical-align: middle;
-}
-/* Dark mode for read/unread */
-body.dark-mode .email-list-table > tbody > tr.email-read {
-  background-color: #2a2b2d !important;
-  color: #9aa0a6 !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-unread {
-  background-color: #202124 !important;
-  font-weight: bold;
-  color: #e8eaed !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-read .sender-name {
-  color: #9aa0a6 !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-read .subject-line {
-  color: #888 !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-unread .sender-name {
-  color: #e8eaed !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-unread .subject-line {
-  color: #9aa0a6 !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-read:hover {
-  background-color: #3c4043 !important;
-}
-body.dark-mode .email-list-table > tbody > tr.email-unread:hover {
-  background-color: #3c4043 !important;
 }

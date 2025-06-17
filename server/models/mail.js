@@ -18,7 +18,6 @@ const mail = {
   content,
   timestamp: new Date().toISOString(),
   labels: ["sent", "inbox"],
-  read: false,
 };
 
 
