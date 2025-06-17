@@ -13,21 +13,23 @@ function createMail(senderId, recipientId, subject, content) {
   const recipient = users.find(u => u.id === recipientId) || {};
   const timestamp = new Date().toISOString();
 
-  const senderName = sender.username || 'Unknown';
-  const recipientName = recipient.username || 'Unknown';
 
-  // Recipient's copy (inbox)
-  const inboxMail = {
-    id: uuidv4(),
-    senderId,
-    senderName,
-    recipientId,
-    recipientName,
-    subject,
-    content,
-    timestamp,
-    labels: ['inbox']
-  };
+  
+
+ 
+const mail = {
+  id: uuidv4(),
+  senderId,
+  senderName: sender ? sender.username : "Unknown", // Use username only
+  recipientId,
+  recipientName: recipient ? recipient.username : "Unknown", // Use username only
+  subject,
+  content,
+  timestamp: new Date().toISOString(),
+  labels: ["sent", "inbox"],
+  read: false,
+};
+
 
   // Sender's copy (sent)
   const sentMail = {

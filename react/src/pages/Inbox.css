@@ -261,3 +261,37 @@ body.dark-mode {
 .dark-mode .gmail-icon-btn svg {
   color: #e8eaed;
 }
+/* slide the whole fixed sidebar column */
+.sidebar-closed {
+  transform: translateX(-240px);
+  transition: transform .3s ease;
+}
+
+/* shrink overlay column too (so main area expands) */
+.sidebar-fixed.sidebar-closed {
+  width: 0 !important;
+}
+
+/* button already uses .gmail-icon-btn class from global css */
+/* ensure it's always on top of header */
+.sidebar-toggle-btn { z-index: 1100; }
+/* shrink wrapper around sidebar so main area expands */
+.sidebar-closed { width: 70px !important; transition: width .3s ease; }
+
+/* floating toggle button stays on top */
+.sidebar-toggle-btn { z-index: 1100; }
+/* outer column follows rail width */
+.sidebar-fixed               { width: 220px; transition: width .3s ease; }
+.sidebar-fixed.icon-only     { width: 70px ; }
+
+/* keeps two-stage slide visually clean */
+.sidebar-toggle-btn          { z-index: 1100; }
+/* Inbox.css  ─  keep at the very end of the file */
+.sidebar-fixed               { width: 220px;      transition: width .25s; } /* expanded */
+.sidebar-fixed.icon-only     { width: 48px !important; }                   /* collapsed */
+/* outer sidebar column */
+.sidebar-fixed           { width: 220px; transition: width .25s ease; }
+.sidebar-fixed.icon-only { width: 48px  !important; background: transparent !important; border-right: none !important; }
+
+/* icon button stays above header / content */
+.sidebar-toggle-btn      { z-index: 1100; }

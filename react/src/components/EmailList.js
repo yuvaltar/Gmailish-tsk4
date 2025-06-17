@@ -4,19 +4,10 @@ import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icon
 import PropTypes from "prop-types";
 import "./EmailList.css";
 
-/**
- * EmailList component displays a list of emails, optionally filtered by label.
- *
- * Props:
- * - setSelectedEmail(emailId): callback for when a row is clicked
- * - propEmails: array of emails from a search result (optional)
- * - labelFilter: string matching the current label (e.g. "inbox", "starred", "spam")
- */
 function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
 
-  // Build fetch URL based on optional labelFilter
   const fetchEmails = async () => {
     let url = "http://localhost:3000/api/mails";
     if (labelFilter) {
@@ -29,15 +20,13 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Invalid data");
       setEmails(data);
-      // Reset any checks when folder changes
-      setCheckedEmails(new Set());
+      setCheckedEmails(new Set()); // Reset checks
     } catch (err) {
       console.error("Failed to fetch mails:", err.message);
       setEmails([]);
     }
   };
 
-  // Whenever either propEmails (search results) OR labelFilter changes, reload
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
@@ -71,16 +60,56 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
     }
   };
 
-  const toggleStar = (emailId) => {
-    setEmails((prev) =>
-      prev.map((email) =>
-        email.id === emailId ? { ...email, starred: !email.starred } : email
-      )
-    );
+  const toggleStar = async (emailId) => {
+    try {
+      const email = emails.find((e) => e.id === emailId);
+      if (!email) return;
+      const isStarred = email.labels?.includes("starred");
+
+      const res = await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "starred", action: isStarred ? "remove" : "add" }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update label");
+
+      setEmails((prev) =>
+        prev.map((e) =>
+          e.id === emailId
+            ? {
+                ...e,
+                labels: isStarred
+                  ? e.labels.filter((l) => l !== "starred")
+                  : [...(e.labels || []), "starred"],
+              }
+            : e
+        )
+      );
+    } catch (err) {
+      console.error("Failed to toggle star label:", err.message);
+    }
   };
 
-  const isAllSelected =
-    emails.length > 0 && checkedEmails.size === emails.length;
+  const handleRowClick = async (email) => {
+    setSelectedEmail(email.id);
+    if (!email.read) {
+      try {
+        await fetch(`http://localhost:3000/api/mails/${email.id}/markRead`, {
+          method: "PATCH",
+          credentials: "include",
+        });
+        setEmails((prev) =>
+          prev.map((m) => (m.id === email.id ? { ...m, read: true } : m))
+        );
+      } catch (err) {
+        console.error("Failed to mark as read:", err.message);
+      }
+    }
+  };
+
+  const isAllSelected = emails.length > 0 && checkedEmails.size === emails.length;
 
   return (
     <div className="w-100 p-0">
@@ -91,11 +120,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
             checked={isAllSelected}
             onChange={handleSelectAll}
           />
-          <button
-            className="gmail-icon-btn"
-            onClick={fetchEmails}
-            title="Refresh"
-          >
+          <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh">
             <BsArrowClockwise size={18} />
           </button>
           <button
@@ -108,15 +133,16 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
         </div>
       </div>
 
-      <Table hover className="mb-0">
+      <Table hover className="mb-0 email-list-table">
         <tbody>
           {emails.map((email) => (
             <tr
               key={email.id}
-              onClick={() => setSelectedEmail(email.id)}
-              className={
-                checkedEmails.has(email.id) ? "table-primary" : ""
-              }
+              onClick={() => handleRowClick(email)}
+              className={`
+                ${checkedEmails.has(email.id) ? "table-primary" : ""}
+                ${email.read ? "email-read" : "email-unread"}
+              `}
               style={{ cursor: "pointer" }}
             >
               <td className="ps-3">
@@ -137,7 +163,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
                     }}
                     className="star-cell"
                   >
-                    {email.starred ? (
+                    {email.labels?.includes("starred") ? (
                       <BsStarFill className="star-filled" size={14} />
                     ) : (
                       <BsStar className="star-empty" size={14} />
@@ -145,12 +171,8 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
                   </span>
                 </div>
               </td>
-
               <td className="email-snippet-cell">
-                <div
-                  className="sender-name"
-                  title={email.senderName || email.senderId}
-                >
+                <div className="sender-name" title={email.senderName || email.senderId}>
                   {email.senderName || email.senderId}
                 </div>
                 <div className="subject-line" title={email.subject}>
@@ -159,7 +181,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
                     : email.subject}
                 </div>
               </td>
-
               <td className="text-end pe-3">
                 {new Date(email.timestamp).toLocaleDateString()}
               </td>
