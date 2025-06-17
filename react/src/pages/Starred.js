@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import EmailList from "../components/EmailList";
 import MailView from "../components/MailView";
-import "./PageStyles.css"; // optional shared styling for layout
+
 
 function Starred() {
   const [emails, setEmails] = useState([]);
@@ -10,7 +10,7 @@ function Starred() {
   useEffect(() => {
     const fetchStarredEmails = async () => {
       try {
-        const res = await fetch("/api/labels/star/emails", {
+        const res = await fetch("http://localhost:3000/api/labels/starred/emails", {
           credentials: "include"
         });
         if (!res.ok) throw new Error("Failed to fetch starred emails");

@@ -25,7 +25,6 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
-      console.log("Draft emails:", propEmails);
       return;
     }
     fetchEmails();
@@ -53,13 +52,43 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
     }
   };
 
-  const toggleStar = (emailId) => {
-    setEmails((prev) =>
-      prev.map((email) =>
-        email.id === emailId ? { ...email, starred: !email.starred } : email
+  const toggleStar = async (emailId) => {
+  const email = emails.find(e => e.id === emailId);
+  if (!email) return;
+
+  const isStarred = email.labels?.includes("starred");
+  const action = isStarred ? "remove" : "add";
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ label: "starred", action })
+    });
+
+    if (!res.ok) throw new Error("Failed to update label");
+
+    // Locally update email labels in state
+    setEmails(prev =>
+      prev.map(e =>
+        e.id === emailId
+          ? {
+              ...e,
+              labels: action === "remove"
+                ? e.labels.filter(l => l !== "starred")
+                : [...(e.labels || []), "starred"]
+            }
+          : e
       )
     );
-  };
+  } catch (err) {
+    console.error("Failed to toggle star label:", err.message);
+  }
+};
+
 
   const isAllSelected = checkedEmails.size > 0 && checkedEmails.size === emails.length;
 
@@ -110,7 +139,7 @@ function EmailList({ setSelectedEmail, emails: propEmails }) {
                     }}
                     className="star-cell"
                   >
-                    {email.starred ? (
+                    {email.labels?.includes("starred") ?  (
                       <BsStarFill className="star-filled" size={14} />
                     ) : (
                       <BsStar className="star-empty" size={14} />

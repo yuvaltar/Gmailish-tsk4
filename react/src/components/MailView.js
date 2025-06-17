@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Spinner, Alert } from "react-bootstrap";
-import { BsArrowLeft, BsArchive, BsExclamationCircle, BsTrash, BsStar, BsTag } from "react-icons/bs";
+import {
+  BsArrowLeft, BsArchive, BsExclamationCircle, BsTrash, BsStar, BsStarFill, BsTag
+} from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
 function MailView({ emailId, onBack }) {
@@ -10,43 +12,47 @@ function MailView({ emailId, onBack }) {
   const [labels, setLabels] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch the mail data
+  // Fetch the mail
   useEffect(() => {
+    if (!emailId) return;
     setMailData(null);
     setError(null);
 
-    if (!emailId) return;
-
-    const fetchMail = async () => {
-      try {
-        const res = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
-          credentials: "include"
-        });
-
-        if (!res.ok) {
-          const { error } = await res.json();
-          throw new Error(error || "Mail not found");
-        }
-
-        const mail = await res.json();
-        setMailData(mail);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchMail();
+    fetch(`http://localhost:3000/api/mails/${emailId}`, {
+      credentials: "include"
+    })
+      .then(res => res.ok ? res.json() : Promise.reject("Mail not found"))
+      .then(setMailData)
+      .catch(err => setError(err));
   }, [emailId]);
 
-  // Fetch available labels (system + custom) on mount
+  // Fetch all labels
   useEffect(() => {
-    fetch("http://localhost:3000/api/labels", { credentials: "include" })
+    fetch("http://localhost:3000/api/labels", {
+      credentials: "include"
+    })
       .then(res => res.json())
       .then(setLabels)
       .catch(() => setLabels([]));
   }, []);
 
-  // Toolbar action handlers
+  const updateLabel = async (label, action = "add") => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label, action })
+      });
+
+      if (!res.ok) throw new Error("Failed to update label");
+      const updated = await res.json();
+      setMailData(updated.mail);
+    } catch (err) {
+      alert("Label update failed: " + err.message);
+    }
+  };
+
   const handleArchive = async () => {
     await updateLabel("archive");
     navigate("/archive");
@@ -62,31 +68,18 @@ function MailView({ emailId, onBack }) {
     navigate("/trash");
   };
 
-  const handleStar = async () => {
-    await updateLabel("starred");
-    navigate("/starred");
-  };
-
-  const handleLabel = () => setShowLabels(show => !show);
+  const handleLabel = () => setShowLabels(prev => !prev);
 
   const handleSelectLabel = async (label) => {
     await updateLabel(label);
     setShowLabels(false);
-    navigate(`/labels/${encodeURIComponent(label)}`);
+    navigate(`/label/${encodeURIComponent(label)}`);
   };
 
-  // Helper to add a label to this mail
-  const updateLabel = async (label) => {
-    try {
-      await fetch(`http://localhost:3000/api/mails/${emailId}/labels`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ label }),
-      });
-    } catch (err) {
-      alert("Failed to update label: " + err.message);
-    }
+  const handleStar = async () => {
+    const isStarred = mailData.labels?.includes("starred");
+    await updateLabel("starred", isStarred ? "remove" : "add");
+    navigate("/starred");
   };
 
   if (error) {
@@ -103,31 +96,33 @@ function MailView({ emailId, onBack }) {
 
   return (
     <div className="p-3 mail-view-container" style={{ position: "relative" }}>
-      {/* Gmail-style top toolbar */}
+      {/* Toolbar */}
       <div className="mail-toolbar d-flex align-items-center gap-2 mb-3">
+        <button className="gmail-icon-btn" onClick={onBack} title="Back">
+          <BsArrowLeft size={18} />
+        </button>
+        <button className="gmail-icon-btn" onClick={handleArchive} title="Archive">
+          <BsArchive size={18} />
+        </button>
+        <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
+          <BsTag size={18} />
+        </button>
+        <button className="gmail-icon-btn" onClick={handleStar} title="Star/Unstar">
+          {mailData.labels?.includes("starred") ? (
+            <BsStarFill className="text-warning" size={18} />
+          ) : (
+            <BsStar size={18} />
+          )}
+        </button>
+        <button className="gmail-icon-btn" onClick={handleSpam} title="Report Spam">
+          <BsExclamationCircle size={18} />
+        </button>
+        <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
+          <BsTrash size={18} />
+        </button>
+      </div>
 
-      <button className="gmail-icon-btn" onClick={onBack} title="Back to Inbox">
-        <BsArrowLeft size={18} />
-      </button>
-      <button className="gmail-icon-btn" onClick={handleArchive} title="Archive">
-        <BsArchive size={18} />
-      </button>
-      <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
-        <BsTag size={18} />
-      </button>
-      <button className="gmail-icon-btn" onClick={handleStar} title="Star">
-        <BsStar size={18} />
-      </button>
-       <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
-        <BsExclamationCircle size={18} />
-      </button>
-      <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
-        <BsTrash size={18} />
-      </button>
-    </div>
-
-
-      {/* Label Picker Dropdown */}
+      {/* Label Picker */}
       {showLabels && (
         <div
           style={{
@@ -162,7 +157,7 @@ function MailView({ emailId, onBack }) {
         </div>
       )}
 
-      {/* Email Content */}
+      {/* Mail Content */}
       <Card>
         <Card.Header>
           <strong>From:</strong> {mailData.senderName || mailData.senderId}<br />

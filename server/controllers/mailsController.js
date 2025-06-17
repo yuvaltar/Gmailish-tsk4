@@ -148,13 +148,28 @@ exports.saveDraft = (req, res) => {
 // PATCH /api/mails/:id/label
 exports.addLabelToEmail = (req, res) => {
   const mail = getMailById(req.params.id);
-  const { label } = req.body;
-  if (!label || typeof label !== 'string' || !label.trim()) return res.status(400).json({ error: 'Invalid label' });
-  if (!mail) return res.status(404).json({ error: 'Mail not found' });
-  if (mail.senderId !== req.user.id && mail.recipientId !== req.user.id) {
-    return res.status(403).json({ error: 'Unauthorized' });
+  const { label, action } = req.body; // action = 'add' or 'remove'
+
+  if (!label || typeof label !== "string" || !label.trim()) {
+    return res.status(400).json({ error: "Invalid label" });
   }
+
+  if (!mail) return res.status(404).json({ error: "Mail not found" });
+
+  const userId = req.user.id;
+  if (mail.senderId !== userId && mail.recipientId !== userId) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
   if (!mail.labels) mail.labels = [];
-  if (!mail.labels.includes(label)) mail.labels.push(label);
-  res.status(200).json({ message: `Label '${label}' added`, mail });
+
+  if (action === "remove") {
+    mail.labels = mail.labels.filter(l => l !== label);
+  } else {
+    if (!mail.labels.includes(label)) {
+      mail.labels.push(label);
+    }
+  }
+
+  res.status(200).json({ message: `Label '${label}' ${action === "remove" ? "removed" : "added"}`, mail });
 };

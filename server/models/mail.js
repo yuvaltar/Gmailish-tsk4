@@ -16,7 +16,7 @@ function createMail(senderId, recipientId, subject, content) {
     subject,
     content,
     timestamp: new Date().toISOString(),
-    labels: [senderId ? "sent" : "inbox"],
+    labels: [],
   };
 
   mails.push(mail);
@@ -60,7 +60,8 @@ function getDraftsForUser(userId) {
 
 function getEmailsByLabelName(labelName, userId) {
   return mails.filter(email =>
-    email.labels?.includes(labelName) && email.userId === userId
+    email.labels?.includes(labelName) &&
+    (email.senderId === userId || email.recipientId === userId)
   );
 }
 

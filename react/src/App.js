@@ -7,6 +7,7 @@ import Compose from "./pages/Compose";
 import LabelPage from "./pages/LabelPage";
 import Draft from "./pages/Draft";
 import Sent from "./pages/Sent";
+import Starred from "./pages/Starred";
 import ProtectedRoute from "./utils/ProtectedRoute"; // Use your utils/ProtectedRoute
 
 function App() {
@@ -40,6 +41,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Draft />
+          </ProtectedRoute>
+        }
+        />
+        <Route
+        path="/starred"
+        element={
+          <ProtectedRoute>
+            <Starred />
           </ProtectedRoute>
         }
         />

@@ -12,7 +12,7 @@ function Sent() {
   useEffect(() => {
     const fetchSentEmails = async () => {
       try {
-        const res = await fetch("/api/labels/sent/emails", {
+        const res = await fetch("api/labels/sent/emails", {
           credentials: "include"
         });
         if (!res.ok) throw new Error("Failed to load sent emails");
