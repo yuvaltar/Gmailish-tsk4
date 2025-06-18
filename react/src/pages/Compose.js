@@ -1,31 +1,41 @@
 import React, { useState } from "react";
 import { X, ArrowsFullscreen } from "react-bootstrap-icons";
 
-function Compose({ onClose }) {
+function Compose({ onClose, draft }) {
   const [minimized, setMinimized] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [to, setTo] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
-
+  const [to, setTo] = useState(draft?.to || "");
+  const [subject, setSubject] = useState(draft?.subject || "");
+  const [body, setBody] = useState(draft?.content || "");
+  const [draftId] = useState(draft?.id || null);
 
   const handleClose = async () => {
-  if (subject.trim() || body.trim()) {
-    try {
-      await fetch("/api/mails/drafts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ to, subject, content: body })
-      });
-      console.log("Draft saved.");
-    } catch (err) {
-      console.error("Failed to save draft:", err.message);
-    }
+  if (!subject.trim() && !body.trim() && !to.trim()) {
+    return onClose?.();
   }
-  if (onClose) onClose();
+
+  const payload = { subject, content: body };
+  if (to) payload.to = to;
+
+  try {
+    const url = draft?.id
+      ? `/api/mails/${draft.id}`
+      : `/api/mails/drafts`;
+    const method = draft?.id ? "PATCH" : "POST";
+
+    await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload)
+    });
+
+    console.log("Draft saved.");
+  } catch (err) {
+    console.error("Failed to save draft:", err.message);
+  }
+
+  onClose?.();
 };
 
   const handleSubmit = async (e) => {
@@ -53,6 +63,18 @@ function Compose({ onClose }) {
       if (!mailRes.ok) {
         const errMsg = await mailRes.json();
         throw new Error(errMsg.error || "Failed to send mail");
+      }
+
+      // STEP 3: If this was a draft, remove the 'draft' label
+      if (draft?.id) {
+        await fetch(`/api/mails/${draft.id}/label`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify({ label: "draft", action: "remove" })
+        });
       }
 
       alert("Mail sent!");

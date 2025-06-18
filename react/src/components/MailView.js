@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Card, Spinner, Alert } from "react-bootstrap";
+import { Spinner, Alert } from "react-bootstrap";
 import {
   BsArrowLeft, BsArchive, BsExclamationCircle, BsTrash, BsStar, BsStarFill, BsTag
 } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import Compose from "../pages/Compose";
 
 function MailView({ emailId, onBack }) {
   const [mailData, setMailData] = useState(null);
@@ -22,7 +23,9 @@ function MailView({ emailId, onBack }) {
       credentials: "include"
     })
       .then(res => res.ok ? res.json() : Promise.reject("Mail not found"))
-      .then(setMailData)
+      .then(mail => {
+        setMailData(mail);
+      })
       .catch(err => setError(err));
   }, [emailId]);
 
@@ -94,9 +97,22 @@ function MailView({ emailId, onBack }) {
     );
   }
 
+  if (mailData.labels?.includes("draft")) {
+    return (
+      <Compose
+        draft={{
+          id: mailData.id,
+          to: mailData.recipientName || mailData.recipientId,
+          subject: mailData.subject,
+          content: mailData.content
+        }}
+        onClose={onBack}
+      />
+    );
+  }
+
   return (
     <div className="p-3 mail-view-container" style={{ position: "relative" }}>
-      {/* Toolbar */}
       <div className="mail-toolbar d-flex align-items-center gap-2 mb-3">
         <button className="gmail-icon-btn" onClick={onBack} title="Back">
           <BsArrowLeft size={18} />
@@ -122,7 +138,6 @@ function MailView({ emailId, onBack }) {
         </button>
       </div>
 
-      {/* Label Picker */}
       {showLabels && (
         <div
           style={{
@@ -157,17 +172,16 @@ function MailView({ emailId, onBack }) {
         </div>
       )}
 
-      {/* Mail Content */}
-      <Card>
-        <Card.Header>
+      <div className="card">
+        <div className="card-header">
           <strong>From:</strong> {mailData.senderName || mailData.senderId}<br />
           <strong>To:</strong> {mailData.recipientName || mailData.recipientId}<br />
           <strong>Subject:</strong> {mailData.subject}<br />
-        </Card.Header>
-        <Card.Body>
+        </div>
+        <div className="card-body">
           <p>{mailData.content}</p>
-        </Card.Body>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
