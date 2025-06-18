@@ -114,7 +114,9 @@ function Sidebar({ onComposeClick }) {
           <ListGroup.Item
             key={idx}
             action
-            onClick={() => navigate(`/${encodeURIComponent(label)}`)}
+
+            onClick={() => navigate(`/label/${encodeURIComponent(label)}`)}
+
             className="sidebar-item"
           >
             <div className="d-flex align-items-center justify-content-between w-100">

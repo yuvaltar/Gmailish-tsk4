@@ -38,8 +38,13 @@ function createMail(senderId, recipientId, subject, content) {
     recipientName,
     subject,
     content,
+<<<<<<< itay
+    timestamp: new Date().toISOString(),
+    labels: [],
+=======
     timestamp,
     labels: ['sent']
+>>>>>>> itay-yuval
   };
 
   // Store both copies
@@ -69,7 +74,11 @@ function deleteMailById(id) {
  */
 function getInboxForUser(userId) {
   return mails
+<<<<<<< itay
+    .filter(m => m.recipientId === userId && !(m.labels && m.labels.includes("draft")))
+=======
     .filter(m => m.recipientId === userId && m.labels.includes('inbox'))
+>>>>>>> itay-yuval
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
@@ -89,6 +98,19 @@ function getEmailsByLabelName(labelName, userId) {
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
+<<<<<<< itay
+function getDraftsForUser(userId) {
+  return mails.filter(m =>
+    m.senderId === userId &&
+    (!m.labels || m.labels.includes("draft"))
+  );
+}
+
+function getEmailsByLabelName(labelName, userId) {
+  return mails.filter(email =>
+    email.labels?.includes(labelName) &&
+    (email.senderId === userId || email.recipientId === userId)
+=======
 /**
  * Search mails by subject or content for a user.
  * Searches both sent and received mails.
@@ -100,6 +122,7 @@ function searchMails(userId, query) {
       (m.subject && m.subject.toLowerCase().includes(q)) ||
       (m.content && m.content.toLowerCase().includes(q))
     )
+>>>>>>> itay-yuval
   );
 }
 
@@ -109,6 +132,12 @@ module.exports = {
   getMailById,
   deleteMailById,
   getInboxForUser,
+<<<<<<< itay
+  searchMails,
+  getEmailsByLabelName,
+  getDraftsForUser,
+=======
   getEmailsByLabelName,
   searchMails
+>>>>>>> itay-yuval
 };

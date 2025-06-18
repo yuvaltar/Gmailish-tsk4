@@ -79,9 +79,70 @@ input[type="checkbox"] {
   color: #c0c0c0;
   font-size: 1rem;
 }
+<<<<<<< itay
 
 .star-cell:hover .star-empty {
   color: #888;
+=======
+
+.star-cell:hover .star-empty {
+  color: #888;
+}
+
+body.dark-mode .star-empty {
+  color: #888;
+}
+
+body.dark-mode .star-filled {
+  color: #fbbc04;
+}
+
+body.dark-mode .table-primary td {
+  background-color: #3a3d42 !important;
+  color: #e8eaed !important;
+}
+
+/* Snippet Cell Styles */
+.email-snippet-cell {
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sender-name,
+.subject-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.sender-name {
+  font-weight: 500;
+  color: #202124;
+  font-size: 0.95rem;
+  max-width: 200px;
+}
+
+.subject-line {
+  font-size: 0.85rem;
+  color: #5f6368;
+  max-width: 360px;
+}
+
+body.dark-mode .sender-name {
+  color: #e8eaed;
+}
+
+body.dark-mode .subject-line {
+  color: #9aa0a6;
+}
+
+/* Align end cells */
+.text-end {
+  vertical-align: middle;
+>>>>>>> itay-yuval
 }
 
 body.dark-mode .star-empty {

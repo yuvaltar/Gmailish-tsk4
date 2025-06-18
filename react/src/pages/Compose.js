@@ -2,12 +2,42 @@ import React, { useState } from "react";
 import { X, ArrowsFullscreen } from "react-bootstrap-icons";
 import "./Compose.css";
 
-function Compose({ onClose }) {
+function Compose({ onClose, draft }) {
   const [minimized, setMinimized] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [to, setTo] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
+  const [to, setTo] = useState(draft?.to || "");
+  const [subject, setSubject] = useState(draft?.subject || "");
+  const [body, setBody] = useState(draft?.content || "");
+  const [draftId] = useState(draft?.id || null);
+
+  const handleClose = async () => {
+  if (!subject.trim() && !body.trim() && !to.trim()) {
+    return onClose?.();
+  }
+
+  const payload = { subject, content: body };
+  if (to) payload.to = to;
+
+  try {
+    const url = draft?.id
+      ? `/api/mails/${draft.id}`
+      : `/api/mails/drafts`;
+    const method = draft?.id ? "PATCH" : "POST";
+
+    await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload)
+    });
+
+    console.log("Draft saved.");
+  } catch (err) {
+    console.error("Failed to save draft:", err.message);
+  }
+
+  onClose?.();
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +64,18 @@ function Compose({ onClose }) {
       if (!mailRes.ok) {
         const errMsg = await mailRes.json();
         throw new Error(errMsg.error || "Failed to send mail");
+      }
+
+      // STEP 3: If this was a draft, remove the 'draft' label
+      if (draft?.id) {
+        await fetch(`/api/mails/${draft.id}/label`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify({ label: "draft", action: "remove" })
+        });
       }
 
       alert("Mail sent!");
@@ -76,13 +118,39 @@ function Compose({ onClose }) {
           >
             <ArrowsFullscreen size={14} />
           </button>
-          <button className="btn btn-sm btn-light" onClick={onClose} title="Close">
+          <button className="btn btn-sm btn-light" onClick={handleClose} title="Close">
             <X size={14} />
           </button>
         </div>
       </div>
 
       {!minimized && (
+<<<<<<< itay
+        <form className="p-3 pt-0" onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Recipients (email)"
+            className="form-control mb-2"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Subject"
+            className="form-control mb-2"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+          <textarea
+            className="form-control mb-2"
+            placeholder="Body"
+            rows="6"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+          <button type="submit" className="btn btn-sm btn-primary">Send</button>
+        </form>
+=======
         <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
   <input
     type="email"
@@ -107,6 +175,7 @@ function Compose({ onClose }) {
   </div>
 </form>
 
+>>>>>>> itay-yuval
       )}
     </div>
   );

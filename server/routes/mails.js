@@ -21,16 +21,36 @@ router.post('/', mailsController.sendMail);
 // GET /api/mails/search/:query → search mails
 router.get('/search/:query', mailsController.searchMails);
 
+<<<<<<< itay
+//Draft
+router.post('/drafts', mailsController.saveDraft);
+
+router.get('/drafts', mailsController.getDrafts);
+
+// GET /api/mails/:id - get specific mail
+=======
 // GET /api/mails/:id     → get specific mail
+>>>>>>> itay-yuval
 router.get('/:id', mailsController.getMailById);
 
 // PATCH /api/mails/:id   → edit mail
 router.patch('/:id', mailsController.updateMail);
 
+<<<<<<< itay
+// route to assign a label to an email
+=======
 // PATCH /api/mails/:id/label → add a custom label
+>>>>>>> itay-yuval
 router.patch('/:id/label', mailsController.addLabelToEmail);
 
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
 
+<<<<<<< itay
+
+
+
+
+=======
+>>>>>>> itay-yuval
 module.exports = router;
