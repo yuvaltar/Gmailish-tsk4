@@ -71,13 +71,25 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
     }
   };
 
-  const toggleStar = (emailId) => {
+  const toggleStar = async (emailId) => {
+  try {
+    const res = await fetch(`/api/mails/${emailId}/star`, {
+      method: "PATCH",
+      credentials: "include"
+    });
+    if (!res.ok) throw new Error("Star toggle failed");
+
+    const { starred } = await res.json();
     setEmails((prev) =>
       prev.map((email) =>
-        email.id === emailId ? { ...email, starred: !email.starred } : email
+        email.id === emailId ? { ...email, starred } : email
       )
     );
-  };
+  } catch (err) {
+    console.error("Failed to toggle star:", err.message);
+  }
+};
+
 
   const isAllSelected =
     emails.length > 0 && checkedEmails.size === emails.length;

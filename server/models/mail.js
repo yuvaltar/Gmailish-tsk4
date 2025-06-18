@@ -103,6 +103,40 @@ function searchMails(userId, query) {
   );
 }
 
+/**
+ * Toggle the 'starred' flag for a mail (if the user owns it).
+ */
+function toggleStar(mailId, userId) {
+  const mail = mails.find(m => m.id === mailId);
+  if (!mail || (mail.senderId !== userId && mail.recipientId !== userId)) {
+    return null;
+  }
+
+  mail.starred = !mail.starred;
+
+  // Handle 'starred' label logic
+  mail.labels = mail.labels || [];
+  if (mail.starred) {
+    if (!mail.labels.includes('starred')) mail.labels.push('starred');
+  } else {
+    mail.labels = mail.labels.filter(label => label !== 'starred');
+  }
+
+  return mail.starred;
+}
+
+
+/**
+ * Mark all inbox mails for the user as read (by adding 'read' label).
+ */
+function markAllAsRead(userId) {
+  mails.forEach(mail => {
+    if (mail.recipientId === userId && mail.labels.includes('inbox') && !mail.labels.includes('read')) {
+      mail.labels.push('read');
+    }
+  });
+}
+
 module.exports = {
   mails,
   createMail,
@@ -110,5 +144,7 @@ module.exports = {
   deleteMailById,
   getInboxForUser,
   getEmailsByLabelName,
-  searchMails
+  searchMails,
+  toggleStar,
+  markAllAsRead
 };

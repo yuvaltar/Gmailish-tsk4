@@ -1,4 +1,3 @@
-// src/components/MailView.js
 import React, { useEffect, useState } from "react";
 import { Card, Spinner, Alert } from "react-bootstrap";
 import {
@@ -7,6 +6,7 @@ import {
   BsExclamationCircle,
   BsTrash,
   BsStar,
+  BsStarFill,
   BsTag
 } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
@@ -75,20 +75,14 @@ function MailView({ emailId, onBack }) {
     navigate("/trash");
   };
 
-  const handleStar = async () => {
-    await updateLabel("starred");
-    navigate("/starred");
-  };
-
   const handleLabel = () => setShowLabels((s) => !s);
 
   const handleSelectLabel = async (label) => {
     await updateLabel(label);
     setShowLabels(false);
-    navigate(`/labels/${encodeURIComponent(label)}`);
+    navigate(`/${encodeURIComponent(label)}`);
   };
 
-  // Helper to add a label to this mail
   const updateLabel = async (label) => {
     try {
       await fetch(
@@ -102,6 +96,21 @@ function MailView({ emailId, onBack }) {
       );
     } catch (err) {
       alert("Failed to update label: " + err.message);
+    }
+  };
+
+  const handleToggleStar = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/mails/${emailId}/star`, {
+        method: "PATCH",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Star toggle failed");
+
+      const { starred } = await res.json();
+      setMailData((prev) => ({ ...prev, starred }));
+    } catch (err) {
+      alert("Failed to toggle star: " + err.message);
     }
   };
 
@@ -125,46 +134,26 @@ function MailView({ emailId, onBack }) {
     <div className="p-3 mail-view-container" style={{ position: "relative" }}>
       {/* Gmail-style top toolbar */}
       <div className="mail-toolbar d-flex align-items-center gap-2 mb-3">
-        <button
-          className="gmail-icon-btn"
-          onClick={onBack}
-          title="Back to Inbox"
-        >
+        <button className="gmail-icon-btn" onClick={onBack} title="Back to Inbox">
           <BsArrowLeft size={18} />
         </button>
-        <button
-          className="gmail-icon-btn"
-          onClick={handleArchive}
-          title="Archive"
-        >
+        <button className="gmail-icon-btn" onClick={handleArchive} title="Archive">
           <BsArchive size={18} />
         </button>
-        <button
-          className="gmail-icon-btn"
-          onClick={handleLabel}
-          title="Label"
-        >
+        <button className="gmail-icon-btn" onClick={handleLabel} title="Label">
           <BsTag size={18} />
         </button>
-        <button
-          className="gmail-icon-btn"
-          onClick={handleStar}
-          title="Star"
-        >
-          <BsStar size={18} />
+        <button className="gmail-icon-btn" onClick={handleToggleStar} title="Star">
+          {mailData.starred ? (
+            <BsStarFill className="text-warning" size={18} />
+          ) : (
+            <BsStar size={18} />
+          )}
         </button>
-        <button
-          className="gmail-icon-btn"
-          onClick={handleSpam}
-          title="Report spam"
-        >
+        <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
           <BsExclamationCircle size={18} />
         </button>
-        <button
-          className="gmail-icon-btn"
-          onClick={handleDelete}
-          title="Delete"
-        >
+        <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
           <BsTrash size={18} />
         </button>
       </div>
@@ -206,13 +195,21 @@ function MailView({ emailId, onBack }) {
 
       {/* Email Content */}
       <Card>
-        <Card.Header>
-          <strong>From:</strong> {mailData.senderName || mailData.senderId}
-          <br />
-          <strong>To:</strong> {mailData.recipientName || mailData.recipientId}
-          <br />
-          <strong>Subject:</strong> {mailData.subject}
-          <br />
+        <Card.Header className="d-flex justify-content-between align-items-start">
+          <div>
+            <strong>From:</strong> {mailData.senderName || mailData.senderId}
+            <br />
+            <strong>To:</strong> {mailData.recipientName || mailData.recipientId}
+            <br />
+            <strong>Subject:</strong> {mailData.subject}
+          </div>
+          <div onClick={handleToggleStar} style={{ cursor: "pointer" }} title="Toggle star">
+            {mailData.starred ? (
+              <BsStarFill className="text-warning" size={20} />
+            ) : (
+              <BsStar size={20} />
+            )}
+          </div>
         </Card.Header>
         <Card.Body>
           <p>{mailData.content}</p>

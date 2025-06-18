@@ -30,7 +30,11 @@ router.patch('/:id', mailsController.updateMail);
 // PATCH /api/mails/:id/label → add a custom label
 router.patch('/:id/label', mailsController.addLabelToEmail);
 
+router.patch("/:id/star", authenticate, mailsController.toggleStar);
+
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
+
+
 
 module.exports = router;
