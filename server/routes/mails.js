@@ -26,7 +26,6 @@ router.get('/:id', mailsController.getMailById);
 router.patch('/:id', mailsController.updateMail);
 
 // route to assign a label to an email
-
 router.patch('/:id/label', mailsController.addLabelToEmail);
 
 // DELETE /api/mails/:id - delete mail
