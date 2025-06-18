@@ -1,4 +1,7 @@
+// src/App.js
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+<<<<<<< itay
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Inbox from "./pages/Inbox";
@@ -9,26 +12,30 @@ import Draft from "./pages/Draft";
 import Sent from "./pages/Sent";
 import Starred from "./pages/Starred";
 import ProtectedRoute from "./utils/ProtectedRoute"; // Use your utils/ProtectedRoute
+=======
+
+import Login          from "./pages/Login";
+import Register       from "./pages/Register";
+import Compose        from "./pages/Compose";
+import Search         from "./pages/Search";
+import EmailPage      from "./pages/EmailPage";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import Layout         from "./components/Layout";
+>>>>>>> itay-yuval
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
+
+        {/* Public */}
+        <Route path="/"         element={<Login />} />
+        <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes */}
+        {/* All mail views share the same Layout */}
         <Route
-          path="/inbox"
-          element={
-            <ProtectedRoute>
-              <Inbox />
-            </ProtectedRoute>
-          }
-        />
-        <Route
+<<<<<<< itay
           path="/sent"
           element={
             <ProtectedRoute>
@@ -68,6 +75,25 @@ function App() {
             </ProtectedRoute>
           }
         />
+=======
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          {/* default = / → inbox */}
+          <Route index            element={<EmailPage />} />
+
+          {/* /spam, /starred, /MyCustomLabel, etc. */}
+          <Route path=":labelName" element={<EmailPage />} />
+
+          {/* Compose & Search */}
+          <Route path="send"      element={<Compose />} />
+          <Route path="search"    element={<Search />} />
+        </Route>
+>>>>>>> itay-yuval
       </Routes>
     </Router>
   );

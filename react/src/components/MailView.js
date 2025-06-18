@@ -1,10 +1,24 @@
+// src/components/MailView.js
 import React, { useEffect, useState } from "react";
+<<<<<<< itay
 import { Spinner, Alert } from "react-bootstrap";
 import {
   BsArrowLeft, BsArchive, BsExclamationCircle, BsTrash, BsStar, BsStarFill, BsTag
 } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Compose from "../pages/Compose";
+=======
+import { Card, Spinner, Alert } from "react-bootstrap";
+import {
+  BsArrowLeft,
+  BsArchive,
+  BsExclamationCircle,
+  BsTrash,
+  BsStar,
+  BsTag
+} from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+>>>>>>> itay-yuval
 
 function MailView({ emailId, onBack }) {
   const [mailData, setMailData] = useState(null);
@@ -13,11 +27,16 @@ function MailView({ emailId, onBack }) {
   const [labels, setLabels] = useState([]);
   const navigate = useNavigate();
 
+<<<<<<< itay
   // Fetch the mail
+=======
+  // Fetch the mail data
+>>>>>>> itay-yuval
   useEffect(() => {
     if (!emailId) return;
     setMailData(null);
     setError(null);
+<<<<<<< itay
 
     fetch(`http://localhost:3000/api/mails/${emailId}`, {
       credentials: "include"
@@ -72,10 +91,72 @@ function MailView({ emailId, onBack }) {
   };
 
   const handleLabel = () => setShowLabels(prev => !prev);
+=======
+    if (!emailId) return;
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/mails/${emailId}`,
+          { credentials: "include" }
+        );
+        if (!res.ok) {
+          const { error } = await res.json();
+          throw new Error(error || "Mail not found");
+        }
+        setMailData(await res.json());
+      } catch (err) {
+        setError(err.message);
+      }
+    })();
+  }, [emailId]);
+
+  // Fetch available labels (system + custom) on mount
+  useEffect(() => {
+    fetch("http://localhost:3000/api/labels", { credentials: "include" })
+      .then((res) => res.json())
+      .then(setLabels)
+      .catch(() => setLabels([]));
+  }, []);
+
+  // Toolbar action handlers
+  const handleArchive = async () => {
+    await updateLabel("archive");
+    navigate("/archive");
+  };
+
+  const handleSpam = async () => {
+    try {
+      await fetch(
+        `http://localhost:3000/api/mails/${emailId}/spam`,
+        {
+          method: "POST",
+          credentials: "include"
+        }
+      );
+      navigate("/spam");
+    } catch (err) {
+      alert("Failed to mark as spam: " + err.message);
+    }
+  };
+
+  const handleDelete = async () => {
+    await updateLabel("trash");
+    navigate("/trash");
+  };
+
+  const handleStar = async () => {
+    await updateLabel("starred");
+    navigate("/starred");
+  };
+
+  const handleLabel = () => setShowLabels((s) => !s);
+>>>>>>> itay-yuval
 
   const handleSelectLabel = async (label) => {
     await updateLabel(label);
     setShowLabels(false);
+<<<<<<< itay
     navigate(`/label/${encodeURIComponent(label)}`);
   };
 
@@ -83,10 +164,34 @@ function MailView({ emailId, onBack }) {
     const isStarred = mailData.labels?.includes("starred");
     await updateLabel("starred", isStarred ? "remove" : "add");
     navigate("/starred");
+=======
+    navigate(`/labels/${encodeURIComponent(label)}`);
+  };
+
+  // Helper to add a label to this mail
+  const updateLabel = async (label) => {
+    try {
+      await fetch(
+        `http://localhost:3000/api/mails/${emailId}/label`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label })
+        }
+      );
+    } catch (err) {
+      alert("Failed to update label: " + err.message);
+    }
+>>>>>>> itay-yuval
   };
 
   if (error) {
-    return <Alert variant="danger" className="m-3">Error: {error}</Alert>;
+    return (
+      <Alert variant="danger" className="m-3">
+        Error: {error}
+      </Alert>
+    );
   }
 
   if (!mailData) {
@@ -113,6 +218,7 @@ function MailView({ emailId, onBack }) {
 
   return (
     <div className="p-3 mail-view-container" style={{ position: "relative" }}>
+<<<<<<< itay
       <div className="mail-toolbar d-flex align-items-center gap-2 mb-3">
         <button className="gmail-icon-btn" onClick={onBack} title="Back">
           <BsArrowLeft size={18} />
@@ -134,10 +240,58 @@ function MailView({ emailId, onBack }) {
           <BsExclamationCircle size={18} />
         </button>
         <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
+=======
+      {/* Gmail-style top toolbar */}
+      <div className="mail-toolbar d-flex align-items-center gap-2 mb-3">
+        <button
+          className="gmail-icon-btn"
+          onClick={onBack}
+          title="Back to Inbox"
+        >
+          <BsArrowLeft size={18} />
+        </button>
+        <button
+          className="gmail-icon-btn"
+          onClick={handleArchive}
+          title="Archive"
+        >
+          <BsArchive size={18} />
+        </button>
+        <button
+          className="gmail-icon-btn"
+          onClick={handleLabel}
+          title="Label"
+        >
+          <BsTag size={18} />
+        </button>
+        <button
+          className="gmail-icon-btn"
+          onClick={handleStar}
+          title="Star"
+        >
+          <BsStar size={18} />
+        </button>
+        <button
+          className="gmail-icon-btn"
+          onClick={handleSpam}
+          title="Report spam"
+        >
+          <BsExclamationCircle size={18} />
+        </button>
+        <button
+          className="gmail-icon-btn"
+          onClick={handleDelete}
+          title="Delete"
+        >
+>>>>>>> itay-yuval
           <BsTrash size={18} />
         </button>
       </div>
 
+<<<<<<< itay
+=======
+      {/* Label Picker Dropdown */}
+>>>>>>> itay-yuval
       {showLabels && (
         <div
           style={{
@@ -154,7 +308,11 @@ function MailView({ emailId, onBack }) {
           {labels.length === 0 ? (
             <div style={{ padding: "1rem" }}>No labels</div>
           ) : (
+<<<<<<< itay
             labels.map(l => (
+=======
+            labels.map((l) => (
+>>>>>>> itay-yuval
               <div
                 key={l.name}
                 className="label-picker-item"
@@ -172,6 +330,7 @@ function MailView({ emailId, onBack }) {
         </div>
       )}
 
+<<<<<<< itay
       <div className="card">
         <div className="card-header">
           <strong>From:</strong> {mailData.senderName || mailData.senderId}<br />
@@ -179,6 +338,19 @@ function MailView({ emailId, onBack }) {
           <strong>Subject:</strong> {mailData.subject}<br />
         </div>
         <div className="card-body">
+=======
+      {/* Email Content */}
+      <Card>
+        <Card.Header>
+          <strong>From:</strong> {mailData.senderName || mailData.senderId}
+          <br />
+          <strong>To:</strong> {mailData.recipientName || mailData.recipientId}
+          <br />
+          <strong>Subject:</strong> {mailData.subject}
+          <br />
+        </Card.Header>
+        <Card.Body>
+>>>>>>> itay-yuval
           <p>{mailData.content}</p>
         </div>
       </div>

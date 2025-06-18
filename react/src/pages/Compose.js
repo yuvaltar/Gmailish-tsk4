@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, ArrowsFullscreen } from "react-bootstrap-icons";
+import "./Compose.css";
 
 function Compose({ onClose, draft }) {
   const [minimized, setMinimized] = useState(false);
@@ -124,6 +125,7 @@ function Compose({ onClose, draft }) {
       </div>
 
       {!minimized && (
+<<<<<<< itay
         <form className="p-3 pt-0" onSubmit={handleSubmit}>
           <input
             type="email"
@@ -148,6 +150,32 @@ function Compose({ onClose, draft }) {
           />
           <button type="submit" className="btn btn-sm btn-primary">Send</button>
         </form>
+=======
+        <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
+  <input
+    type="email"
+    placeholder="To"
+    value={to}
+    onChange={(e) => setTo(e.target.value)}
+  />
+  <input
+    type="text"
+    placeholder="Subject"
+    value={subject}
+    onChange={(e) => setSubject(e.target.value)}
+  />
+  <textarea
+    placeholder="Write your message..."
+    value={body}
+    onChange={(e) => setBody(e.target.value)}
+  ></textarea>
+  <div className="compose-footer">
+    <button type="submit" className="btn-send">Send</button>
+    {/* Optionally add icons like attach, emoji etc */}
+  </div>
+</form>
+
+>>>>>>> itay-yuval
       )}
     </div>
   );

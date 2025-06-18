@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
-import './Sidebar.css';
+import "./Sidebar.css";
 import Label from "./Label";
 import { Button, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { isTokenValid } from "../utils/auth";
 import {
   BsInbox,
   BsStar,
   BsSend,
   BsFileEarmarkText,
-  BsExclamationCircle
+  BsExclamationCircle,
+  BsArchive,
+  BsTrash
 } from "react-icons/bs";
 
 function Sidebar({ onComposeClick }) {
   const navigate = useNavigate();
   const [showLabelModal, setShowLabelModal] = useState(false);
-  const [customLabels, setCustomLabels] = useState([]); 
+  const [customLabels, setCustomLabels] = useState([]);
 
   useEffect(() => {
-  const fetchLabels = async () => {
-    try {
-      const res = await fetch("/api/labels", {
-        credentials: "include"
-      });
-      const data = await res.json();
-      setCustomLabels(data.map((label) => label.name));
-    } catch (err) {
-      console.error("Failed to load labels:", err);
-    }
-  };
-
-  fetchLabels();
-}, []);
+    const fetchLabels = async () => {
+      try {
+        const res = await fetch("/api/labels", {
+          credentials: "include"
+        });
+        const data = await res.json();
+        setCustomLabels(data.map((label) => label.name));
+      } catch (err) {
+        console.error("Failed to load labels:", err);
+      }
+    };
+    fetchLabels();
+  }, []);
 
   const addLabel = (newLabel) => {
     setCustomLabels((prev) => [...prev, newLabel]);
@@ -48,10 +48,8 @@ function Sidebar({ onComposeClick }) {
       </Button>
 
       <ListGroup variant="flush">
-        {/* Labels Header */}
+        {/* Labels Header (no navigation) */}
         <ListGroup.Item
-          action
-          onClick={() => navigate("/labels")}
           className="d-flex justify-content-between align-items-center sidebar-labels-header"
         >
           <span className="fw-bold">Labels</span>
@@ -75,12 +73,6 @@ function Sidebar({ onComposeClick }) {
           </div>
         </ListGroup.Item>
 
-        <ListGroup.Item action onClick={() => navigate("/starred")} className="sidebar-item">
-          <div className="d-flex align-items-center justify-content-between w-100">
-            <span>Starred</span> <BsStar />
-          </div>
-        </ListGroup.Item>
-
         <ListGroup.Item action onClick={() => navigate("/sent")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Sent</span> <BsSend />
@@ -93,18 +85,38 @@ function Sidebar({ onComposeClick }) {
           </div>
         </ListGroup.Item>
 
+        <ListGroup.Item action onClick={() => navigate("/archive")} className="sidebar-item">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Archive</span> <BsArchive />
+          </div>
+        </ListGroup.Item>
+
+        <ListGroup.Item action onClick={() => navigate("/starred")} className="sidebar-item">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Starred</span> <BsStar />
+          </div>
+        </ListGroup.Item>
+
         <ListGroup.Item action onClick={() => navigate("/spam")} className="sidebar-item">
           <div className="d-flex align-items-center justify-content-between w-100">
             <span>Spam</span> <BsExclamationCircle />
           </div>
         </ListGroup.Item>
 
-        {/* Custom labels go here */}
-        {customLabels.map((label, index) => (
+        <ListGroup.Item action onClick={() => navigate("/trash")} className="sidebar-item">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <span>Trash</span> <BsTrash />
+          </div>
+        </ListGroup.Item>
+
+        {/* Custom labels */}
+        {customLabels.map((label, idx) => (
           <ListGroup.Item
-            key={index}
+            key={idx}
             action
+
             onClick={() => navigate(`/label/${encodeURIComponent(label)}`)}
+
             className="sidebar-item"
           >
             <div className="d-flex align-items-center justify-content-between w-100">
@@ -118,9 +130,10 @@ function Sidebar({ onComposeClick }) {
       <Label
         show={showLabelModal}
         onClose={() => setShowLabelModal(false)}
-        onCreate={addLabel} // 🟢 pass the callback
+        onCreate={addLabel}
       />
     </div>
   );
 }
+
 export default Sidebar;
