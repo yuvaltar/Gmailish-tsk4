@@ -62,9 +62,14 @@ exports.getEmailsByLabelName = (req, res) => {
   const userId = req.user.id;
 
   const labeledEmails = mails.filter(email =>
-    (email.recipientId === userId || email.senderId === userId) &&
-    email.labels?.includes(labelName)
-  );
+  email.labels?.includes(labelName) &&
+  (
+    (labelName === 'sent' && email.senderId === userId) ||
+    (labelName === 'inbox' && email.recipientId === userId) ||
+    (labelName !== 'sent' && labelName !== 'inbox' && (email.senderId === userId || email.recipientId === userId))
+  )
+);
 
   res.status(200).json(labeledEmails);
 };
+

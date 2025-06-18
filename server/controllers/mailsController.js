@@ -10,15 +10,13 @@ const {
 
   getDraftsForUser
 } = require('../models/mail');
-const { mails } = require('../models/mail');
+
 const { users } = require('../models/user');
 const uuidv4 = require('../utils/uuid');
 const { sendToCpp } = require('../services/blacklistService');
 
 // Helper to check blacklisted URLs
 
-  getEmailsByLabelName
-} = require('../models/mail');
 
 
 // Regex for robust URL matching
@@ -114,28 +112,11 @@ exports.sendMail = async (req, res) => {
   if (check.error) return res.status(500).json({ error: `Unexpected response from C++ server for ${check.url}` });
   if (check.blacklisted) return res.status(400).json({ error: `URL is blacklisted: ${check.url}` });
 
-  const mail = {
-    id: uuidv4(),
-    senderId: sender.id,
-    senderName: `${sender.firstName} ${sender.lastName}`,
-    recipientId: to,
-    recipientName: `${recipient.firstName} ${recipient.lastName}`,
-    subject: subject.trim(),
-    content: content.trim(),
-    timestamp: new Date().toISOString(),
-    labels: ["sent"]
-  };
-
-  mails.push(mail);
-  res.status(201).json(mail);
+  const { inboxMail, sentMail } = createMail(sender.id, to, subject, content);
+  res.status(201).json(sentMail);
 };
 
-// GET /api/mails
-exports.getInbox = (req, res) => {
-  const inbox = getInboxForUser(req.user.id);
-  res.status(200).json(inbox);
 
-};
 
 // GET /api/mails/:id ⇒ fetch a single mail
 exports.getMailById = (req, res) => {

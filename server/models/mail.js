@@ -1,67 +1,65 @@
-const uuidv4 = require('../utils/uuid');
-const { users } = require('./user');  // Ensure this imports your user list
+// src/models/mail.js
 
-// In-memory storage of all mail records
+const uuidv4 = require('../utils/uuid');
+const { users } = require('./user');  // make sure this points at your in-memory users
+
+// In-memory mail store
 const mails = [];
 
 /**
- * Create a mail entry in both sender's "sent" and recipient's "inbox".
- * Returns an object with the two created mail records.
+ * Create a mail record in both sender's "sent" and recipient's "inbox".
+ * Returns { inboxMail, sentMail }
  */
 function createMail(senderId, recipientId, subject, content) {
   const sender = users.find(u => u.id === senderId) || {};
   const recipient = users.find(u => u.id === recipientId) || {};
   const timestamp = new Date().toISOString();
 
-  const senderName = sender.username || 'Unknown';
-  const recipientName = recipient.username || 'Unknown';
+  const senderName = sender.firstName && sender.lastName
+    ? `${sender.firstName} ${sender.lastName}`
+    : (sender.username || 'Unknown');
 
-  // Recipient's copy (inbox)
+  const recipientName = recipient.firstName && recipient.lastName
+    ? `${recipient.firstName} ${recipient.lastName}`
+    : (recipient.username || 'Unknown');
+
   const inboxMail = {
     id: uuidv4(),
     senderId,
     senderName,
     recipientId,
     recipientName,
-    subject,
-    content,
+    subject: subject.trim(),
+    content: content.trim(),
     timestamp,
-    labels: ['inbox']
+    labels: ['inbox'],
   };
 
-  // Sender's copy (sent)
   const sentMail = {
     id: uuidv4(),
     senderId,
     senderName,
     recipientId,
     recipientName,
-    subject,
-    content,
-<<<<<<< itay
-    timestamp: new Date().toISOString(),
-    labels: [],
-=======
+    subject: subject.trim(),
+    content: content.trim(),
     timestamp,
-    labels: ['sent']
->>>>>>> itay-yuval
+    labels: ['sent'],
   };
 
-  // Store both copies
   mails.push(inboxMail, sentMail);
-
   return { inboxMail, sentMail };
 }
 
 /**
- * Find a mail by its ID.
+ * Get a single mail by its ID.
  */
 function getMailById(id) {
   return mails.find(m => m.id === id);
 }
 
 /**
- * Delete a mail record by its ID.
+ * Delete a mail by its ID.
  */
 function deleteMailById(id) {
   const idx = mails.findIndex(m => m.id === id);
@@ -69,22 +67,22 @@ function deleteMailById(id) {
 }
 
 /**
- * Get up to the 50 newest inbox mails for a user.
- * Only includes mails received by the user (not sent by them).
+ * Get the latest 50 inbox mails for a given user (excluding drafts).
  */
 function getInboxForUser(userId) {
   return mails
-<<<<<<< itay
-    .filter(m => m.recipientId === userId && !(m.labels && m.labels.includes("draft")))
-=======
-    .filter(m => m.recipientId === userId && m.labels.includes('inbox'))
->>>>>>> itay-yuval
+    .filter(m =>
+      m.recipientId === userId &&
+      !m.labels.includes('draft') &&
+      !m.labels.includes('spam')
+    )
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
 
 /**
- * Get mails by any label (sent, spam, starred, custom, etc.).
+ * Get all mails for a user with a given label name.
+ * (works for 'sent', 'spam', 'trash', custom labels, etc.)
  */
 function getEmailsByLabelName(labelName, userId) {
   return mails
@@ -98,31 +96,30 @@ function getEmailsByLabelName(labelName, userId) {
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
-<<<<<<< itay
+/**
+ * Get all draft mails for a user.
+ */
 function getDraftsForUser(userId) {
-  return mails.filter(m =>
-    m.senderId === userId &&
-    (!m.labels || m.labels.includes("draft"))
-  );
+  return mails
+    .filter(m =>
+      m.senderId === userId &&
+      m.labels.includes('draft')
+    );
 }
 
-function getEmailsByLabelName(labelName, userId) {
-  return mails.filter(email =>
-    email.labels?.includes(labelName) &&
-    (email.senderId === userId || email.recipientId === userId)
-=======
 /**
- * Search mails by subject or content for a user.
- * Searches both sent and received mails.
+ * Search mails by subject or content (or sender/recipient name) for a user.
  */
 function searchMails(userId, query) {
   const q = query.toLowerCase();
   return mails.filter(m =>
-    (m.senderId === userId || m.recipientId === userId) && (
+    (m.senderId === userId || m.recipientId === userId) &&
+    (
+      (m.senderName && m.senderName.toLowerCase().includes(q)) ||
+      (m.recipientName && m.recipientName.toLowerCase().includes(q)) ||
       (m.subject && m.subject.toLowerCase().includes(q)) ||
       (m.content && m.content.toLowerCase().includes(q))
     )
->>>>>>> itay-yuval
   );
 }
 
@@ -132,12 +129,7 @@ module.exports = {
   getMailById,
   deleteMailById,
   getInboxForUser,
-<<<<<<< itay
-  searchMails,
   getEmailsByLabelName,
   getDraftsForUser,
-=======
-  getEmailsByLabelName,
-  searchMails
->>>>>>> itay-yuval
+  searchMails,
 };

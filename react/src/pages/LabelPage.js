@@ -31,7 +31,7 @@ function LabelPage() {
       <div className="row">
         <div className="col-md-5">
           <h2 className="mb-3">{labelName}</h2>
-          <EmailList emails={emails} setSelectedEmail={setSelectedEmailId} />
+          <EmailList propEmails={emails} setSelectedEmail={setSelectedEmailId} />
         </div>
         <div className="col-md-7">
           {selectedEmailId ? (

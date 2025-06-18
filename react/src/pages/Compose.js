@@ -125,32 +125,7 @@ function Compose({ onClose, draft }) {
       </div>
 
       {!minimized && (
-<<<<<<< itay
-        <form className="p-3 pt-0" onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Recipients (email)"
-            className="form-control mb-2"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Subject"
-            className="form-control mb-2"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
-          <textarea
-            className="form-control mb-2"
-            placeholder="Body"
-            rows="6"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-          />
-          <button type="submit" className="btn btn-sm btn-primary">Send</button>
-        </form>
-=======
+
         <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
   <input
     type="email"
@@ -175,7 +150,6 @@ function Compose({ onClose, draft }) {
   </div>
 </form>
 
->>>>>>> itay-yuval
       )}
     </div>
   );

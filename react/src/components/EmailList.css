@@ -79,11 +79,7 @@ input[type="checkbox"] {
   color: #c0c0c0;
   font-size: 1rem;
 }
-<<<<<<< itay
 
-.star-cell:hover .star-empty {
-  color: #888;
-=======
 
 .star-cell:hover .star-empty {
   color: #888;
@@ -142,7 +138,7 @@ body.dark-mode .subject-line {
 /* Align end cells */
 .text-end {
   vertical-align: middle;
->>>>>>> itay-yuval
+
 }
 
 body.dark-mode .star-empty {
