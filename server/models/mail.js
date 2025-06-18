@@ -34,7 +34,7 @@ function deleteMailById(id) {
 
 function getInboxForUser(userId) {
   return mails
-    .filter(m => m.recipientId === userId)
+    .filter(m => m.recipientId === userId && !(m.labels && m.labels.includes("draft")))
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
