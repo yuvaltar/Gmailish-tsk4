@@ -69,7 +69,12 @@ function deleteMailById(id) {
  */
 function getInboxForUser(userId) {
   return mails
-    .filter(m => m.recipientId === userId && m.labels.includes('inbox'))
+    .filter(m =>
+      m.recipientId === userId &&
+      m.labels.includes('inbox') &&
+      !m.labels.includes('spam') &&
+      !m.labels.includes('trash')
+    )
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
@@ -79,13 +84,34 @@ function getInboxForUser(userId) {
  */
 function getEmailsByLabelName(labelName, userId) {
   return mails
-    .filter(m =>
-      m.labels.includes(labelName) &&
-      (
-        (labelName === 'sent' && m.senderId === userId) ||
-        (labelName !== 'sent' && m.recipientId === userId)
-      )
-    )
+    .filter(m => {
+      const isTrashed = m.labels.includes('trash');
+      const isSpam = m.labels.includes('spam');
+
+      if (labelName === "trash") {
+        return isTrashed && (m.senderId === userId || m.recipientId === userId);
+      }
+
+      if (labelName === "spam") {
+        return isSpam && m.recipientId === userId; // ✅ only recipient sees spam
+      }
+
+      if (labelName === "inbox") {
+        return (
+          m.recipientId === userId &&
+          m.labels.includes("inbox") &&
+          !isTrashed &&
+          !isSpam
+        );
+      }
+
+      if (labelName === "sent") {
+        return m.senderId === userId && m.labels.includes("sent") && !isTrashed;
+      }
+
+      const isOwner = m.recipientId === userId || m.senderId === userId;
+      return isOwner && m.labels.includes(labelName) && !isTrashed;
+    })
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
@@ -125,13 +151,16 @@ function toggleStar(mailId, userId) {
   return mail.starred;
 }
 
-
 /**
  * Mark all inbox mails for the user as read (by adding 'read' label).
  */
 function markAllAsRead(userId) {
   mails.forEach(mail => {
-    if (mail.recipientId === userId && mail.labels.includes('inbox') && !mail.labels.includes('read')) {
+    if (
+      mail.recipientId === userId &&
+      mail.labels.includes('inbox') &&
+      !mail.labels.includes('read')
+    ) {
       mail.labels.push('read');
     }
   });
