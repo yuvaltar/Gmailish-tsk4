@@ -1,15 +1,32 @@
+import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
 
-  if (!token) {
-    // Redirect to login, and remember where the user wanted to go
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  useEffect(() => {
+    fetch("http://localhost:3000/api/tokens/me", {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Auth failed");
+        return res.json();
+      })
+      .then(() => {
+        setAuthenticated(true);
+        setLoading(false);
+      })
+      .catch(() => {
+        setAuthenticated(false);
+        setLoading(false);
+      });
+  }, []);
 
-  return children;
+  if (loading) return <p className="p-4">Checking authentication...</p>;
+
+  return authenticated ? children : <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 export default ProtectedRoute;
