@@ -138,3 +138,6 @@ body.dark-mode .subject-line {
 .text-end {
   vertical-align: middle;
 }
+.label-icon-glow {
+  color: #0d6efd !important; /* primary blue glow */
+}

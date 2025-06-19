@@ -14,7 +14,7 @@ const {
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
 
-const URL_REGEX = /(?:(?:file:\/\/(?:[A-Za-z]:)?(?:\/[^\s]*)?)|(?:[A-Za-z][A-Za-z0-9+.\-]*:\/\/)?(?:localhost|(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:\/[^\s]*)?)/g;
+const URL_REGEX = /(?:(?:file:\/\/(?:[A-Za-z]:)?(?:\/[^s]*)?)|(?:[A-Za-z][A-Za-z0-9+\-\.]*:\/\/)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:\/[^s]*)?)/g;
 
 async function containsBlacklistedUrl(text) {
   const matches = Array.from(text.matchAll(URL_REGEX), m => m[0]);
@@ -194,4 +194,21 @@ exports.markAllAsRead = (req, res) => {
   const userId = req.user.id;
   markAllAsRead(userId);
   return res.status(204).end();
+};
+
+exports.removeLabelFromEmail = (req, res) => {
+  const mail = getMailById(req.params.id);
+  const userId = req.user.id;
+  const { label } = req.params;
+
+  if (!mail || mail.ownerId !== userId) {
+    return res.status(404).json({ error: 'Mail not found or not owned by you' });
+  }
+
+  const index = mail.labels.indexOf(label);
+  if (index !== -1) {
+    mail.labels.splice(index, 1);
+  }
+
+  return res.status(200).json({ message: `Label '${label}' removed`, mail });
 };

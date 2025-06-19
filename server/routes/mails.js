@@ -21,8 +21,8 @@ router.post('/', mailsController.sendMail);
 // GET /api/mails/search/:query → search mails
 router.get('/search/:query', mailsController.searchMails);
 
+// GET /api/mails/search/:label/:query → search mails by label
 router.get('/search/:label/:query', mailsController.searchMailsByLabel);
-
 
 // GET /api/mails/:id     → get specific mail
 router.get('/:id', mailsController.getMailById);
@@ -33,11 +33,16 @@ router.patch('/:id', mailsController.updateMail);
 // PATCH /api/mails/:id/label → add a custom label
 router.patch('/:id/label', mailsController.addLabelToEmail);
 
-router.patch("/:id/star", authenticate, mailsController.toggleStar);
+// ✅ NEW: DELETE /api/mails/:id/label/:label → remove a label from mail
+router.delete('/:id/label/:label', mailsController.removeLabelFromEmail);
+
+// PATCH /api/mails/:id/star → toggle star
+router.patch('/:id/star', mailsController.toggleStar);
+
+// PATCH /api/mails/markAllRead → mark all mails as read
+router.patch('/markAllRead', mailsController.markAllAsRead);
 
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
-
-
 
 module.exports = router;
