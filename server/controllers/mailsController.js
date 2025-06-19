@@ -5,7 +5,7 @@ const {
   deleteMailById,
   getInboxForUser,
   searchMails,
-  searchMailsWithLabel, // ✅ NEW
+  searchMailsWithLabel,
   getEmailsByLabelName,
   toggleStar,
   markAllAsRead
@@ -14,12 +14,8 @@ const {
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
 
-// Regex for robust URL matching
 const URL_REGEX = /(?:(?:file:\/\/(?:[A-Za-z]:)?(?:\/[^\s]*)?)|(?:[A-Za-z][A-Za-z0-9+.\-]*:\/\/)?(?:localhost|(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:\/[^\s]*)?)/g;
 
-/**
- * Helper to detect blacklisted URLs for send/edit flows
- */
 async function containsBlacklistedUrl(text) {
   const matches = Array.from(text.matchAll(URL_REGEX), m => m[0]);
   for (const url of matches) {
@@ -30,7 +26,7 @@ async function containsBlacklistedUrl(text) {
         return { blacklisted: true, url };
       }
     } else if (result.startsWith('404 Not Found')) {
-      continue; // safe
+      continue;
     } else {
       return { error: true, url };
     }
@@ -38,10 +34,9 @@ async function containsBlacklistedUrl(text) {
   return { blacklisted: false };
 }
 
-// POST /api/mails/:id/spam ⇒ mark mail as spam + blacklist its URLs
 exports.markAsSpam = async (req, res) => {
   const mail = getMailById(req.params.id);
-  if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
+  if (!mail || mail.ownerId !== req.user.id) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
 
@@ -58,14 +53,12 @@ exports.markAsSpam = async (req, res) => {
   return res.status(200).json({ message: 'Marked as spam', mail });
 };
 
-// GET /api/mails/spam ⇒ alias route for spam view
 exports.getSpam = (req, res) => {
   const userId = req.user.id;
   const spamList = getEmailsByLabelName('spam', userId);
   return res.status(200).json(spamList);
 };
 
-// GET /api/mails?label=x ⇒ inbox or label-specific listing
 exports.getInbox = (req, res) => {
   const userId = req.user.id;
   const label = req.query.label;
@@ -80,7 +73,6 @@ exports.getInbox = (req, res) => {
   return res.status(200).json(inbox);
 };
 
-// POST /api/mails ⇒ send new mail
 exports.sendMail = async (req, res) => {
   const { to, subject, content } = req.body;
   const sender = req.user;
@@ -111,19 +103,17 @@ exports.sendMail = async (req, res) => {
   return res.status(201).json(sentMail);
 };
 
-// GET /api/mails/:id ⇒ fetch a single mail
 exports.getMailById = (req, res) => {
   const mail = getMailById(req.params.id);
-  if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
-    return res.status(404).json({ error: 'Mail not found' });
+  if (!mail || mail.ownerId !== req.user.id) {
+    return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
   return res.status(200).json(mail);
 };
 
-// PATCH /api/mails/:id ⇒ update mail
 exports.updateMail = async (req, res) => {
   const mail = getMailById(req.params.id);
-  if (!mail || mail.senderId !== req.user.id) {
+  if (!mail || mail.ownerId !== req.user.id) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
 
@@ -140,17 +130,15 @@ exports.updateMail = async (req, res) => {
   return res.status(204).end();
 };
 
-// DELETE /api/mails/:id ⇒ delete mail
 exports.deleteMail = (req, res) => {
   const mail = getMailById(req.params.id);
-  if (!mail || (mail.senderId !== req.user.id && mail.recipientId !== req.user.id)) {
+  if (!mail || mail.ownerId !== req.user.id) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
   deleteMailById(req.params.id);
   return res.status(204).end();
 };
 
-// GET /api/mails/search/:query ⇒ search across all labels
 exports.searchMails = (req, res) => {
   const userId = req.user.id;
   const query = req.params.query;
@@ -158,7 +146,6 @@ exports.searchMails = (req, res) => {
   return res.status(200).json(results);
 };
 
-// ✅ NEW: GET /api/mails/search/:label/:query ⇒ label-aware search
 exports.searchMailsByLabel = (req, res) => {
   const userId = req.user.id;
   const { label, query } = req.params;
@@ -171,34 +158,26 @@ exports.searchMailsByLabel = (req, res) => {
   return res.status(200).json(results);
 };
 
-// PATCH /api/mails/:id/label ⇒ add custom label
 exports.addLabelToEmail = (req, res) => {
-  const mailId = req.params.id;
+  const mail = getMailById(req.params.id);
+  const userId = req.user.id;
   const { label } = req.body;
+
+  if (!mail || mail.ownerId !== userId) {
+    return res.status(404).json({ error: 'Mail not found or not owned by you' });
+  }
 
   if (!label || typeof label !== 'string' || !label.trim()) {
     return res.status(400).json({ error: 'Label must be a non-empty string' });
   }
 
-  const mailInst = getMailById(mailId);
-  if (!mailInst) {
-    return res.status(404).json({ error: 'Email not found' });
+  if (!mail.labels.includes(label)) {
+    mail.labels.push(label);
   }
 
-  const userId = req.user.id;
-  if (mailInst.senderId !== userId && mailInst.recipientId !== userId) {
-    return res.status(403).json({ error: 'You are not authorized to label this email' });
-  }
-
-  mailInst.labels = mailInst.labels || [];
-  if (!mailInst.labels.includes(label)) {
-    mailInst.labels.push(label);
-  }
-
-  return res.status(200).json({ message: `Label '${label}' added`, mail: mailInst });
+  return res.status(200).json({ message: `Label '${label}' added`, mail });
 };
 
-// PATCH /api/mails/:id/star ⇒ toggle starred flag
 exports.toggleStar = (req, res) => {
   const userId = req.user.id;
   const mailId = req.params.id;
@@ -211,7 +190,6 @@ exports.toggleStar = (req, res) => {
   return res.status(200).json({ starred: newState });
 };
 
-// PATCH /api/mails/markAllRead ⇒ mark inbox mails as read
 exports.markAllAsRead = (req, res) => {
   const userId = req.user.id;
   markAllAsRead(userId);

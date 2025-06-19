@@ -1,5 +1,5 @@
 const uuidv4 = require('../utils/uuid');
-const { users } = require('./user');  // Ensure this imports your user list
+const { users } = require('./user');
 
 // In-memory storage of all mail records
 const mails = [];
@@ -26,7 +26,8 @@ function createMail(senderId, recipientId, subject, content) {
     subject,
     content,
     timestamp,
-    labels: ['inbox']
+    labels: ['inbox'],
+    ownerId: recipientId
   };
 
   // Sender's copy (sent)
@@ -39,7 +40,8 @@ function createMail(senderId, recipientId, subject, content) {
     subject,
     content,
     timestamp,
-    labels: ['sent']
+    labels: ['sent'],
+    ownerId: senderId
   };
 
   // Store both copies
@@ -49,27 +51,21 @@ function createMail(senderId, recipientId, subject, content) {
 }
 
 /**
- * Find a mail by its ID.
+ * Find a mail by its ID and owner.
  */
 function getMailById(id) {
   return mails.find(m => m.id === id);
 }
 
-/**
- * Delete a mail record by its ID.
- */
 function deleteMailById(id) {
   const idx = mails.findIndex(m => m.id === id);
   if (idx !== -1) mails.splice(idx, 1);
 }
 
-/**
- * Get up to the 50 newest inbox mails for a user.
- * Only includes mails received by the user (not sent by them).
- */
 function getInboxForUser(userId) {
   return mails
     .filter(m =>
+      m.ownerId === userId &&
       m.recipientId === userId &&
       m.labels.includes('inbox') &&
       !m.labels.includes('spam') &&
@@ -78,11 +74,11 @@ function getInboxForUser(userId) {
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
+
 function searchMailsWithLabel(userId, query, label) {
   const q = query.toLowerCase();
-
   return mails.filter(m =>
-    (m.senderId === userId || m.recipientId === userId) &&
+    m.ownerId === userId &&
     m.labels.includes(label) &&
     (
       (m.subject && m.subject.toLowerCase().includes(q)) ||
@@ -91,68 +87,40 @@ function searchMailsWithLabel(userId, query, label) {
   );
 }
 
-/**
- * Get mails by any label (sent, spam, starred, custom, etc.).
- */
 function getEmailsByLabelName(labelName, userId) {
   return mails
     .filter(m => {
+      if (m.ownerId !== userId) return false;
+
       const isTrashed = m.labels.includes('trash');
       const isSpam = m.labels.includes('spam');
 
-      if (labelName === "trash") {
-        return isTrashed && (m.senderId === userId || m.recipientId === userId);
-      }
+      if (labelName === 'trash') return isTrashed;
+      if (labelName === 'spam') return isSpam && m.recipientId === userId;
+      if (labelName === 'inbox') return m.recipientId === userId && m.labels.includes('inbox') && !isSpam && !isTrashed;
+      if (labelName === 'sent') return m.senderId === userId && m.labels.includes('sent') && !isTrashed;
 
-      if (labelName === "spam") {
-        return isSpam && m.recipientId === userId; // ✅ only recipient sees spam
-      }
-
-      if (labelName === "inbox") {
-        return (
-          m.recipientId === userId &&
-          m.labels.includes("inbox") &&
-          !isTrashed &&
-          !isSpam
-        );
-      }
-
-      if (labelName === "sent") {
-        return m.senderId === userId && m.labels.includes("sent") && !isTrashed;
-      }
-
-      const isOwner = m.recipientId === userId || m.senderId === userId;
-      return isOwner && m.labels.includes(labelName) && !isTrashed;
+      return m.labels.includes(labelName) && !isTrashed;
     })
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
-/**
- * Search mails by subject or content for a user.
- * Searches both sent and received mails.
- */
 function searchMails(userId, query) {
   const q = query.toLowerCase();
   return mails.filter(m =>
-    (m.senderId === userId || m.recipientId === userId) && (
+    m.ownerId === userId &&
+    (
       (m.subject && m.subject.toLowerCase().includes(q)) ||
       (m.content && m.content.toLowerCase().includes(q))
     )
   );
 }
 
-/**
- * Toggle the 'starred' flag for a mail (if the user owns it).
- */
 function toggleStar(mailId, userId) {
-  const mail = mails.find(m => m.id === mailId);
-  if (!mail || (mail.senderId !== userId && mail.recipientId !== userId)) {
-    return null;
-  }
+  const mail = mails.find(m => m.id === mailId && m.ownerId === userId);
+  if (!mail) return null;
 
   mail.starred = !mail.starred;
-
-  // Handle 'starred' label logic
   mail.labels = mail.labels || [];
   if (mail.starred) {
     if (!mail.labels.includes('starred')) mail.labels.push('starred');
@@ -163,12 +131,10 @@ function toggleStar(mailId, userId) {
   return mail.starred;
 }
 
-/**
- * Mark all inbox mails for the user as read (by adding 'read' label).
- */
 function markAllAsRead(userId) {
   mails.forEach(mail => {
     if (
+      mail.ownerId === userId &&
       mail.recipientId === userId &&
       mail.labels.includes('inbox') &&
       !mail.labels.includes('read')
