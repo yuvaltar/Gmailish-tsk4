@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsSearch } from "react-icons/bs";
-import './Header.css';
+import "./Header.css";
 
-function Header({ onSearch }) {
+function Header({ setSearchQuery }) {
   const [darkMode, setDarkMode] = useState(false);
   const [query, setQuery] = useState("");
   const [user, setUser] = useState(null);
@@ -17,11 +17,11 @@ function Header({ onSearch }) {
 
   useEffect(() => {
     fetch("http://localhost:3000/api/tokens/me", {
-      credentials: "include"
+      credentials: "include",
     })
-      .then(res => res.json())
-      .then(data => setUser(data))
-      .catch(err => console.error("User fetch error", err));
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.error("User fetch error", err));
   }, []);
 
   useEffect(() => {
@@ -39,13 +39,16 @@ function Header({ onSearch }) {
     window.location.reload();
   };
 
+  const performSearch = () => {
+    setSearchQuery(query.trim());
+  };
+
   const handleSearch = (e) => {
     if (e.key === "Enter") {
-      onSearch(query);
+      performSearch();
     }
   };
 
-  // Compose the user's Gmailish email address
   const gmailishEmail = user?.username ? `${user.username}@gmailish.com` : "";
 
   return (
@@ -60,11 +63,7 @@ function Header({ onSearch }) {
       </h5>
 
       <div className="search-bar-container position-relative w-50 me-3">
-        <button
-          className="search-icon-btn"
-          onClick={() => onSearch(query)}
-          type="button"
-        >
+        <button className="search-icon-btn" onClick={performSearch} type="button">
           <BsSearch />
         </button>
         <input
@@ -84,11 +83,7 @@ function Header({ onSearch }) {
         {darkMode ? "🌓 Dark Mode" : "🌓 Light Mode"}
       </button>
 
-      <div
-        className="position-relative ms-3"
-        ref={menuRef}
-        style={{ display: "inline-block" }}
-      >
+      <div className="position-relative ms-3" ref={menuRef} style={{ display: "inline-block" }}>
         <img
           src={
             user?.picture
@@ -108,12 +103,10 @@ function Header({ onSearch }) {
               right: 0,
               top: "110%",
               minWidth: "180px",
-              zIndex: 1000
+              zIndex: 1000,
             }}
           >
-            <div className="dropdown-item-text text-muted small">
-              {gmailishEmail}
-            </div>
+            <div className="dropdown-item-text text-muted small">{gmailishEmail}</div>
             <button
               className="dropdown-item"
               onClick={() => {

@@ -5,10 +5,12 @@ const {
   deleteMailById,
   getInboxForUser,
   searchMails,
+  searchMailsWithLabel, // ✅ NEW
   getEmailsByLabelName,
   toggleStar,
   markAllAsRead
 } = require('../models/mail');
+
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
 
@@ -63,11 +65,7 @@ exports.getSpam = (req, res) => {
   return res.status(200).json(spamList);
 };
 
-/**
- * GET /api/mails
- * - if ?label= is provided, return that folder
- * - otherwise return inbox (default)
- */
+// GET /api/mails?label=x ⇒ inbox or label-specific listing
 exports.getInbox = (req, res) => {
   const userId = req.user.id;
   const label = req.query.label;
@@ -122,7 +120,7 @@ exports.getMailById = (req, res) => {
   return res.status(200).json(mail);
 };
 
-// PATCH /api/mails/:id ⇒ update mail (with blacklist check)
+// PATCH /api/mails/:id ⇒ update mail
 exports.updateMail = async (req, res) => {
   const mail = getMailById(req.params.id);
   if (!mail || mail.senderId !== req.user.id) {
@@ -152,11 +150,24 @@ exports.deleteMail = (req, res) => {
   return res.status(204).end();
 };
 
-// GET /api/mails/search/:query ⇒ search mails
+// GET /api/mails/search/:query ⇒ search across all labels
 exports.searchMails = (req, res) => {
   const userId = req.user.id;
   const query = req.params.query;
   const results = searchMails(userId, query);
+  return res.status(200).json(results);
+};
+
+// ✅ NEW: GET /api/mails/search/:label/:query ⇒ label-aware search
+exports.searchMailsByLabel = (req, res) => {
+  const userId = req.user.id;
+  const { label, query } = req.params;
+
+  if (!label || !query) {
+    return res.status(400).json({ error: 'Missing label or query' });
+  }
+
+  const results = searchMailsWithLabel(userId, query, label);
   return res.status(200).json(results);
 };
 

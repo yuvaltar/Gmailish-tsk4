@@ -5,18 +5,18 @@ import PropTypes from "prop-types";
 import "./EmailList.css";
 
 /**
- * EmailList component displays a list of emails, optionally filtered by label.
+ * EmailList component displays a list of emails, optionally filtered by label and search query.
  *
  * Props:
  * - setSelectedEmail(emailId): callback for when a row is clicked
  * - propEmails: array of emails from a search result (optional)
  * - labelFilter: string matching the current label (e.g. "inbox", "starred", "spam")
+ * - searchQuery: search string typed by the user
  */
-function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
+function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
 
-  // Build fetch URL based on optional labelFilter
   const fetchEmails = async () => {
     let url = "http://localhost:3000/api/mails";
     if (labelFilter) {
@@ -29,7 +29,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Invalid data");
       setEmails(data);
-      // Reset any checks when folder changes
       setCheckedEmails(new Set());
     } catch (err) {
       console.error("Failed to fetch mails:", err.message);
@@ -37,7 +36,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
     }
   };
 
-  // Whenever either propEmails (search results) OR labelFilter changes, reload
+  // Load emails when label or propEmails change
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
@@ -45,6 +44,23 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
     }
     fetchEmails();
   }, [propEmails, labelFilter]);
+
+  // Filter by search query
+  useEffect(() => {
+    if (!searchQuery) {
+      // If no query, reload original label content
+      if (!propEmails) fetchEmails();
+      return;
+    }
+
+    setEmails((prev) =>
+      prev.filter(
+        (m) =>
+          m.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          m.content?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [searchQuery]);
 
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
@@ -72,24 +88,23 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
   };
 
   const toggleStar = async (emailId) => {
-  try {
-    const res = await fetch(`/api/mails/${emailId}/star`, {
-      method: "PATCH",
-      credentials: "include"
-    });
-    if (!res.ok) throw new Error("Star toggle failed");
+    try {
+      const res = await fetch(`/api/mails/${emailId}/star`, {
+        method: "PATCH",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Star toggle failed");
 
-    const { starred } = await res.json();
-    setEmails((prev) =>
-      prev.map((email) =>
-        email.id === emailId ? { ...email, starred } : email
-      )
-    );
-  } catch (err) {
-    console.error("Failed to toggle star:", err.message);
-  }
-};
-
+      const { starred } = await res.json();
+      setEmails((prev) =>
+        prev.map((email) =>
+          email.id === emailId ? { ...email, starred } : email
+        )
+      );
+    } catch (err) {
+      console.error("Failed to toggle star:", err.message);
+    }
+  };
 
   const isAllSelected =
     emails.length > 0 && checkedEmails.size === emails.length;
@@ -126,9 +141,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter }) {
             <tr
               key={email.id}
               onClick={() => setSelectedEmail(email.id)}
-              className={
-                checkedEmails.has(email.id) ? "table-primary" : ""
-              }
+              className={checkedEmails.has(email.id) ? "table-primary" : ""}
               style={{ cursor: "pointer" }}
             >
               <td className="ps-3">
@@ -187,11 +200,13 @@ EmailList.propTypes = {
   setSelectedEmail: PropTypes.func.isRequired,
   propEmails: PropTypes.array,
   labelFilter: PropTypes.string,
+  searchQuery: PropTypes.string, // ✅ NEW
 };
 
 EmailList.defaultProps = {
   propEmails: null,
   labelFilter: "inbox",
+  searchQuery: "",
 };
 
 export default EmailList;

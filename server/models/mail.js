@@ -78,6 +78,18 @@ function getInboxForUser(userId) {
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 50);
 }
+function searchMailsWithLabel(userId, query, label) {
+  const q = query.toLowerCase();
+
+  return mails.filter(m =>
+    (m.senderId === userId || m.recipientId === userId) &&
+    m.labels.includes(label) &&
+    (
+      (m.subject && m.subject.toLowerCase().includes(q)) ||
+      (m.content && m.content.toLowerCase().includes(q))
+    )
+  );
+}
 
 /**
  * Get mails by any label (sent, spam, starred, custom, etc.).
@@ -175,5 +187,6 @@ module.exports = {
   getEmailsByLabelName,
   searchMails,
   toggleStar,
+  searchMailsWithLabel,
   markAllAsRead
 };

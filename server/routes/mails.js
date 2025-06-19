@@ -21,6 +21,9 @@ router.post('/', mailsController.sendMail);
 // GET /api/mails/search/:query → search mails
 router.get('/search/:query', mailsController.searchMails);
 
+router.get('/search/:label/:query', mailsController.searchMailsByLabel);
+
+
 // GET /api/mails/:id     → get specific mail
 router.get('/:id', mailsController.getMailById);
 
