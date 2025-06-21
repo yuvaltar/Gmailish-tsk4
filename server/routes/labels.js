@@ -1,3 +1,4 @@
+//routes/labels
 const express = require('express');
 const router = express.Router();
 const labelsController = require('../controllers/labelsController');

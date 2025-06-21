@@ -1,3 +1,4 @@
+//labelscontroller.js
 const uuidv4 = require('../utils/uuid');
 const { mails } = require('../models/mail');
 const userLabels = {};  // Fixed: correctly scoped per user

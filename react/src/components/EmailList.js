@@ -1,23 +1,25 @@
-// emaillist
 // src/components/EmailList.js
 import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
-import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill, BsEnvelope } from "react-icons/bs";
+import {
+  BsArrowClockwise,
+  BsEnvelopeOpen,
+  BsEnvelope,
+  BsStar,
+  BsStarFill,
+  BsTag,
+  BsExclamationCircle,
+  BsTrash,
+  BsArchive,
+} from "react-icons/bs";
 import PropTypes from "prop-types";
 import "./EmailList.css";
 
-/**
- * EmailList component displays a list of emails, optionally filtered by label and search query.
- *
- * Props:
- * - setSelectedEmail(emailId): callback for when a row is clicked
- * - propEmails: array of emails from a search result (optional)
- * - labelFilter: string matching the current label (e.g. "inbox", "starred", "spam")
- * - searchQuery: search string typed by the user
- */
 function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
+  const [showLabelPicker, setShowLabelPicker] = useState(false);
+  const [labels, setLabels] = useState([]);
 
   const fetchEmails = async () => {
     let url = "http://localhost:3000/api/mails";
@@ -38,7 +40,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
   };
 
-  // Load emails when label or propEmails change
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
@@ -47,7 +48,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     fetchEmails();
   }, [propEmails, labelFilter]);
 
-  // Filter by search query
   useEffect(() => {
     if (!searchQuery) {
       if (!propEmails) fetchEmails();
@@ -63,6 +63,13 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     );
   }, [searchQuery]);
 
+  useEffect(() => {
+    fetch("http://localhost:3000/api/labels", { credentials: "include" })
+      .then((res) => res.json())
+      .then(setLabels)
+      .catch(() => setLabels([]));
+  }, []);
+
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
     if (newChecked.has(emailId)) newChecked.delete(emailId);
@@ -71,9 +78,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   };
 
   const handleSelectAll = (e) => {
-    setCheckedEmails(
-      e.target.checked ? new Set(emails.map((e) => e.id)) : new Set()
-    );
+    setCheckedEmails(e.target.checked ? new Set(emails.map((e) => e.id)) : new Set());
   };
 
   const handleMarkAllAsRead = async () => {
@@ -87,9 +92,9 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       console.error("Mark all as read failed", err.message);
     }
   };
+
   const handleMarkSelectedAsUnread = async () => {
     if (checkedEmails.size === 0) return;
-
     try {
       await fetch("http://localhost:3000/api/mails/markUnread", {
         method: "PATCH",
@@ -102,15 +107,75 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       console.error("Mark as unread failed", err.message);
     }
   };
- 
+
+  const handleStarSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/star`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+    }
+    fetchEmails();
+  };
+
+  const handleSpamSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/spam`, {
+        method: "POST",
+        credentials: "include",
+      });
+    }
+    fetchEmails();
+  };
+
+  const handleTrashSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "trash" }),
+      });
+    }
+    fetchEmails();
+  };
+
+  const handleArchiveSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "archive" })
+      });
+      await fetch(`/api/mails/${id}/label/inbox`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+    }
+    fetchEmails();
+  };
+
+  const handleLabelSelected = async (label) => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label })
+      });
+    }
+    setShowLabelPicker(false);
+    fetchEmails();
+  };
+
   const toggleStar = async (emailId) => {
     try {
       const res = await fetch(`/api/mails/${emailId}/star`, {
         method: "PATCH",
-        credentials: "include"
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Star toggle failed");
-
       const { starred } = await res.json();
       setEmails((prev) =>
         prev.map((email) =>
@@ -122,41 +187,84 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
   };
 
-  const isAllSelected =
-    emails.length > 0 && checkedEmails.size === emails.length;
+  const isAllSelected = emails.length > 0 && checkedEmails.size === emails.length;
+  const hasSelection = checkedEmails.size > 0;
 
   return (
-    <div className="w-100 p-0">
+    <div className="w-100 p-0 position-relative">
       <div className="email-toolbar d-flex align-items-center ps-1 py-0.1 border-bottom">
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
-          <Form.Check
-            type="checkbox"
-            checked={isAllSelected}
-            onChange={handleSelectAll}
-          />
-          <button
-            className="gmail-icon-btn"
-            onClick={fetchEmails}
-            title="Refresh"
-          >
-            <BsArrowClockwise size={18} />
-          </button>
-          <button
-            className="gmail-icon-btn"
-            onClick={handleMarkAllAsRead}
-            title="Mark all as read"
-          >
-            <BsEnvelopeOpen size={18} />
-          </button>
-          <button
-            className="gmail-icon-btn"
-            onClick={handleMarkSelectedAsUnread}
-            title="Mark as unread"
-          >
-             <BsEnvelope size={18} />
-          </button>
+          <Form.Check type="checkbox" checked={isAllSelected} onChange={handleSelectAll} />
+
+          {!hasSelection ? (
+            <>
+              <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh">
+                <BsArrowClockwise size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleMarkAllAsRead} title="Mark all as read">
+                <BsEnvelopeOpen size={18} />
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="gmail-icon-btn" onClick={handleMarkAllAsRead} title="Mark as read">
+                <BsEnvelopeOpen size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleMarkSelectedAsUnread} title="Mark as unread">
+                <BsEnvelope size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleStarSelected} title="Star">
+                <BsStar size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleArchiveSelected} title="Archive">
+                <BsArchive size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={() => setShowLabelPicker((s) => !s)} title="Label">
+                <BsTag size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleSpamSelected} title="Spam">
+                <BsExclamationCircle size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleTrashSelected} title="Trash">
+                <BsTrash size={18} />
+              </button>
+            </>
+          )}
         </div>
       </div>
+
+      {showLabelPicker && (
+        <div
+          style={{
+            position: "absolute",
+            top: 45,
+            left: 150,
+            background: "#fff",
+            border: "1px solid #ddd",
+            borderRadius: 4,
+            zIndex: 10,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          }}
+        >
+          {labels.length === 0 ? (
+            <div style={{ padding: "1rem" }}>No labels</div>
+          ) : (
+            labels.map((l) => (
+              <div
+                key={l.name}
+                onClick={() => handleLabelSelected(l.name)}
+                style={{
+                  cursor: "pointer",
+                  padding: "0.5rem 1rem",
+                  borderBottom: "1px solid #eee"
+                }}
+              >
+                {l.name}
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       <Table hover className="mb-0">
         <tbody>
@@ -168,7 +276,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                     checkedEmails.has(email.id) ? "table-primary" : ""
                   } ${email.read ? "read-mail" : "unread-mail"}`}
                 >
-                  {/* Left group: checkbox and star */}
                   <div className="d-flex align-items-center gap-2 ps-3">
                     <Form.Check
                       type="checkbox"
@@ -194,31 +301,21 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                     </span>
                   </div>
 
-                  {/* Middle group: sender and subject */}
                   <div className="email-snippet-cell flex-grow-1 px-3">
-                    <div
-                      className="sender-name"
-                      title={email.senderName || email.senderId}
-                    >
+                    <div className="sender-name" title={email.senderName || email.senderId}>
                       {email.senderName || email.senderId}
                     </div>
                     <div className="subject-line" title={email.subject}>
-                      {email.subject.length > 80
-                        ? email.subject.slice(0, 77) + "..."
-                        : email.subject}
+                      {email.subject.length > 80 ? email.subject.slice(0, 77) + "..." : email.subject}
                     </div>
                   </div>
 
-                  {/* Right group: date */}
                   <div className="email-date pe-3 text-nowrap">
                     {new Date(email.timestamp).toLocaleDateString()}
                   </div>
                 </div>
               </td>
             </tr>
-
-
-
           ))}
         </tbody>
       </Table>

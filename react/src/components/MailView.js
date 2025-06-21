@@ -1,3 +1,4 @@
+//mailview.js
 import React, { useEffect, useState } from "react";
 import { Card, Spinner, Alert } from "react-bootstrap";
 import {
@@ -139,24 +140,48 @@ function MailView({ emailId, onBack }) {
 
   const handleDelete = async () => {
     try {
-      await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ label: "trash" })
-      });
+      const isTrashed = mailData.labels.includes("trash");
+
+      if (isTrashed) {
+        // Remove "trash", add "inbox"
+        await fetch(`http://localhost:3000/api/mails/${emailId}/label/trash`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label: "inbox" }),
+        });
+
+      } else {
+        // Add "trash", remove "inbox"
+        await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label: "trash" }),
+        });
+
+        await fetch(`http://localhost:3000/api/mails/${emailId}/label/inbox`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      }
 
       const res = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
-        credentials: "include"
+        credentials: "include",
       });
-
       if (!res.ok) throw new Error("Failed to reload mail");
       const updated = await res.json();
       setMailData(updated);
     } catch (err) {
-      alert("Failed to delete: " + err.message);
+      alert("Failed to toggle trash: " + err.message);
     }
   };
+
 
 
   const handleToggleStar = async () => {
@@ -229,9 +254,10 @@ function MailView({ emailId, onBack }) {
         <button className="gmail-icon-btn" onClick={handleSpam} title="Report spam">
           <BsExclamationCircle size={18} className={mailData.labels.includes("spam") ? "text-danger" : ""} />
         </button>
-        <button className="gmail-icon-btn" onClick={handleDelete} title="Delete">
+        <button className="gmail-icon-btn" onClick={handleDelete} title="Move to trash / Untrash">
           <BsTrash size={18} className={mailData.labels.includes("trash") ? "text-danger" : ""} />
         </button>
+
       </div>
 
       {showLabels && (
