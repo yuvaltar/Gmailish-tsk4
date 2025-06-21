@@ -128,33 +128,62 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     fetchEmails();
   };
 
-  const handleTrashSelected = async () => {
+  const handleToggleTrashSelected = async () => {
     for (const id of checkedEmails) {
-      await fetch(`/api/mails/${id}/label`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ label: "trash" }),
-      });
+      const email = emails.find(e => e.id === id);
+      if (!email) continue;
+
+      if (email.labels.includes("trash")) {
+        await fetch(`/api/mails/${id}/label/trash`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        await fetch(`/api/mails/${id}/label`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label: "inbox" }),
+        });
+      } else {
+        await fetch(`/api/mails/${id}/label`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label: "trash" }),
+        });
+        await fetch(`/api/mails/${id}/label/inbox`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      }
     }
     fetchEmails();
   };
 
-  const handleArchiveSelected = async () => {
+  const handleToggleArchiveSelected = async () => {
     for (const id of checkedEmails) {
-      await fetch(`/api/mails/${id}/label`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ label: "archive" })
-      });
-      await fetch(`/api/mails/${id}/label/inbox`, {
-        method: "DELETE",
-        credentials: "include"
-      });
+      const email = emails.find((e) => e.id === id);
+      if (!email) continue;
+
+      if (email.labels.includes("archive")) {
+        // UNARCHIVE: remove archive label only
+        await fetch(`/api/mails/${id}/label/archive`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      } else {
+        // ARCHIVE: add archive (leave inbox)
+        await fetch(`/api/mails/${id}/label`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label: "archive" }),
+        });
+      }
     }
     fetchEmails();
   };
+
 
   const handleLabelSelected = async (label) => {
     for (const id of checkedEmails) {
@@ -162,7 +191,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ label })
+        body: JSON.stringify({ label }),
       });
     }
     setShowLabelPicker(false);
@@ -216,7 +245,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
               <button className="gmail-icon-btn" onClick={handleStarSelected} title="Star">
                 <BsStar size={18} />
               </button>
-              <button className="gmail-icon-btn" onClick={handleArchiveSelected} title="Archive">
+              <button className="gmail-icon-btn" onClick={handleToggleArchiveSelected} title="Archive / Unarchive">
                 <BsArchive size={18} />
               </button>
               <button className="gmail-icon-btn" onClick={() => setShowLabelPicker((s) => !s)} title="Label">
@@ -225,7 +254,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
               <button className="gmail-icon-btn" onClick={handleSpamSelected} title="Spam">
                 <BsExclamationCircle size={18} />
               </button>
-              <button className="gmail-icon-btn" onClick={handleTrashSelected} title="Trash">
+              <button className="gmail-icon-btn" onClick={handleToggleTrashSelected} title="Trash / Untrash">
                 <BsTrash size={18} />
               </button>
             </>
@@ -243,7 +272,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
             border: "1px solid #ddd",
             borderRadius: 4,
             zIndex: 10,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
         >
           {labels.length === 0 ? (
@@ -256,7 +285,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                 style={{
                   cursor: "pointer",
                   padding: "0.5rem 1rem",
-                  borderBottom: "1px solid #eee"
+                  borderBottom: "1px solid #eee",
                 }}
               >
                 {l.name}
