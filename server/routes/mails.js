@@ -13,7 +13,7 @@ router.get('/', mailsController.getInbox);
 router.get('/spam', mailsController.getSpam);
 
 // POST /api/mails/:id/spam → mark mail as spam and blacklist its URLs
-router.post('/:id/spam', mailsController.markAsSpam);
+router.post('/:id/spam', mailsController.toggleSpam);
 
 // DRAFT
 router.post('/draft', mailsController.saveDraft);

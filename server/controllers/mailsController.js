@@ -17,6 +17,11 @@ const uuidv4 = require('../utils/uuid');
 
 const URL_REGEX = /(?:(?:file:\/\/(?:[A-Za-z]:)?(?:\/[^s]*)?)|(?:[A-Za-z][A-Za-z0-9+\-\.]*:\/\/)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:\/[^s]*)?)/g;
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 exports.saveDraft = (req, res) => {
   const { to, subject, content } = req.body;
   const sender = req.user;
@@ -78,23 +83,44 @@ async function containsBlacklistedUrl(text) {
   return { blacklisted: false };
 }
 
-exports.markAsSpam = async (req, res) => {
+exports.toggleSpam = async (req, res) => {
   const mail = getMailById(req.params.id);
   if (!mail || mail.ownerId !== req.user.id) {
     return res.status(404).json({ error: 'Mail not found or not owned by you' });
   }
 
   const text = `${mail.subject} ${mail.content}`;
-  const matches = Array.from(text.matchAll(URL_REGEX), m => m[0]);
-  for (const url of matches) {
-    const result = (await sendToCpp(`POST ${url}`)).trim();
-    if (!['201 Created', '409 Conflict'].includes(result)) {
-      return res.status(500).json({ error: `Failed to blacklist ${url}: ${result}` });
-    }
-  }
+  const urls = Array.from(text.matchAll(URL_REGEX), m => m[0]);
 
-  if (!mail.labels.includes('spam')) mail.labels.push('spam');
-  return res.status(200).json({ message: 'Marked as spam', mail });
+  try {
+    if (mail.labels.includes("spam")) {
+      // UNMARK SPAM: Remove label + remove URLs from blacklist
+      mail.labels = mail.labels.filter(l => l !== "spam");
+
+      for (const url of urls) {
+        await sendToCpp(`DELETE ${url}`);
+        await delay(50);
+      }
+
+      return res.status(200).json({ message: "Unmarked as spam", mail });
+    } else {
+      // MARK AS SPAM: Add label + add URLs to blacklist
+      if (!mail.labels.includes("spam")) mail.labels.push("spam");
+
+      for (const url of urls) {
+        const result = (await sendToCpp(`POST ${url}`)).trim();
+        if (!["201 Created", "409 Conflict"].includes(result)) {
+          console.error("Blacklist error on:", url, "→", result);
+          return res.status(500).json({ error: `Failed to blacklist ${url}: ${result}` });
+        }
+      }
+
+      return res.status(200).json({ message: "Marked as spam", mail });
+    }
+  } catch (err) {
+    console.error("toggleSpam() exception:", err);
+    return res.status(500).json({ error: 'Internal error in spam toggle' });
+  }
 };
 
 exports.getSpam = (req, res) => {
@@ -131,17 +157,18 @@ exports.sendMail = async (req, res) => {
   }
 
   const check = await containsBlacklistedUrl(`${subject} ${content}`);
-  if (check.error) {
+   if (check.error) {
     return res.status(500).json({ error: `Blacklist error for ${check.url}` });
-  } else if (check.blacklisted) {
-    return res.status(400).json({ error: `URL is blacklisted: ${check.url}` });
   }
+
+  const recipientLabels = check.blacklisted ? ['spam'] : ['inbox'];
 
   const { inboxMail, sentMail } = createMail(
     sender.id,
     to,
     subject.trim(),
-    content.trim()
+    content.trim(),
+    recipientLabels
   );
 
   return res.status(201).json(sentMail);

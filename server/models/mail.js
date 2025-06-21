@@ -8,7 +8,7 @@ const mails = [];
  * Create a mail entry in both sender's "sent" and recipient's "inbox".
  * Returns an object with the two created mail records.
  */
-function createMail(senderId, recipientId, subject, content) {
+function createMail(senderId, recipientId, subject, content, recipientLabels = ['inbox']) {
   const sender = users.find(u => u.id === senderId) || {};
   const recipient = users.find(u => u.id === recipientId) || {};
   const timestamp = new Date().toISOString();
@@ -26,7 +26,7 @@ function createMail(senderId, recipientId, subject, content) {
     subject,
     content,
     timestamp,
-    labels: ['inbox'],
+    labels: recipientLabels,
     ownerId: recipientId
   };
 

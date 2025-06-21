@@ -118,20 +118,40 @@ function MailView({ emailId, onBack }) {
 
   const handleSpam = async () => {
     try {
-      await fetch(`http://localhost:3000/api/mails/${emailId}/spam`, {
+      const res = await fetch(`http://localhost:3000/api/mails/${emailId}/spam`, {
         method: "POST",
         credentials: "include"
       });
-      navigate("/spam");
+      if (!res.ok) throw new Error("Spam toggle failed");
+
+      const updated = await res.json();
+      setMailData(updated.mail); // ✅ Refresh UI
     } catch (err) {
-      alert("Failed to mark as spam: " + err.message);
+      alert("Failed to toggle spam: " + err.message);
     }
   };
 
   const handleDelete = async () => {
-    await updateLabel("trash");
-    navigate("/trash");
+    try {
+      await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "trash" })
+      });
+
+      const res = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
+        credentials: "include"
+      });
+
+      if (!res.ok) throw new Error("Failed to reload mail");
+      const updated = await res.json();
+      setMailData(updated);
+    } catch (err) {
+      alert("Failed to delete: " + err.message);
+    }
   };
+
 
   const handleToggleStar = async () => {
     try {
