@@ -2,48 +2,85 @@ import React, { useState } from "react";
 import { X, ArrowsFullscreen } from "react-bootstrap-icons";
 import "./Compose.css";
 
-function Compose({ onClose }) {
+function Compose({ onClose, draft }) {
   const [minimized, setMinimized] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [to, setTo] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
+  const [to, setTo] = useState(draft?.to || "");
+  const [subject, setSubject] = useState(draft?.subject || "");
+  const [body, setBody] = useState(draft?.content || "");
+  const draftId = draft?.id || null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleClose = async () => {
+    if (!subject.trim() && !body.trim() && !to.trim()) {
+      return onClose?.();
+    }
+
+    const payload = { subject, content: body };
+    if (to) payload.to = to;
 
     try {
-      // STEP 1: Fetch user ID by email
-      const userRes = await fetch(`http://localhost:3000/api/users/by-email/${encodeURIComponent(to)}`, {
-        credentials: "include"
-      });
+      const url = draftId ? `http://localhost:3000/api/mails/${draftId}`: `http://localhost:3000/api/mails/draft`;
+      const method = draftId ? "PATCH" : "POST";
 
-      if (!userRes.ok) throw new Error("Recipient not found");
-      const { id: recipientId } = await userRes.json();
-
-      // STEP 2: Send the mail with recipient ID
-      const mailRes = await fetch("http://localhost:3000/api/mails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+      await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ to: recipientId, subject, content: body })
+        body: JSON.stringify(payload)
       });
-
-      if (!mailRes.ok) {
-        const errMsg = await mailRes.json();
-        throw new Error(errMsg.error || "Failed to send mail");
-      }
-
-      alert("Mail sent!");
-      setTo(""); setSubject(""); setBody("");
-      if (onClose) onClose();
 
     } catch (err) {
-      alert(err.message);
+      console.error("Failed to save draft:", err.message);
     }
+
+    onClose?.();
   };
+
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // STEP 1: Fetch user ID by email
+    const userRes = await fetch(`http://localhost:3000/api/users/by-email/${encodeURIComponent(to)}`, {
+      credentials: "include"
+    });
+
+    if (!userRes.ok) throw new Error("Recipient not found");
+    const { id: recipientId } = await userRes.json();
+
+    // STEP 2: Send the mail
+    const mailRes = await fetch("http://localhost:3000/api/mails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ to: recipientId, subject, content: body })
+    });
+
+    if (!mailRes.ok) {
+      const errMsg = await mailRes.json();
+      throw new Error(errMsg.error || "Failed to send mail");
+    }
+
+    // ✅ STEP 3: If this was a draft, delete it
+    if (draftId) {
+      await fetch(`http://localhost:3000/api/mails/${draftId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+    }
+
+    alert("Mail sent!");
+    setTo(""); setSubject(""); setBody("");
+    if (onClose) onClose();
+
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 
   return (
     <div className={
@@ -76,7 +113,7 @@ function Compose({ onClose }) {
           >
             <ArrowsFullscreen size={14} />
           </button>
-          <button className="btn btn-sm btn-light" onClick={onClose} title="Close">
+          <button className="btn btn-sm btn-light" onClick={handleClose} title="Close">
             <X size={14} />
           </button>
         </div>

@@ -99,6 +99,7 @@ function getEmailsByLabelName(labelName, userId) {
       if (labelName === 'spam') return isSpam && m.recipientId === userId;
       if (labelName === 'inbox') return m.recipientId === userId && m.labels.includes('inbox') && !isSpam && !isTrashed;
       if (labelName === 'sent') return m.senderId === userId && m.labels.includes('sent') && !isTrashed;
+      if (labelName === 'drafts') return m.labels.includes('drafts') && m.senderId === userId;
 
       return m.labels.includes(labelName) && !isTrashed;
     })
@@ -135,9 +136,9 @@ function markAllAsRead(userId) {
   mails.forEach(mail => {
     if (
       mail.ownerId === userId &&
-      mail.recipientId === userId &&
-      mail.labels.includes('inbox') &&
-      !mail.labels.includes('read')
+      !mail.labels.includes('read') &&
+      !mail.labels.includes('trash') &&
+      !mail.labels.includes('spam')
     ) {
       mail.labels.push('read');
     }

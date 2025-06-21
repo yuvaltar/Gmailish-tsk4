@@ -13,8 +13,52 @@ const {
 
 const { users } = require('../models/user');
 const { sendToCpp } = require('../services/blacklistService');
+const uuidv4 = require('../utils/uuid');
 
 const URL_REGEX = /(?:(?:file:\/\/(?:[A-Za-z]:)?(?:\/[^s]*)?)|(?:[A-Za-z][A-Za-z0-9+\-\.]*:\/\/)?(?:localhost|(?:[A-Za-z0-9\-]+\.)+[A-Za-z0-9\-]+|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?:\/[^s]*)?)/g;
+
+exports.saveDraft = (req, res) => {
+  const { to, subject, content } = req.body;
+  const sender = req.user;
+
+  if (!subject && !content && !to) {
+    return res.status(400).json({ error: 'Draft is empty' });
+  }
+
+  let recipientId = null;
+  let recipientName = null;
+  let recipientEmail = null;
+
+  if (to) {
+  const recipient = users.find(u => u.email === to);
+  if (recipient) {
+    recipientId = recipient.id;
+    recipientName = `${recipient.firstName} ${recipient.lastName}`;
+    recipientEmail = recipient.email;
+  } else {
+    recipientEmail = to; // fallback
+  }
+}
+
+  const mail = {
+    id: uuidv4(),
+    senderId: sender.id,
+    senderName: `${sender.firstName} ${sender.lastName}`,
+    recipientId,
+    recipientName,
+    recipientEmail,
+    subject: subject?.trim() || "",
+    content: content?.trim() || "",
+    timestamp: new Date().toISOString(),
+    labels: ["drafts"],
+    ownerId: sender.id               
+  };
+
+  
+  mails.push(mail);
+  res.status(201).json(mail);
+};
+
 
 async function containsBlacklistedUrl(text) {
   const matches = Array.from(text.matchAll(URL_REGEX), m => m[0]);

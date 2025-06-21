@@ -16,31 +16,58 @@ function isValidDate(dateStr) {
 // POST /api/users
 exports.registerUser = (req, res) => {
   const { firstName, lastName, username, gender, password, birthdate } = req.body;
-
-
   const picture = req.file;
 
-   if (!firstName || !lastName || !username || !gender || !password || !birthdate || !picture) {
-
+  // Basic presence check
+  if (!firstName || !lastName || !username || !gender || !password || !birthdate || !picture) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
+  // Birthdate format check
   if (!isValidDate(birthdate)) {
     return res.status(400).json({ error: 'Birthdate must be in YYYY-MM-DD format' });
   }
 
+  // Password validation
+  const passwordErrors = [];
+  if (password.length < 8) {
+    passwordErrors.push("must be at least 8 characters long");
+  }
+  if (!/[a-z]/.test(password)) {
+    passwordErrors.push("must include at least one lowercase letter");
+  }
+  if (!/[A-Z]/.test(password)) {
+    passwordErrors.push("must include at least one uppercase letter");
+  }
+  if (!/\d/.test(password)) {
+    passwordErrors.push("must include at least one digit");
+  }
+  if (!/[!@#$%^&*()_\-+=[\]{};':"\\|,.<>/?]/.test(password)) {
+    passwordErrors.push("must include at least one special character");
+  }
 
-  const newUser = createUser({ firstName, lastName, username, gender, password, birthdate,picture: picture.filename});
+  if (passwordErrors.length > 0) {
+    return res.status(400).json({ error: "Password " + passwordErrors.join(", ") + "." });
+  }
+
+  const newUser = createUser({
+    firstName,
+    lastName,
+    username,
+    gender,
+    password,
+    birthdate,
+    picture: picture.filename
+  });
 
   if (!newUser) {
     return res.status(409).json({ error: 'Username already exists' });
   }
 
-
-  console.log('Created user:', newUser);         // <-- for your server logs
-  res.status(201).json(newUser);                  // <-- send the user back
-
+  console.log('Created user:', newUser);
+  res.status(201).json(newUser);
 };
+
 
 // GET /api/users/:id
 exports.getUser = (req, res) => {

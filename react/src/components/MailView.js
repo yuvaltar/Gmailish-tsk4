@@ -10,6 +10,8 @@ import {
   BsTag
 } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import Compose from "../pages/Compose";
+
 
 function MailView({ emailId, onBack }) {
   const [mailData, setMailData] = useState(null);
@@ -69,9 +71,50 @@ function MailView({ emailId, onBack }) {
   };
 
   const handleArchive = async () => {
-    await updateLabel("archive");
-    navigate("/archive");
-  };
+  try {
+    const isArchived = mailData.labels.includes("archive");
+
+    if (isArchived) {
+      // Unarchive: remove "archive", add "inbox"
+      await fetch(`http://localhost:3000/api/mails/${emailId}/label/archive`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "inbox" })
+      });
+
+    } else {
+      // Archive: add "archive", remove "inbox"
+      await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "archive" })
+      });
+
+      await fetch(`http://localhost:3000/api/mails/${emailId}/label/inbox`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+    }
+    
+    const res = await fetch(`http://localhost:3000/api/mails/${emailId}`, {
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("Failed to reload mail");
+    const updated = await res.json();
+    setMailData(updated);
+
+  } catch (err) {
+    alert("Failed to toggle archive: " + err.message);
+  }
+};
 
   const handleSpam = async () => {
     try {
@@ -121,6 +164,21 @@ function MailView({ emailId, onBack }) {
     return <div className="d-flex justify-content-center align-items-center h-100">
       <Spinner animation="border" />
     </div>;
+  }
+
+  //draft logic
+  if (mailData.labels.includes("drafts")) {
+    return (
+      <Compose
+        draft={{
+          id: mailData.id,
+          to: mailData.recipientEmail || mailData.recipientId,
+          subject: mailData.subject,
+          content: mailData.content
+        }}
+        onClose={onBack}
+      />
+    );
   }
 
   return (
