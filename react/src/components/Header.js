@@ -35,9 +35,24 @@ function Header({ setSearchQuery }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-  };
+  fetch("http://localhost:3000/api/tokens/logout", {
+    method: "POST",
+    credentials: "include",
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Logout failed");
+      // Make sure browser processes the Set-Cookie header
+      return new Promise((resolve) => setTimeout(resolve, 100)); 
+    })
+    .then(() => {
+      window.location.href = "/login";
+    })
+    .catch((err) => {
+      console.error("Logout failed", err);
+      window.location.href = "/login";
+    });
+};
+
 
   const performSearch = () => {
     setSearchQuery(query.trim());

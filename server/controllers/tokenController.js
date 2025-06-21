@@ -26,6 +26,15 @@ exports.login = (req, res) => {
     .json({ message: "Login successful" });
 };
 
+exports.logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "Lax",
+    secure: false, // change to true in production
+  });
+  res.status(200).json({ message: "Logged out" });
+};
+
 exports.getCurrentUser = (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "Not authenticated" });

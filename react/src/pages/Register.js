@@ -30,15 +30,32 @@ const Register = () => {
     }
   };
 
+  const isStrongPassword = (password) => {
+    const errors = [];
+    if (password.length < 8) errors.push("8 characters");
+    if (!/[a-z]/.test(password)) errors.push("1 lowercase");
+    if (!/[A-Z]/.test(password)) errors.push("1 uppercase");
+    if (!/\d/.test(password)) errors.push("1 digit");
+    if (!/[!@#$%^&*()_\-+=[\]{};':"\\|,.<>/?]/.test(password))
+      errors.push("1 special character");
+    return errors.length === 0 ? null : `Password must include: ${errors.join(", ")}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Simple validation
     if (form.password !== form.confirm) {
       setError("Passwords do not match");
       return;
     }
+
+    const passwordError = isStrongPassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
     if (
       !form.firstName ||
       !form.lastName ||
@@ -51,15 +68,10 @@ const Register = () => {
       return;
     }
 
-    // Build FormData for multipart upload
     const formData = new FormData();
-    formData.append("firstName", form.firstName);
-    formData.append("lastName", form.lastName);
-    formData.append("username", form.username);
-    formData.append("gender", form.gender);
-    formData.append("birthdate", form.birthdate);
-    formData.append("password", form.password);
-    formData.append("picture", form.picture);
+    Object.entries(form).forEach(([key, value]) => {
+      if (key !== "confirm") formData.append(key, value);
+    });
 
     try {
       const res = await fetch("/api/users", {
@@ -82,7 +94,7 @@ const Register = () => {
 
   return (
     <div className="container mt-5" style={{ maxWidth: 400 }}>
-      <h2>Register for Gmailish</h2>
+      <h2>Register</h2>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <input
           type="text"
@@ -170,7 +182,7 @@ const Register = () => {
           </div>
         )}
         {error && <div className="alert alert-danger">{error}</div>}
-        <button className="btn btn-success w-100" type="submit">
+        <button className="btn btn-primary w-100" type="submit">
           Register
         </button>
       </form>
