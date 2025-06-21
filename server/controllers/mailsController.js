@@ -8,7 +8,8 @@ const {
   searchMailsWithLabel,
   getEmailsByLabelName,
   toggleStar,
-  markAllAsRead
+  markAllAsRead,
+  markAsUnreadByIds
 } = require('../models/mail');
 
 const { users } = require('../models/user');
@@ -296,4 +297,11 @@ exports.markAsRead = (req, res) => {
   }
 
   return res.status(200).json(mail);
+};
+exports.markAsUnread = (req, res) => {
+  const { ids } = req.body; // Expect an array of mail IDs
+  if (!Array.isArray(ids)) return res.status(400).json({ error: 'Expected array of IDs' });
+
+  markAsUnreadByIds(ids, req.user.id);
+  return res.sendStatus(204);
 };

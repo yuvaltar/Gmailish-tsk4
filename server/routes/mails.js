@@ -30,24 +30,29 @@ router.get('/search/:label/:query', mailsController.searchMailsByLabel);
 // GET /api/mails/:id     → get specific mail
 router.get('/:id', mailsController.getMailById);
 
-// PATCH /api/mails/:id   → edit mail
-router.patch('/:id', mailsController.updateMail);
-
-// PATCH /api/mails/:id/label → add a custom label
-router.patch('/:id/label', mailsController.addLabelToEmail);
-
-// ✅ NEW: DELETE /api/mails/:id/label/:label → remove a label from mail
+// DELETE /api/mails/:id/label/:label → remove a label from mail
 router.delete('/:id/label/:label', mailsController.removeLabelFromEmail);
-
-// PATCH /api/mails/:id/star → toggle star
-router.patch('/:id/star', mailsController.toggleStar);
-
-// PATCH /api/mails/markAllRead → mark all mails as read
-router.patch('/markAllRead', mailsController.markAllAsRead);
 
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
 
+// PATCH /api/mails/:id/label → add a custom label
+router.patch('/:id/label', mailsController.addLabelToEmail);
+
+// PATCH /api/mails/markAllRead → mark all mails as read
+router.patch('/markAllRead', mailsController.markAllAsRead);
+
+router.patch('/markUnread', mailsController.markAsUnread);
+
+
+// PATCH /api/mails/:id/read → mark single mail as read
 router.patch('/:id/read', mailsController.markAsRead);
+
+// PATCH /api/mails/:id/star → toggle star
+router.patch('/:id/star', mailsController.toggleStar);
+
+// PATCH /api/mails/:id → edit mail
+router.patch('/:id', mailsController.updateMail);
+
 
 module.exports = router;

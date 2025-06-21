@@ -1,19 +1,19 @@
 // src/components/EmailList.js
 import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
-import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
+import {
+  BsArrowClockwise,
+  BsEnvelopeOpen,
+  BsStar,
+  BsStarFill,
+  BsEnvelope,
+  BsTag,
+  BsExclamationCircle,
+  BsTrash,
+} from "react-icons/bs";
 import PropTypes from "prop-types";
 import "./EmailList.css";
 
-/**
- * EmailList component displays a list of emails, optionally filtered by label and search query.
- *
- * Props:
- * - setSelectedEmail(emailId): callback for when a row is clicked
- * - propEmails: array of emails from a search result (optional)
- * - labelFilter: string matching the current label (e.g. "inbox", "starred", "spam")
- * - searchQuery: search string typed by the user
- */
 function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
@@ -37,7 +37,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
   };
 
-  // Load emails when label or propEmails change
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
@@ -46,7 +45,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     fetchEmails();
   }, [propEmails, labelFilter]);
 
-  // Filter by search query
   useEffect(() => {
     if (!searchQuery) {
       if (!propEmails) fetchEmails();
@@ -87,14 +85,60 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
   };
 
+  const handleMarkSelectedAsUnread = async () => {
+    if (checkedEmails.size === 0) return;
+    try {
+      await fetch("http://localhost:3000/api/mails/markUnread", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ ids: Array.from(checkedEmails) }),
+      });
+      fetchEmails();
+    } catch (err) {
+      console.error("Mark as unread failed", err.message);
+    }
+  };
+
+  const handleStarSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/star`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+    }
+    fetchEmails();
+  };
+
+  const handleSpamSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/spam`, {
+        method: "POST",
+        credentials: "include",
+      });
+    }
+    fetchEmails();
+  };
+
+  const handleTrashSelected = async () => {
+    for (const id of checkedEmails) {
+      await fetch(`/api/mails/${id}/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ label: "trash" }),
+      });
+    }
+    fetchEmails();
+  };
+
   const toggleStar = async (emailId) => {
     try {
       const res = await fetch(`/api/mails/${emailId}/star`, {
         method: "PATCH",
-        credentials: "include"
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Star toggle failed");
-
       const { starred } = await res.json();
       setEmails((prev) =>
         prev.map((email) =>
@@ -118,20 +162,34 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
             checked={isAllSelected}
             onChange={handleSelectAll}
           />
-          <button
-            className="gmail-icon-btn"
-            onClick={fetchEmails}
-            title="Refresh"
-          >
-            <BsArrowClockwise size={18} />
-          </button>
-          <button
-            className="gmail-icon-btn"
-            onClick={handleMarkAllAsRead}
-            title="Mark all as read"
-          >
-            <BsEnvelopeOpen size={18} />
-          </button>
+          {checkedEmails.size > 0 ? (
+            <>
+              <button className="gmail-icon-btn" title="Mark as Read" onClick={handleMarkAllAsRead}>
+                <BsEnvelopeOpen size={18} />
+              </button>
+              <button className="gmail-icon-btn" title="Mark as Unread" onClick={handleMarkSelectedAsUnread}>
+                <BsEnvelope size={18} />
+              </button>
+              <button className="gmail-icon-btn" title="Star" onClick={handleStarSelected}>
+                <BsStar size={18} />
+              </button>
+              <button className="gmail-icon-btn" title="Spam" onClick={handleSpamSelected}>
+                <BsExclamationCircle size={18} />
+              </button>
+              <button className="gmail-icon-btn" title="Delete" onClick={handleTrashSelected}>
+                <BsTrash size={18} />
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh">
+                <BsArrowClockwise size={18} />
+              </button>
+              <button className="gmail-icon-btn" onClick={handleMarkAllAsRead} title="Mark all as read">
+                <BsEnvelopeOpen size={18} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -145,7 +203,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                     checkedEmails.has(email.id) ? "table-primary" : ""
                   } ${email.read ? "read-mail" : "unread-mail"}`}
                 >
-                  {/* Left group: checkbox and star */}
                   <div className="d-flex align-items-center gap-2 ps-3">
                     <Form.Check
                       type="checkbox"
@@ -171,7 +228,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                     </span>
                   </div>
 
-                  {/* Middle group: sender and subject */}
                   <div className="email-snippet-cell flex-grow-1 px-3">
                     <div
                       className="sender-name"
@@ -186,16 +242,12 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                     </div>
                   </div>
 
-                  {/* Right group: date */}
                   <div className="email-date pe-3 text-nowrap">
                     {new Date(email.timestamp).toLocaleDateString()}
                   </div>
                 </div>
               </td>
             </tr>
-
-
-
           ))}
         </tbody>
       </Table>

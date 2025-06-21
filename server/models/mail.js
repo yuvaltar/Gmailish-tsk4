@@ -157,6 +157,15 @@ function markAsReadById(mailId, userId) {
   return true;
 }
 
+function markAsUnreadByIds(ids, userId) {
+  ids.forEach(id => {
+    const mail = mails.find(m => m.id === id && m.ownerId === userId);
+    if (mail) {
+      mail.read = false;
+      mail.labels = mail.labels.filter(l => l !== 'read');
+    }
+  });
+}
 module.exports = {
   mails,
   createMail,
@@ -168,5 +177,6 @@ module.exports = {
   toggleStar,
   searchMailsWithLabel,
   markAllAsRead,
-  markAsReadById
+  markAsReadById,
+  markAsUnreadByIds
 };
