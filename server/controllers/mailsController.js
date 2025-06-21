@@ -283,3 +283,17 @@ exports.removeLabelFromEmail = (req, res) => {
 
   return res.status(200).json({ message: `Label '${label}' removed`, mail });
 };
+
+exports.markAsRead = (req, res) => {
+  const mail = getMailById(req.params.id);
+  if (!mail || mail.ownerId !== req.user.id) {
+    return res.status(404).json({ error: 'Mail not found or not owned by you' });
+  }
+
+  if (!mail.read) {
+    mail.read = true;
+    if (!mail.labels.includes('read')) mail.labels.push('read');
+  }
+
+  return res.status(200).json(mail);
+};

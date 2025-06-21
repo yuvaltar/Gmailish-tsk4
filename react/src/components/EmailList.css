@@ -141,3 +141,26 @@ body.dark-mode .subject-line {
 .label-icon-glow {
   color: #0d6efd !important; /* primary blue glow */
 }
+.unread-mail {
+  font-weight: bold;
+  background-color: #f9f9f9;
+}
+
+.read-mail {
+  font-weight: normal;
+  background-color: #d5dcdf ; 
+  color: #5f6363;
+}
+.email-row-flex.read-mail {
+  background-color: #f1f3f4;
+  font-weight: normal;
+}
+
+.email-row-flex.unread-mail {
+  background-color: #fff;
+  font-weight: bold;
+}
+
+.email-row-flex:hover {
+  background-color: #eaeaea;
+}

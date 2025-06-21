@@ -1,3 +1,4 @@
+// src/components/EmailList.js
 import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
 import { BsArrowClockwise, BsEnvelopeOpen, BsStar, BsStarFill } from "react-icons/bs";
@@ -48,7 +49,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   // Filter by search query
   useEffect(() => {
     if (!searchQuery) {
-      // If no query, reload original label content
       if (!propEmails) fetchEmails();
       return;
     }
@@ -138,57 +138,64 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       <Table hover className="mb-0">
         <tbody>
           {emails.map((email) => (
-            <tr
-              key={email.id}
-              onClick={() => setSelectedEmail(email.id)}
-              className={checkedEmails.has(email.id) ? "table-primary" : ""}
-              style={{ cursor: "pointer" }}
-            >
-              <td className="ps-3">
-                <div className="email-checkbox-star d-flex align-items-center gap-2">
-                  <Form.Check
-                    type="checkbox"
-                    checked={checkedEmails.has(email.id)}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      handleCheckboxChange(email.id);
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <span
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleStar(email.id);
-                    }}
-                    className="star-cell"
-                  >
-                    {email.starred ? (
-                      <BsStarFill className="star-filled" size={14} />
-                    ) : (
-                      <BsStar className="star-empty" size={14} />
-                    )}
-                  </span>
-                </div>
-              </td>
-
-              <td className="email-snippet-cell">
+            <tr key={email.id} onClick={() => setSelectedEmail(email.id)} style={{ cursor: "pointer" }}>
+              <td colSpan={3} className="p-0">
                 <div
-                  className="sender-name"
-                  title={email.senderName || email.senderId}
+                  className={`email-row-flex d-flex align-items-center justify-content-between w-100 ${
+                    checkedEmails.has(email.id) ? "table-primary" : ""
+                  } ${email.read ? "read-mail" : "unread-mail"}`}
                 >
-                  {email.senderName || email.senderId}
-                </div>
-                <div className="subject-line" title={email.subject}>
-                  {email.subject.length > 80
-                    ? email.subject.slice(0, 77) + "..."
-                    : email.subject}
-                </div>
-              </td>
+                  {/* Left group: checkbox and star */}
+                  <div className="d-flex align-items-center gap-2 ps-3">
+                    <Form.Check
+                      type="checkbox"
+                      checked={checkedEmails.has(email.id)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleCheckboxChange(email.id);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleStar(email.id);
+                      }}
+                      className="star-cell"
+                    >
+                      {email.starred ? (
+                        <BsStarFill className="star-filled" size={14} />
+                      ) : (
+                        <BsStar className="star-empty" size={14} />
+                      )}
+                    </span>
+                  </div>
 
-              <td className="text-end pe-3">
-                {new Date(email.timestamp).toLocaleDateString()}
+                  {/* Middle group: sender and subject */}
+                  <div className="email-snippet-cell flex-grow-1 px-3">
+                    <div
+                      className="sender-name"
+                      title={email.senderName || email.senderId}
+                    >
+                      {email.senderName || email.senderId}
+                    </div>
+                    <div className="subject-line" title={email.subject}>
+                      {email.subject.length > 80
+                        ? email.subject.slice(0, 77) + "..."
+                        : email.subject}
+                    </div>
+                  </div>
+
+                  {/* Right group: date */}
+                  <div className="email-date pe-3 text-nowrap">
+                    {new Date(email.timestamp).toLocaleDateString()}
+                  </div>
+                </div>
               </td>
             </tr>
+
+
+
           ))}
         </tbody>
       </Table>
@@ -200,7 +207,7 @@ EmailList.propTypes = {
   setSelectedEmail: PropTypes.func.isRequired,
   propEmails: PropTypes.array,
   labelFilter: PropTypes.string,
-  searchQuery: PropTypes.string, // ✅ NEW
+  searchQuery: PropTypes.string,
 };
 
 EmailList.defaultProps = {

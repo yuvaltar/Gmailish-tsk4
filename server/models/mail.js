@@ -26,8 +26,9 @@ function createMail(senderId, recipientId, subject, content, recipientLabels = [
     subject,
     content,
     timestamp,
-    labels: recipientLabels,
-    ownerId: recipientId
+    labels: ['inbox'],
+    ownerId: recipientId,
+    read: false
   };
 
   // Sender's copy (sent)
@@ -41,7 +42,8 @@ function createMail(senderId, recipientId, subject, content, recipientLabels = [
     content,
     timestamp,
     labels: ['sent'],
-    ownerId: senderId
+    ownerId: senderId,
+    read: true  // Sent mails are considered read by default
   };
 
   // Store both copies
@@ -141,8 +143,18 @@ function markAllAsRead(userId) {
       !mail.labels.includes('spam')
     ) {
       mail.labels.push('read');
+      mail.read = true;
     }
   });
+}
+
+function markAsReadById(mailId, userId) {
+  const mail = mails.find(m => m.id === mailId && m.ownerId === userId);
+  if (!mail) return false;
+
+  mail.read = true;
+  if (!mail.labels.includes('read')) mail.labels.push('read');
+  return true;
 }
 
 module.exports = {
@@ -155,5 +167,6 @@ module.exports = {
   searchMails,
   toggleStar,
   searchMailsWithLabel,
-  markAllAsRead
+  markAllAsRead,
+  markAsReadById
 };

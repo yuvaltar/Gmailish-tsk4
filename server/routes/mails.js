@@ -48,4 +48,6 @@ router.patch('/markAllRead', mailsController.markAllAsRead);
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
 
+router.patch('/:id/read', mailsController.markAsRead);
+
 module.exports = router;

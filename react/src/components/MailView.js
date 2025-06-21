@@ -35,6 +35,12 @@ function MailView({ emailId, onBack }) {
           throw new Error(error || "Mail not found");
         }
         setMailData(await res.json());
+          
+        // Mark as read
+        await fetch(`http://localhost:3000/api/mails/${emailId}/read`, {
+          method: "PATCH",
+          credentials: "include"
+        });
       } catch (err) {
         setError(err.message);
       }
