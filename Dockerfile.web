@@ -1,9 +1,0 @@
-# Dockerfile.web
-
-FROM nginx:alpine
-
-# Copy static site contents
-COPY web /usr/share/nginx/html
-
-# Default port
-EXPOSE 80

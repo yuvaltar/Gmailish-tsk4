@@ -1,45 +1,43 @@
 version: "3.9"
-
 services:
-
-  user:
+  react:
     build:
-      context: .
-      dockerfile: Dockerfile.user
+      context: ./react
     ports:
-      - "3000:3000"  # default
+      - "3001:3001"
     volumes:
-      - .:/usr/src/app
+      - ./react:/app
+      - /app/node_modules
     environment:
-      - CPP_PORT=4000
-      - PORT=3000
-    restart: unless-stopped
-    command: sh -c "npm install && npm run dev"
-
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    ports:
-      - "8080:80"
-    restart: unless-stopped
+      - PORT=3001
+      - REACT_APP_API_URL=http://server:3000
+    stdin_open: true
+    tty: true
 
   server:
     build:
-      context: .
-      dockerfile: Dockerfile.server
+      context: ./server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - PORT=3000
+      - CPP_PORT=4000
+      - CPP_HOST=cpp_server
+      - JWT_SECRET=someSuperSecretStringHere
+      - HOST=0.0.0.0
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+    depends_on:
+      - cpp_server
+
+  cpp_server:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
     ports:
       - "4000:4000"
-    command: ["./server", "4000", "1024", "3", "5"]
+    command: ["./cpp_server", "4000", "1024", "3", "5"]
     restart: unless-stopped
-
-  react:
-    build:
-      context: ./client-react
-    ports:
-      - "5173:3000"
-    working_dir: /app
-    volumes:
-      - ./client-react:/app
-    stdin_open: true
-    tty: true
