@@ -421,3 +421,128 @@ body.dark-mode .email-row-flex:hover {
 /* restore native checkbox in Bootstrap reset */
 input[type="checkbox"] { all: revert; }
 .text-end { vertical-align: middle; }
+
+/* Pagination Controls */
+.pagination-controls {
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+}
+
+.pagination-controls .gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.pagination-controls .gmail-icon-btn:hover:not(:disabled) {
+  background-color: rgba(60, 64, 67, 0.1);
+}
+
+.pagination-controls .gmail-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pagination-controls .gmail-icon-btn svg {
+  color: #5f6368;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+.email-count-display {
+  font-size: 0.85rem;
+  color: #5f6368;
+}
+
+/* Dark mode pagination */
+body.dark-mode .pagination-controls {
+  background: #202124;
+  border-bottom-color: #3c4043;
+}
+
+body.dark-mode .pagination-controls .gmail-icon-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .pagination-controls .gmail-icon-btn svg {
+  color: #e8eaed;
+}
+
+body.dark-mode .pagination-info,
+body.dark-mode .email-count-display {
+  color: #e8eaed;
+}
+/* Pagination Controls */
+.pagination-controls {
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+}
+
+.pagination-controls .gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.pagination-controls .gmail-icon-btn:hover:not(:disabled) {
+  background-color: rgba(60, 64, 67, 0.1);
+}
+
+.pagination-controls .gmail-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pagination-controls .gmail-icon-btn svg {
+  color: #5f6368;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+.email-count-display {
+  font-size: 0.85rem;
+  color: #5f6368;
+}
+
+/* Dark mode pagination */
+body.dark-mode .pagination-controls {
+  background: #202124;
+  border-bottom-color: #3c4043;
+}
+
+body.dark-mode .pagination-controls .gmail-icon-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .pagination-controls .gmail-icon-btn svg {
+  color: #e8eaed;
+}
+
+body.dark-mode .pagination-info,
+body.dark-mode .email-count-display {
+  color: #e8eaed;
+}

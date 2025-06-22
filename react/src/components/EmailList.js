@@ -11,6 +11,12 @@ import {
   BsExclamationCircle,
   BsTrash,
   BsArchive,
+  BsChevronLeft,
+  BsChevronRight,
+  BsArrowLeft,
+  BsArrowRight,
+  BsChevronDoubleLeft,
+  BsChevronDoubleRight,
 } from "react-icons/bs";
 import PropTypes from "prop-types";
 import "./EmailList.css";
@@ -20,6 +26,10 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [checkedEmails, setCheckedEmails] = useState(new Set());
   const [showLabelPicker, setShowLabelPicker] = useState(false);
   const [labels, setLabels] = useState([]);
+  
+  // Pagination state - Changed to 50 emails per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const emailsPerPage = 50;
 
   const fetchEmails = async () => {
     let url = "http://localhost:3000/api/mails";
@@ -34,6 +44,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!Array.isArray(data)) throw new Error("Invalid data");
       setEmails(data);
       setCheckedEmails(new Set());
+      setCurrentPage(1);
     } catch (err) {
       console.error("Failed to fetch mails:", err.message);
       setEmails([]);
@@ -43,6 +54,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   useEffect(() => {
     if (propEmails) {
       setEmails(propEmails);
+      setCurrentPage(1);
       return;
     }
     fetchEmails();
@@ -61,6 +73,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
           m.content?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
+    setCurrentPage(1);
   }, [searchQuery]);
 
   useEffect(() => {
@@ -70,6 +83,28 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       .catch(() => setLabels([]));
   }, []);
 
+  // Pagination calculations
+  const totalEmails = emails.length;
+  const totalPages = Math.ceil(totalEmails / emailsPerPage);
+  const startIndex = (currentPage - 1) * emailsPerPage;
+  const endIndex = startIndex + emailsPerPage;
+  const currentEmails = emails.slice(startIndex, endIndex);
+
+  // Pagination handlers
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      setCheckedEmails(new Set());
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      setCheckedEmails(new Set());
+    }
+  };
+
   const handleCheckboxChange = (emailId) => {
     const newChecked = new Set(checkedEmails);
     if (newChecked.has(emailId)) newChecked.delete(emailId);
@@ -78,7 +113,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   };
 
   const handleSelectAll = (e) => {
-    setCheckedEmails(e.target.checked ? new Set(emails.map((e) => e.id)) : new Set());
+    setCheckedEmails(e.target.checked ? new Set(currentEmails.map((e) => e.id)) : new Set());
   };
 
   const handleMarkAllAsRead = async () => {
@@ -101,7 +136,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
         method: "DELETE",
         credentials: "include",
       });
-      fetchEmails(); // Refresh list
+      fetchEmails();
     } catch (err) {
       console.error("Failed to clear trash:", err.message);
     }
@@ -180,36 +215,21 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!email) continue;
 
       if (email.labels.includes("archive")) {
-        // UNARCHIVE: remove "archive", re-add "inbox"
         await fetch(`/api/mails/${id}/label/archive`, {
           method: "DELETE",
           credentials: "include",
         });
-
-        await fetch(`/api/mails/${id}/label`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ label: "inbox" }),
-        });
       } else {
-        // ARCHIVE: add "archive", remove "inbox"
         await fetch(`/api/mails/${id}/label`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ label: "archive" }),
         });
-
-        await fetch(`/api/mails/${id}/label/inbox`, {
-          method: "DELETE",
-          credentials: "include",
-        });
       }
     }
     fetchEmails();
   };
-
 
   const handleLabelSelected = async (label) => {
     for (const id of checkedEmails) {
@@ -242,8 +262,9 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
   };
 
-  const isAllSelected = emails.length > 0 && checkedEmails.size === emails.length;
+  const isAllSelected = currentEmails.length > 0 && checkedEmails.size === currentEmails.length;
   const hasSelection = checkedEmails.size > 0;
+  const showPagination = totalEmails > emailsPerPage;
 
   return (
     <div className="w-100 p-0 position-relative">
@@ -283,6 +304,36 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                 <BsTrash size={18} />
               </button>
             </>
+          )}
+        </div>
+        
+        {/* Email count and pagination controls in the same row */}
+        <div className="email-count-pagination-container ms-auto pe-3 d-flex align-items-center gap-2">
+          <span className="text-muted small">
+            {totalEmails === 0 ? "No emails" : `${startIndex + 1}-${Math.min(endIndex, totalEmails)} of ${totalEmails}`}
+          </span>
+          
+          {/* Pagination controls - only show if more than 50 emails */}
+          {showPagination && (
+            <div className="pagination-controls-inline d-flex align-items-center">
+              <button 
+                className="gmail-icon-btn-small" 
+                onClick={handlePreviousPage} 
+                disabled={currentPage === 1}
+                title="Previous page"
+              >
+                <BsChevronLeft size={16} />
+              </button>
+              
+              <button 
+                className="gmail-icon-btn-small" 
+                onClick={handleNextPage} 
+                disabled={currentPage === totalPages}
+                title="Next page"
+              >
+                <BsChevronRight size={16} />
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -330,7 +381,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
 
       <Table hover className="mb-0">
         <tbody>
-          {emails.map((email) => (
+          {currentEmails.map((email) => (
             <tr key={email.id} onClick={() => setSelectedEmail(email.id)} style={{ cursor: "pointer" }}>
               <td colSpan={3} className="p-0">
                 <div
