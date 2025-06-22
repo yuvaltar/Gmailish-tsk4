@@ -180,21 +180,36 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!email) continue;
 
       if (email.labels.includes("archive")) {
+        // UNARCHIVE: remove "archive", re-add "inbox"
         await fetch(`/api/mails/${id}/label/archive`, {
           method: "DELETE",
           credentials: "include",
         });
+
+        await fetch(`/api/mails/${id}/label`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ label: "inbox" }),
+        });
       } else {
+        // ARCHIVE: add "archive", remove "inbox"
         await fetch(`/api/mails/${id}/label`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ label: "archive" }),
         });
+
+        await fetch(`/api/mails/${id}/label/inbox`, {
+          method: "DELETE",
+          credentials: "include",
+        });
       }
     }
     fetchEmails();
   };
+
 
   const handleLabelSelected = async (label) => {
     for (const id of checkedEmails) {

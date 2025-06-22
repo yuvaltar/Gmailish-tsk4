@@ -272,7 +272,7 @@ body.dark-mode .email-toolbar{background:#202124;border-bottom-color:#3c4043;}
 body.dark-mode .email-toolbar .gmail-icon-btn:hover{background:rgba(255,255,255,.1);}
 body.dark-mode .email-toolbar .gmail-icon-btn svg{color:#e8eaed;}
 
-/* FIXED: Dark mode for email list table */
+/* DARK MODE: Email list table container */
 body.dark-mode .email-list-table {
   background: #202124 !important;
   border-bottom: 1px solid #3c4043 !important;
@@ -281,106 +281,143 @@ body.dark-mode .email-list-table {
 
 body.dark-mode .email-list-table th,
 body.dark-mode .email-list-table td {
-  background: #202124 !important;
-  border-bottom: 1px solid #3c4043 !important;
-  color: #e8eaed !important;
+  border-bottom: 1px solid #333333 !important;
 }
 
-/* FIXED: Dark mode for main containers */
+/* DARK MODE: Main containers */
 body.dark-mode .email-list-container,
 body.dark-mode .w-100.p-0,
 body.dark-mode .main-content-area {
   background: #202124 !important;
 }
 
-/* FIXED: Make all email text WHITE and VISIBLE in dark mode */
+/* DARK MODE: Each email row gets BLACK background with WHITE text */
 body.dark-mode .email-list-table > tbody > tr {
-  background: #202124 !important;
-  color: #e8eaed !important;
+  background: #000000 !important; /* Pure black background */
+  color: #ffffff !important; /* White text */
 }
 
-body.dark-mode .email-list-table > tbody > tr.email-read {
-  background: #2a2b2d !important;
-  color: #9aa0a6 !important;
+body.dark-mode .email-list-table > tbody > tr td {
+  background: #000000 !important; /* Pure black background for all cells */
+  color: #ffffff !important; /* White text for all cells */
 }
 
-body.dark-mode .email-list-table > tbody > tr.email-unread {
-  background: #202124 !important;
-  color: #e8eaed !important;
+/* DARK MODE: All email text becomes WHITE */
+body.dark-mode .email-list-table .sender-name,
+body.dark-mode .sender-name {
+  color: #ffffff !important; /* White sender names */
   font-weight: bold;
 }
 
-/* FIXED: Make sender names and subject lines WHITE in dark mode */
-body.dark-mode .sender-name,
-body.dark-mode .email-list-table .sender-name {
-  color: #e8eaed !important;
+body.dark-mode .email-list-table .subject-line,
+body.dark-mode .subject-line {
+  color: #ffffff !important; /* White subject lines */
 }
 
-body.dark-mode .subject-line,
-body.dark-mode .email-list-table .subject-line {
-  color: #bdc1c6 !important;
+/* DARK MODE: Read emails - slightly different for distinction */
+body.dark-mode .email-list-table > tbody > tr.email-read {
+  background: #111111 !important; /* Slightly lighter black for read emails */
+  color: #cccccc !important; /* Light gray text for read emails */
 }
 
-/* Read email text colors in dark mode */
+body.dark-mode .email-list-table > tbody > tr.email-read td {
+  background: #111111 !important;
+  color: #cccccc !important;
+}
+
 body.dark-mode .email-list-table > tbody > tr.email-read .sender-name {
-  color: #9aa0a6 !important;
+  color: #cccccc !important; /* Light gray for read sender names */
 }
 
 body.dark-mode .email-list-table > tbody > tr.email-read .subject-line {
-  color: #80868b !important;
+  color: #999999 !important; /* Darker gray for read subject lines */
 }
 
-/* Unread email text colors in dark mode */
-body.dark-mode .email-list-table > tbody > tr.email-unread .sender-name {
-  color: #e8eaed !important;
+/* DARK MODE: Unread emails - pure black with bright white text */
+body.dark-mode .email-list-table > tbody > tr.email-unread {
+  background: #000000 !important; /* Pure black for unread */
+  color: #ffffff !important; /* Bright white text */
+  font-weight: bold;
 }
 
-body.dark-mode .email-list-table > tbody > tr.email-unread .subject-line {
-  color: #bdc1c6 !important;
-}
-
-/* Hover states in dark mode */
-body.dark-mode .email-list-table > tbody > tr:hover {
-  background: #3c4043 !important;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-read:hover {
-  background: #3c4043 !important;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-unread:hover {
-  background: #3c4043 !important;
-}
-
-/* Selected email styling */
-body.dark-mode .table-primary td {
-  background: #1a73e8 !important;
+body.dark-mode .email-list-table > tbody > tr.email-unread td {
+  background: #000000 !important;
   color: #ffffff !important;
 }
 
-/* Date column in dark mode */
-body.dark-mode .text-end {
-  color: #9aa0a6 !important;
+body.dark-mode .email-list-table > tbody > tr.email-unread .sender-name {
+  color: #ffffff !important; /* Bright white for unread sender names */
+  font-weight: bold;
 }
 
-/* Star icons in dark mode */
+body.dark-mode .email-list-table > tbody > tr.email-unread .subject-line {
+  color: #ffffff !important; /* Bright white for unread subject lines */
+}
+
+/* DARK MODE: Hover effects */
+body.dark-mode .email-list-table > tbody > tr:hover {
+  background: #222222 !important; /* Dark gray on hover */
+  color: #ffffff !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr:hover td {
+  background: #222222 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-read:hover {
+  background: #222222 !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-unread:hover {
+  background: #222222 !important;
+}
+
+/* DARK MODE: Selected email styling */
+body.dark-mode .email-list-table > tbody > tr.table-primary td {
+  background: #1a73e8 !important; /* Blue background for selected */
+  color: #ffffff !important; /* White text for selected */
+}
+
+/* DARK MODE: Date column */
+body.dark-mode .email-list-table .text-end,
+body.dark-mode .text-end {
+  color: #ffffff !important; /* White text for dates */
+}
+
+/* DARK MODE: Star icons */
 body.dark-mode .star-empty {
-  color: #9aa0a6 !important;
+  color: #cccccc !important;
 }
 
 body.dark-mode .star-filled {
   color: #fbbc04 !important;
 }
 
-/* Checkbox styling in dark mode */
+/* DARK MODE: Checkbox styling */
 body.dark-mode input[type="checkbox"] {
-  background-color: #3c4043 !important;
-  border-color: #5f6368 !important;
+  background-color: #000000 !important;
+  border-color: #ffffff !important;
 }
 
+/* DARK MODE: Row flex styling */
+body.dark-mode .email-row-flex.read-mail {
+  background-color: #111111 !important;
+  color: #cccccc !important;
+  font-weight: normal;
+}
+
+body.dark-mode .email-row-flex.unread-mail {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+body.dark-mode .email-row-flex:hover {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+}
 
 /* restore native checkbox in Bootstrap reset */
 input[type="checkbox"] { all: revert; }
 .text-end { vertical-align: middle; }
-
-

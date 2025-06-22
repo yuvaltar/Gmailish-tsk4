@@ -27,27 +27,45 @@
 .sidebar-item,
 .sidebar-labels-header {
   color: #444;
-  border-radius: 0 24px 24px 0;  /* Keep this for all items */
+  border-radius: 0 24px 24px 0;
   margin-bottom: 4px;
-  padding: 0.6rem 1.5rem;
+  padding: 0.6rem 1rem 0.6rem 1rem; /* Consistent left/right padding for icon alignment */
   transition: background 0.2s, color 0.2s;
+  display: flex !important;
+  align-items: center !important;
 }
+
+/* Icon styling for consistent alignment */
+.sidebar-icon {
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+  margin-right: 0.75rem !important;
+}
+
+/* Text alignment */
+.sidebar-item span,
+.sidebar-labels-header span {
+  margin-left: 0 !important;
+  text-align: left !important;
+}
+
 .custom-sidebar .list-group .list-group-item:first-child {
-  border-radius: 24px !important; /* All corners rounded */
+  border-radius: 24px !important;
 }
 
 .custom-sidebar .list-group .list-group-item:last-child {
-  border-radius: 0 24px 24px 0 !important; /* ✨ Only right side rounded */
+  border-radius: 0 24px 24px 0 !important;
 }
+
 /* Dark mode border line under Labels */
 body.dark-mode .sidebar-labels-header {
   background: #fcfdfd !important;
-  border: 1px solid #c6ccd1 !important; /* 🔥 full white-ish border */
-  border-radius: 24px !important;       /* keeps pill shape */
-  padding: 0.6rem 1.5rem;
+  border: 1px solid #c6ccd1 !important;
+  border-radius: 24px !important;
+  padding: 0.6rem 1rem;
   margin-bottom: 4px;
 }
-
 
 /* Dark mode border line under Spam */
 body.dark-mode .sidebar-item:last-child {
@@ -70,7 +88,7 @@ body.dark-mode .sidebar-item:last-child {
 .sidebar-labels-add {
   color: #1a73e8 !important;
   font-size: 1.3em;
-  margin-left: 0.5em;
+  margin-left: auto !important;
 }
 
 .sidebar-item.active {
@@ -132,18 +150,19 @@ body.dark-mode .sidebar-item.active {
   z-index: 100;
 }
 
-/* Sidebar collapsed: float over content, no background */
+/* Sidebar collapsed: float over content with special styling */
 .custom-sidebar.icon-only.collapsed-float {
   position: absolute !important;
   left: 0;
   top: 0;
-  width: 48px !important;
+  width: 56px !important; /* Slightly wider for better appearance */
   min-width: 0 !important;
   height: 100vh;
-  background: transparent !important;
-  border-right: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  background: rgba(246, 248, 252, 0.95) !important; /* Semi-transparent background */
+  border-right: none !important; /* No border */
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow */
+  backdrop-filter: blur(8px) !important; /* Blur effect */
+  padding: 0.5rem 0 !important;
   z-index: 1200;
 }
 
@@ -155,27 +174,45 @@ body.dark-mode .sidebar-item.active {
   display: none !important;
 }
 
-/* Only show icons, align them left, transparent background */
+/* Collapsed mode icons with better styling */
 .custom-sidebar.icon-only .sidebar-item {
   background: transparent !important;
-  border: none !important;
-  justify-content: flex-start !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  justify-content: center !important;
   align-items: center !important;
-  padding: 0.7rem 0 0.7rem 0 !important;
-  margin-bottom: 4px;
-  width: 100%;
-  transition: background 0.2s;
+  padding: 0.75rem 0.5rem !important;
+  margin: 4px 6px !important; /* Better spacing from edges */
+  width: calc(100% - 12px) !important;
+  transition: all 0.2s ease !important;
 }
 
-/* Remove hover background in collapsed mode, keep subtle effect */
+/* Enhanced hover effect for collapsed icons */
 .custom-sidebar.icon-only .sidebar-item:hover {
-  background: rgba(60, 64, 67, 0.08) !important;
+  background: rgba(26, 115, 232, 0.1) !important;
+  border: 1px solid rgba(26, 115, 232, 0.3) !important;
+  transform: translateX(2px) !important; /* Subtle slide effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Icon size and color for clarity */
+/* Icon size and color for better visibility */
 .custom-sidebar.icon-only .sidebar-icon {
-  font-size: 1.4rem !important;
+  font-size: 1.3rem !important;
   color: #5f6368 !important;
+  margin-right: 0 !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Active state for collapsed icons */
+.custom-sidebar.icon-only .sidebar-item.active {
+  background: rgba(26, 115, 232, 0.15) !important;
+  border: 1px solid #1a73e8 !important;
+  color: #1a73e8 !important;
+}
+
+.custom-sidebar.icon-only .sidebar-item.active .sidebar-icon {
+  color: #1a73e8 !important;
 }
 
 /* Sidebar toggle button styling */
@@ -198,32 +235,60 @@ body.dark-mode .sidebar-item.active {
 }
 
 /* Main content: always full width, flush left */
+/* Main content: default state (when sidebar is expanded) - no changes */
 .main-content,
 .flex-grow-1.overflow-auto {
   background: #fff !important;
-  margin-left: 0 !important;
+  margin-left: 0 !important; /* Keep original positioning when expanded */
   padding-left: 0 !important;
-  width: 100% !important;
+  width: 100% !important; /* Full width when expanded */
   min-width: 0 !important;
-  transition: margin-left 0.25s;
+  transition: margin-left 0.25s, width 0.25s;
 }
 
-/* --- DARK MODE --- */
+/* ONLY when sidebar is collapsed - adjust main content */
+.custom-sidebar.icon-only.collapsed-float ~ .main-content,
+.custom-sidebar.icon-only.collapsed-float ~ .flex-grow-1.overflow-auto {
+  margin-left: 56px !important; /* Start after collapsed sidebar */
+  width: calc(100% - 56px) !important; /* Adjust width for collapsed sidebar */
+}
+
+
+/* --- DARK MODE COLLAPSED STYLING --- */
+body.dark-mode .custom-sidebar.icon-only.collapsed-float {
+  background: rgba(24, 26, 27, 0.95) !important; /* Dark semi-transparent */
+  border-right: 2px solid #8ab4f8 !important; /* Blue border for dark mode */
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3) !important; /* Stronger shadow */
+}
+
+body.dark-mode .custom-sidebar.icon-only .sidebar-item {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+body.dark-mode .custom-sidebar.icon-only .sidebar-item:hover {
+  background: rgba(138, 180, 248, 0.1) !important;
+  border: 1px solid rgba(138, 180, 248, 0.3) !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-mode .custom-sidebar.icon-only .sidebar-icon {
+  color: #e8eaed !important;
+}
+
+body.dark-mode .custom-sidebar.icon-only .sidebar-item.active {
+  background: rgba(138, 180, 248, 0.15) !important;
+  border: 1px solid #8ab4f8 !important;
+}
+
+body.dark-mode .custom-sidebar.icon-only .sidebar-item.active .sidebar-icon {
+  color: #8ab4f8 !important;
+}
+
+/* Regular dark mode styles */
 body.dark-mode .custom-sidebar {
   background: #181a1b;
   color: #fff;
   border-right: 1px solid #23272a;
-}
-body.dark-mode .custom-sidebar.icon-only.collapsed-float {
-  background: transparent !important;
-  border-right: none !important;
-}
-body.dark-mode .custom-sidebar.icon-only .sidebar-item {
-  background: transparent !important;
-}
-body.dark-mode .custom-sidebar.icon-only .sidebar-item:hover {
-  background: rgba(255,255,255,0.06) !important;
-}
-body.dark-mode .custom-sidebar.icon-only .sidebar-icon {
-  color: #e8eaed !important;
 }

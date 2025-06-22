@@ -100,7 +100,14 @@ function getEmailsByLabelName(labelName, userId) {
 
       if (labelName === 'trash') return isTrashed;
       if (labelName === 'spam') return isSpam && m.recipientId === userId;
-      if (labelName === 'inbox') return m.recipientId === userId && m.labels.includes('inbox') && !isSpam && !isTrashed;
+      if (labelName === 'inbox')
+      return (
+        m.recipientId === userId &&
+        m.labels.includes('inbox') &&
+        !isSpam &&
+        !isTrashed &&
+        !m.labels.includes('archive') // 👈 EXCLUDE archived mails from inbox
+      );
       if (labelName === 'sent') return m.senderId === userId && m.labels.includes('sent') && !isTrashed;
       if (labelName === 'drafts') return m.labels.includes('drafts') && m.senderId === userId;
 
