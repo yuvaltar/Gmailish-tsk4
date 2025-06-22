@@ -36,6 +36,8 @@ router.delete('/:id/label/:label', mailsController.removeLabelFromEmail);
 // DELETE /api/mails/:id  → delete mail
 router.delete('/:id', mailsController.deleteMail);
 
+router.delete('/trash/clear', mailsController.clearTrash);
+
 // PATCH /api/mails/:id/label → add a custom label
 router.patch('/:id/label', mailsController.addLabelToEmail);
 

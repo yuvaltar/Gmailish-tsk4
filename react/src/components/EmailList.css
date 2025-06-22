@@ -164,3 +164,223 @@ body.dark-mode .subject-line {
 .email-row-flex:hover {
   background-color: #eaeaea;
 }
+
+/* ──────────  CARD CONTAINER  ────────── */
+.email-list-table {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(60,64,67,.07);
+  margin-top: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Remove all left padding from table header and cells */
+.email-list-table th,
+.email-list-table td,
+.email-list-table td:first-child,
+.email-list-table th:first-child {
+  padding-left: 0 !important;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+/* Remove all left margin and padding from containers */
+.email-list-container,
+.w-100.p-0 {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  border-left: none !important;
+}
+
+/* Remove left padding/margin from snippet and sender/subject */
+.email-snippet-cell,
+.sender-name,
+.subject-line,
+.email-checkbox-star {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Remove left padding/margin from toolbar and its children */
+.email-toolbar,
+.email-toolbar .toolbar-group > * {
+  padding-left: 0 !important;
+  border-left: none !important;
+}
+
+.email-toolbar {
+  gap: 6px;
+  padding: .25rem 0 .25rem 0 !important;
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  margin-left: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+}
+
+/* OPTION 3: Precise margin control for toolbar icons */
+.toolbar-group {
+  gap: 4px;
+  margin-left: 16px !important; /* ADJUST THIS VALUE TO MOVE ICONS LEFT/RIGHT */
+}
+
+.email-toolbar .gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color .2s ease;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.email-toolbar .gmail-icon-btn:hover { background: rgba(60,64,67,.1);}
+.email-toolbar .gmail-icon-btn svg { color: #5f6368; }
+
+/* ──────────  STAR ICONS  ────────── */
+.star-cell{cursor:pointer;display:flex;align-items:center;}
+.star-filled{color:#fbbc04;font-size:1rem;}
+.star-empty {color:#c0c0c0;font-size:1rem;}
+.star-cell:hover .star-empty{color:#888;}
+
+/* ──────────  SNIPPET CELL  ────────── */
+.email-snippet-cell{
+  max-width:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.sender-name, .subject-line{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sender-name{font-weight:500;color:#202124;font-size:.95rem;max-width:200px;}
+.subject-line{font-size:.85rem;color:#5f6368;max-width:360px;}
+
+/* ──────────  DARK-MODE OVERRIDES  ────────── */
+body.dark-mode .email-toolbar{background:#202124;border-bottom-color:#3c4043;}
+body.dark-mode .email-toolbar .gmail-icon-btn:hover{background:rgba(255,255,255,.1);}
+body.dark-mode .email-toolbar .gmail-icon-btn svg{color:#e8eaed;}
+
+/* FIXED: Dark mode for email list table */
+body.dark-mode .email-list-table {
+  background: #202124 !important;
+  border-bottom: 1px solid #3c4043 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3) !important;
+}
+
+body.dark-mode .email-list-table th,
+body.dark-mode .email-list-table td {
+  background: #202124 !important;
+  border-bottom: 1px solid #3c4043 !important;
+  color: #e8eaed !important;
+}
+
+/* FIXED: Dark mode for main containers */
+body.dark-mode .email-list-container,
+body.dark-mode .w-100.p-0,
+body.dark-mode .main-content-area {
+  background: #202124 !important;
+}
+
+/* FIXED: Make all email text WHITE and VISIBLE in dark mode */
+body.dark-mode .email-list-table > tbody > tr {
+  background: #202124 !important;
+  color: #e8eaed !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-read {
+  background: #2a2b2d !important;
+  color: #9aa0a6 !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-unread {
+  background: #202124 !important;
+  color: #e8eaed !important;
+  font-weight: bold;
+}
+
+/* FIXED: Make sender names and subject lines WHITE in dark mode */
+body.dark-mode .sender-name,
+body.dark-mode .email-list-table .sender-name {
+  color: #e8eaed !important;
+}
+
+body.dark-mode .subject-line,
+body.dark-mode .email-list-table .subject-line {
+  color: #bdc1c6 !important;
+}
+
+/* Read email text colors in dark mode */
+body.dark-mode .email-list-table > tbody > tr.email-read .sender-name {
+  color: #9aa0a6 !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-read .subject-line {
+  color: #80868b !important;
+}
+
+/* Unread email text colors in dark mode */
+body.dark-mode .email-list-table > tbody > tr.email-unread .sender-name {
+  color: #e8eaed !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-unread .subject-line {
+  color: #bdc1c6 !important;
+}
+
+/* Hover states in dark mode */
+body.dark-mode .email-list-table > tbody > tr:hover {
+  background: #3c4043 !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-read:hover {
+  background: #3c4043 !important;
+}
+
+body.dark-mode .email-list-table > tbody > tr.email-unread:hover {
+  background: #3c4043 !important;
+}
+
+/* Selected email styling */
+body.dark-mode .table-primary td {
+  background: #1a73e8 !important;
+  color: #ffffff !important;
+}
+
+/* Date column in dark mode */
+body.dark-mode .text-end {
+  color: #9aa0a6 !important;
+}
+
+/* Star icons in dark mode */
+body.dark-mode .star-empty {
+  color: #9aa0a6 !important;
+}
+
+body.dark-mode .star-filled {
+  color: #fbbc04 !important;
+}
+
+/* Checkbox styling in dark mode */
+body.dark-mode input[type="checkbox"] {
+  background-color: #3c4043 !important;
+  border-color: #5f6368 !important;
+}
+
+
+/* restore native checkbox in Bootstrap reset */
+input[type="checkbox"] { all: revert; }
+.text-end { vertical-align: middle; }
+
+

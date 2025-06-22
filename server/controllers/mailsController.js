@@ -212,6 +212,21 @@ exports.deleteMail = (req, res) => {
   return res.status(204).end();
 };
 
+exports.clearTrash = (req, res) => {
+  const userId = req.user.id;
+  let deletedCount = 0;
+
+  for (let i = mails.length - 1; i >= 0; i--) {
+    const mail = mails[i];
+    if (mail.ownerId === userId && mail.labels.includes("trash")) {
+      mails.splice(i, 1);
+      deletedCount++;
+    }
+  }
+
+  return res.status(200).json({ message: `Deleted ${deletedCount} emails from trash.` });
+};
+
 exports.searchMails = (req, res) => {
   const userId = req.user.id;
   const query = req.params.query;

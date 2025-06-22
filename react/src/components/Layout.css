@@ -261,3 +261,36 @@ body.dark-mode {
 .dark-mode .gmail-icon-btn svg {
   color: #e8eaed;
 }
+/* Sidebar collapsed state */
+.sidebar-collapsed .custom-sidebar {
+  width: 72px !important;
+  overflow-x: hidden;
+  align-items: center;
+}
+
+/* Collapse-specific layout fixes */
+.collapsed-float {
+  width: 72px !important;
+  align-items: center !important;
+}
+
+.sidebar-collapsed .main-content-area {
+  margin-left: 72px;
+}
+
+/* Hide labels and text when collapsed */
+.sidebar-collapsed .sidebar-item span,
+.sidebar-collapsed .sidebar-labels-header span {
+  display: none;
+}
+
+.sidebar-collapsed .sidebar-labels-add {
+  margin-left: 0 !important;
+}
+
+/* Ensure tooltips or icons remain centered */
+.sidebar-icon {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}

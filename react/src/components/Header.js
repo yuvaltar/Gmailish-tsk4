@@ -13,6 +13,24 @@ function Header({ setSearchQuery }) {
 
   useEffect(() => {
     document.body.classList.toggle("dark-mode", darkMode);
+  // Remove ALL existing favicon links first
+    const existingLinks = document.querySelectorAll('link[rel*="icon"], link[rel="shortcut icon"]');
+    existingLinks.forEach(link => link.remove());
+
+    // Create new favicon link
+    const faviconLink = document.createElement('link');
+    faviconLink.rel = 'icon';
+    faviconLink.type = 'image/png';
+
+    // Use absolute paths without leading slash for Create React App
+    const faviconPath = darkMode ? 'favicon_blackmode.png' : 'favicon.png';
+    faviconLink.href = `${process.env.PUBLIC_URL}/${faviconPath}?v=${Date.now()}`;
+
+    // Add to head
+    document.head.appendChild(faviconLink);
+
+    console.log(`Favicon updated to: ${darkMode ? 'dark' : 'light'} mode`);
+    console.log(`Favicon path: ${faviconLink.href}`);
   }, [darkMode]);
 
   useEffect(() => {
@@ -75,7 +93,7 @@ function Header({ setSearchQuery }) {
       title="Go to Inbox"
     >
       <img
-        src={`${process.env.PUBLIC_URL}/favicon.png`}
+        src={`${process.env.PUBLIC_URL}/${darkMode ? 'favicon_blackmode.png' : 'favicon.png'}`}
         alt="Logo"
         style={{
           width: "40px",

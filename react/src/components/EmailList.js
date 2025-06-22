@@ -93,6 +93,20 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
   };
 
+  const handleClearTrash = async () => {
+    if (!window.confirm("Are you sure you want to permanently delete all trash emails?")) return;
+
+    try {
+      await fetch("http://localhost:3000/api/mails/trash/clear", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      fetchEmails(); // Refresh list
+    } catch (err) {
+      console.error("Failed to clear trash:", err.message);
+    }
+  };
+
   const handleMarkSelectedAsUnread = async () => {
     if (checkedEmails.size === 0) return;
     try {
@@ -166,13 +180,11 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!email) continue;
 
       if (email.labels.includes("archive")) {
-        // UNARCHIVE: remove archive label only
         await fetch(`/api/mails/${id}/label/archive`, {
           method: "DELETE",
           credentials: "include",
         });
       } else {
-        // ARCHIVE: add archive (leave inbox)
         await fetch(`/api/mails/${id}/label`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -183,7 +195,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
     }
     fetchEmails();
   };
-
 
   const handleLabelSelected = async (label) => {
     for (const id of checkedEmails) {
@@ -224,7 +235,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       <div className="email-toolbar d-flex align-items-center ps-1 py-0.1 border-bottom">
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
           <Form.Check type="checkbox" checked={isAllSelected} onChange={handleSelectAll} />
-
           {!hasSelection ? (
             <>
               <button className="gmail-icon-btn" onClick={fetchEmails} title="Refresh">
@@ -261,6 +271,14 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
           )}
         </div>
       </div>
+
+      {labelFilter === "trash" && (
+        <div className="px-3 py-2 d-flex justify-content-end">
+          <button className="btn btn-danger btn-sm" onClick={handleClearTrash}>
+            🗑️ Clear Trash
+          </button>
+        </div>
+      )}
 
       {showLabelPicker && (
         <div

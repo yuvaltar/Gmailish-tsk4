@@ -117,3 +117,113 @@ body.dark-mode .sidebar-item.active {
   background: #23272a !important;
   color: #8ab4f8 !important;
 }
+
+/* Sidebar expanded */
+.custom-sidebar {
+  background: #f6f8fc;
+  color: #444;
+  border-right: 1px solid #e0e0e0;
+  min-width: 220px;
+  width: 220px;
+  height: 100vh;
+  position: relative;
+  padding: 1rem 0;
+  transition: width 0.25s, background 0.25s;
+  z-index: 100;
+}
+
+/* Sidebar collapsed: float over content, no background */
+.custom-sidebar.icon-only.collapsed-float {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  width: 48px !important;
+  min-width: 0 !important;
+  height: 100vh;
+  background: transparent !important;
+  border-right: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  z-index: 1200;
+}
+
+/* Hide text, compose button, and labels in collapsed mode */
+.custom-sidebar.icon-only .sidebar-item span,
+.custom-sidebar.icon-only .sidebar-labels-header,
+.custom-sidebar.icon-only .sidebar-labels-add,
+.custom-sidebar.icon-only .btn-primary {
+  display: none !important;
+}
+
+/* Only show icons, align them left, transparent background */
+.custom-sidebar.icon-only .sidebar-item {
+  background: transparent !important;
+  border: none !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  padding: 0.7rem 0 0.7rem 0 !important;
+  margin-bottom: 4px;
+  width: 100%;
+  transition: background 0.2s;
+}
+
+/* Remove hover background in collapsed mode, keep subtle effect */
+.custom-sidebar.icon-only .sidebar-item:hover {
+  background: rgba(60, 64, 67, 0.08) !important;
+}
+
+/* Icon size and color for clarity */
+.custom-sidebar.icon-only .sidebar-icon {
+  font-size: 1.4rem !important;
+  color: #5f6368 !important;
+}
+
+/* Sidebar toggle button styling */
+.sidebar-toggle-btn {
+  z-index: 1100;
+  background: none;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: rgba(60, 64, 67, 0.1);
+}
+
+/* Main content: always full width, flush left */
+.main-content,
+.flex-grow-1.overflow-auto {
+  background: #fff !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  transition: margin-left 0.25s;
+}
+
+/* --- DARK MODE --- */
+body.dark-mode .custom-sidebar {
+  background: #181a1b;
+  color: #fff;
+  border-right: 1px solid #23272a;
+}
+body.dark-mode .custom-sidebar.icon-only.collapsed-float {
+  background: transparent !important;
+  border-right: none !important;
+}
+body.dark-mode .custom-sidebar.icon-only .sidebar-item {
+  background: transparent !important;
+}
+body.dark-mode .custom-sidebar.icon-only .sidebar-item:hover {
+  background: rgba(255,255,255,0.06) !important;
+}
+body.dark-mode .custom-sidebar.icon-only .sidebar-icon {
+  color: #e8eaed !important;
+}
