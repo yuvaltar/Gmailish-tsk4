@@ -27,7 +27,7 @@ function createMail(senderId, recipientId, subject, content, recipientLabels = [
     subject,
     content,
     timestamp,
-    labels: ['inbox'],
+    labels: recipientLabels,
     ownerId: recipientId,
     read: false
   };
@@ -146,9 +146,7 @@ function markAllAsRead(userId) {
   mails.forEach(mail => {
     if (
       mail.ownerId === userId &&
-      !mail.labels.includes('read') &&
-      !mail.labels.includes('trash') &&
-      !mail.labels.includes('spam')
+      !mail.labels.includes('read')
     ) {
       mail.labels.push('read');
       mail.read = true;
