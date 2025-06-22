@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Compose from "../pages/Compose";
-import { BsList } from "react-icons/bs";
 import "./Layout.css";
 
 export default function Layout() {
@@ -12,22 +11,12 @@ export default function Layout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-     <div className={`container-fluid vh-100 d-flex flex-column p-0${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-       {/* Hamburger toggle button, always top left, above all content */}
-      <button
-        className="sidebar-toggle-btn gmail-icon-btn"
-        style={{
-          position: "fixed",
-          top: 15,
-          left: 0,
-          zIndex: 2000
-        }}
-        onClick={() => setSidebarCollapsed(c => !c)}
-        aria-label="Toggle sidebar"
-      >
-        <BsList size={24} />
-      </button>
-      <Header setSearchQuery={setSearchQuery} />
+    <div className={`container-fluid vh-100 d-flex flex-column p-0${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+      <Header
+        setSearchQuery={setSearchQuery}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
+      />
 
       <div className="flex-grow-1 d-flex overflow-hidden position-relative">
         <Sidebar
@@ -37,9 +26,7 @@ export default function Layout() {
         />
 
         <main className="main-content-area flex-grow-1 overflow-auto" style={{ position: "relative" }}>
-           {sidebarCollapsed && (
-            <div className="vertical-divider"></div>
-          )}
+          {sidebarCollapsed && <div className="vertical-divider"></div>}
           <Outlet context={{ searchQuery, sidebarCollapsed }} />
         </main>
       </div>

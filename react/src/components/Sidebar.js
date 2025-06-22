@@ -60,7 +60,15 @@ function Sidebar({ onComposeClick, collapsed }) {
       className={`custom-sidebar d-flex flex-column h-100 p-2 ${collapsed ? "icon-only collapsed-float" : ""}`}
     >
       {/* Compose button is hidden when sidebar is collapsed */}
-      {!collapsed && (
+      {collapsed ? (
+        <button
+          className="compose-icon-collapsed"
+          onClick={onComposeClick}
+          title="Compose"
+        >
+          <BsPlus size={24} />
+        </button>
+      ) : (
         <Button
           variant="primary"
           className="mb-3 w-100"
@@ -75,7 +83,7 @@ function Sidebar({ onComposeClick, collapsed }) {
         <ListGroup.Item
           className="d-flex align-items-center sidebar-labels-header"
           action={!collapsed}
-          onClick={() => !collapsed && navigate("/labels")}
+          onClick={() => !collapsed}
         >
           <BsFileEarmarkText className="sidebar-icon" />
           {!collapsed && <span className="fw-bold ms-2">Labels</span>}
@@ -103,7 +111,7 @@ function Sidebar({ onComposeClick, collapsed }) {
 
         {/* User-defined labels */}
         {customLabels.map(lbl =>
-          Item(`/labels/${encodeURIComponent(lbl)}`, BsFileEarmarkText, lbl)
+          Item(`/${encodeURIComponent(lbl)}`, BsFileEarmarkText, lbl)
         )}
       </ListGroup>
 

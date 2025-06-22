@@ -56,3 +56,22 @@
 .dropdown-item:hover {
   background: #f1f3f4;
 }
+/* Sidebar toggle button styling */
+.sidebar-toggle-btn {
+  z-index: 1100;
+  background: none;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  font-size: 1.6rem;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: rgba(60, 64, 67, 0.1);
+}
