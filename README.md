@@ -13,7 +13,6 @@
 - [Building and Running](#building-and-running)
 - [Docker Setup](#docker-setup)
 - [Screenshots](#screenshots)
-- [Code Structure](#code-structure)
 - [Jira Link](#jira-link)
 - [Authors](#authors)
 
@@ -212,73 +211,6 @@ docker-compose up
 ![Persistent spam filtering](<screenshots/19. sending the same bad url in a different mail and it goes directly to spam.png>)
 *Subsequent emails with the same malicious URL are also automatically filtered to spam*
 
-## Code Structure
-
-Gmailish-tsk4/
-├── react/ # React Frontend Application
-│ ├── public/ # Static assets and index.html
-│ ├── src/ # React source code
-│ │ ├── components/ # Reusable UI components
-│ │ │ ├── Sidebar/ # Navigation sidebar component
-│ │ │ ├── EmailList/ # Email listing components
-│ │ │ ├── Compose/ # Email composition interface
-│ │ │ ├── Header/ # Top navigation header
-│ │ │ └── ThemeToggle/ # Dark/light mode toggle
-│ │ ├── pages/ # Main application pages
-│ │ │ ├── Login/ # Authentication pages
-│ │ │ ├── Register/ # User registration
-│ │ │ ├── Inbox/ # Main inbox interface
-│ │ │ ├── Compose/ # Email composition page
-│ │ │ └── Profile/ # User profile management
-│ │ ├── utils/ # Utility functions and API calls
-│ │ ├── styles/ # CSS and styling files
-│ │ └── App.js # Main application component
-│ ├── package.json # React dependencies
-│ └── Dockerfile # React container configuration
-├── server/ # Express.js Backend
-│ ├── controllers/ # API route controllers
-│ │ ├── AuthController.js # Authentication logic
-│ │ ├── UserController.js # User management
-│ │ ├── MailController.js # Email operations
-│ │ ├── LabelController.js # Label management
-│ │ └── BlacklistController.js # Spam filtering
-│ ├── middlewares/ # Authentication and validation
-│ │ └── authMiddleware.js # JWT token validation
-│ ├── models/ # Data models and in-memory storage
-│ │ └── InMemoryStore.js # In-memory data storage
-│ ├── routes/ # API route definitions
-│ │ ├── authRoutes.js # Authentication endpoints
-│ │ ├── userRoutes.js # User management endpoints
-│ │ ├── mailRoutes.js # Email operation endpoints
-│ │ ├── labelRoutes.js # Label management endpoints
-│ │ └── blacklistRoutes.js # Blacklist management
-│ ├── services/ # Business logic services
-│ │ └── TokenService.js # JWT token management
-│ ├── app.js # Server entry point
-│ └── package.json # Backend dependencies
-├── src/ # C++ Bloom Filter Service
-│ ├── BloomFilter/ # Bloom filter implementation
-│ │ ├── BloomFilter.cpp # Core Bloom filter logic
-│ │ ├── BloomFilter.h # Header file
-│ │ ├── BlackList.cpp # Blacklist management
-│ │ └── url.cpp # URL processing utilities
-│ ├── server/ # TCP server components
-│ │ ├── server.cpp # Main server implementation
-│ │ ├── SessionHandler.cpp # Client session handling
-│ │ └── CommandManager.cpp # Command processing
-│ ├── main.cpp # Service entry point
-│ └── Makefile # Build configuration
-├── screenshots/ # Application screenshots
-│ ├── 1. all 3 containers working .png
-│ ├── 2. registration success.png
-│ └── ... (19 total screenshots)
-├── docker-compose.yml # Docker orchestration
-├── Dockerfile.react # React container configuration
-├── Dockerfile.server # Backend container configuration
-├── Dockerfile.bloomfilter # C++ service container configuration
-└── README.md # Project documentation
-
-
 
 The application follows a **component-based architecture** where reusable components are integrated into pages, eliminating the need for full page reloads. **Real-time update mechanisms** ensure users see new emails and changes instantly through dedicated refresh functionality built into the interface.
 
@@ -292,17 +224,3 @@ Project planning and task tracking are managed in Jira:
 - **Yuval Tarnopolsky**
 - **Tal Amitay**  
 - **Itay Smouha**
-The key changes made:
-
-Clickable Table of Contents - All section headers now have proper markdown links
-
-Bold Features - All key features and functionality are now bolded throughout the Overview, Features, Architecture, and How It Works sections
-
-Detailed Code Structure - Added a comprehensive project structure based on your repository folders (react, server, src, screenshots) with detailed explanations of each component
-
-Related
-How can I make the Table of Contents more visually appealing and user-friendly
-What is the best way to highlight "How It Works" and other features for better visibility
-How should I structure my project files based on the provided project structure screenshots
-Why is it important to emphasize "Features" and "Architecture" in my documentation
-How can I organize the content so users easily find details about deployment and setup
