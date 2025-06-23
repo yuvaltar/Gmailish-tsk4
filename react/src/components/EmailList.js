@@ -268,7 +268,8 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
 
   return (
     <div className="w-100 p-0 position-relative">
-      <div className="email-toolbar d-flex align-items-center ps-1 py-0.1 border-bottom">
+      <div className="email-toolbar d-flex align-items-center justify-content-between ps-1 py-0.1 border-bottom">
+        {/* Left group: checkboxes and actions */}
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
           <Form.Check type="checkbox" checked={isAllSelected} onChange={handleSelectAll} />
           {!hasSelection ? (
@@ -304,47 +305,48 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                 <BsTrash size={18} />
               </button>
             </>
+
           )}
+          <div className="d-flex align-items-center gap-3 pe-3">
+            {labelFilter === "trash" && (
+              <button className="btn btn-danger btn-sm" onClick={handleClearTrash}>
+                🗑️ Clear Trash
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Right group: trash and pagination */}
         
-        {/* Email count and pagination controls in the same row */}
-        <div className="email-count-pagination-container ms-auto pe-3 d-flex align-items-center gap-2">
-          <span className="text-muted small">
-            {totalEmails === 0 ? "No emails" : `${startIndex + 1}-${Math.min(endIndex, totalEmails)} of ${totalEmails}`}
-          </span>
-          
-          {/* Pagination controls - only show if more than 50 emails */}
-          {showPagination && (
-            <div className="pagination-controls-inline d-flex align-items-center">
-              <button 
-                className="gmail-icon-btn-small" 
-                onClick={handlePreviousPage} 
-                disabled={currentPage === 1}
-                title="Previous page"
-              >
-                <BsChevronLeft size={16} />
-              </button>
-              
-              <button 
-                className="gmail-icon-btn-small" 
-                onClick={handleNextPage} 
-                disabled={currentPage === totalPages}
-                title="Next page"
-              >
-                <BsChevronRight size={16} />
-              </button>
-            </div>
-          )}
+          <div className="email-count-pagination-container d-flex align-items-center gap-2">
+            <span className="text-muted small">
+              {totalEmails === 0
+                ? "No emails"
+                : `${startIndex + 1}-${Math.min(endIndex, totalEmails)} of ${totalEmails}`}
+            </span>
+            {showPagination && (
+              <div className="pagination-controls-inline d-flex align-items-center">
+                <button
+                  className="gmail-icon-btn-small"
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  title="Previous page"
+                >
+                  <BsChevronLeft size={16} />
+                </button>
+                <button
+                  className="gmail-icon-btn-small"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  title="Next page"
+                >
+                  <BsChevronRight size={16} />
+                </button>
+              </div>
+            )}
         </div>
       </div>
 
-      {labelFilter === "trash" && (
-        <div className="px-3 py-2 d-flex justify-content-end">
-          <button className="btn btn-danger btn-sm" onClick={handleClearTrash}>
-            🗑️ Clear Trash
-          </button>
-        </div>
-      )}
 
       {showLabelPicker && (
         <div
