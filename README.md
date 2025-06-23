@@ -156,12 +156,14 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 
 ### 1. Setup & Docker
 
-![All three containers working pt1](<screenshots/20. docker running by  terminal.png>)
+![Docker running by terminal](<screenshots/20. docker running by terminal.png>)
+*Docker containers running and monitored through terminal interface*
 
 ![All three containers working](<screenshots/1. all 3 containers working .png>)
 *All three Docker containers running successfully, you can see how the "docker-compose" command successfully creates the 3 containers in the Docker Desktop*
 
 ### 2. User Registration & Authentication
+
 ![Successful user registration](<screenshots/2. registration success.png>)
 *Successful user registration with profile picture upload*
 
@@ -172,6 +174,7 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 *Enforcing strong password requirements for security*
 
 ### 3. Interface & Display Modes
+
 ![Light vs Dark mode comparison](<screenshots/5. dark mode vs light mode.png>)
 *Interface shown in both light and dark modes*
 
@@ -179,6 +182,7 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 *Responsive sidebar collapsed in both light and dark themes*
 
 ### 4. Core Email Functionality
+
 ![Sending and receiving mail](<screenshots/7. sending a mail from one user to another ( one will appear in sent the other in inbox) .png>)
 *Email sent from one user appears in the recipient's inbox and the sender's "Sent" folder*
 
@@ -188,7 +192,17 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 ![Starring an email](<screenshots/9. toggle a mail with a star would make it in the star labels.png>)
 *Starring an email correctly adds it to the "Starred" label*
 
+![Pagination for large email volumes](<screenshots/21. more than 50 mails can go to another page of mails.png>)
+*Pagination system allowing navigation through more than 50 emails across multiple pages*
+
+![Creating a draft email](<screenshots/22. creating a mail. without sendong will be stored at the draft.png>)
+*Composing an email without sending automatically saves it as a draft*
+
+![Draft email appearing in drafts folder](<screenshots/23. appearing in the draft.png>)
+*Unsent email successfully stored and displayed in the Drafts folder*
+
 ### 5. Label Management
+
 ![Creating custom labels](<screenshots/10. creating 3 more labels named work project and school.png>)
 *Creating new custom labels: "work", "project", and "school"*
 
@@ -205,6 +219,7 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 *Selecting multiple emails to perform bulk actions like marking as read or assigning labels*
 
 ### 6. Advanced Features & Security
+
 ![Search functionality](<screenshots/15. search functionality.png>)
 *Searching the inbox for specific email content*
 
@@ -220,8 +235,6 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 ![Persistent spam filtering](<screenshots/19. sending the same bad url in a different mail and it goes directly to spam.png>)
 *Subsequent emails with the same malicious URL are also automatically filtered to spam*
 
-
-The application follows a **component-based architecture** where reusable components are integrated into pages, eliminating the need for full page reloads. **Real-time update mechanisms** ensure users see new emails and changes instantly through dedicated refresh functionality built into the interface.
 
 ## Jira Link
 
