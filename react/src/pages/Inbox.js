@@ -34,15 +34,10 @@ function Inbox() {
   return (
     <div className="container-fluid vh-100 d-flex flex-column p-0">
       <Header onSearch={handleSearch} />
-
-      {/* Full height body with sidebar + content */}
       <div className="flex-grow-1 d-flex overflow-hidden">
-        {/* Sidebar - fixed width */}
         <div className="sidebar-fixed border-end bg-light">
           <Sidebar onComposeClick={() => setShowCompose(true)} />
         </div>
-
-        {/* Main content area - flexible */}
         <div className="flex-grow-1 overflow-auto">
           {selectedEmail ? (
             <MailView emailId={selectedEmail} onBack={() => setSelectedEmail(null)} />

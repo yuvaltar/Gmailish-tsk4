@@ -10,7 +10,7 @@ function Label({ show, onClose, onCreate }) {
     try {
       const res = await fetch("/api/labels", {
         method: "POST",
-        credentials: "include", // ✅ Send cookie
+        credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },
@@ -49,21 +49,20 @@ function Label({ show, onClose, onCreate }) {
             placeholder="Label name"
           />
         </Form.Group>
-        <Form.Check
-          type="checkbox"
-          label="Nest label under"
-          className="mt-3"
-          disabled
-        />
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+      <Modal.Footer className="gap-2 d-flex align-items-center">
+        <Button
+          onClick={onClose}
+          className="rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center justify-content-center border border-secondary text-secondary bg-white"
+          style={{ minWidth: "100px" }}
+        >
           Cancel
         </Button>
         <Button
-          variant="primary"
           onClick={handleCreate}
           disabled={!labelName.trim()}
+          className="rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center justify-content-center text-white"
+          style={{ minWidth: "100px", backgroundColor: "#0d6efd", border: "none" }}
         >
           Create
         </Button>

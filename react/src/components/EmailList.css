@@ -2,12 +2,13 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(60, 64, 67, 0.07);
-  margin-top: 1.5rem;
   width: 100%;
   overflow: hidden;
 }
 
-.email-list-table th, .email-list-table td {
+.email-list-table th,
+.email-list-table td {
+  padding-left: 0 !important;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   vertical-align: middle;
@@ -20,212 +21,17 @@
 
 .email-toolbar {
   gap: 6px;
-  padding: 0.25rem 0.5rem;
-  background-color: #fff;
-  border-bottom: 1px solid #dadce0;
-}
-
-.email-toolbar .gmail-icon-btn {
-  background: none;
-  border: none;
-  width: 32px;
-  height: 32px;
-  font-size: 1.2rem;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.email-toolbar .gmail-icon-btn:hover {
-  background-color: rgba(60, 64, 67, 0.1);
-}
-
-.email-toolbar .gmail-icon-btn svg {
-  color: #5f6368;
-}
-
-body.dark-mode .email-toolbar {
-  background-color: #202124;
-  border-bottom-color: #3c4043;
-}
-
-body.dark-mode .email-toolbar .gmail-icon-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-body.dark-mode .email-toolbar .gmail-icon-btn svg {
-  color: #e8eaed;
-}
-
-input[type="checkbox"] {
-  all: revert;
-}
-
-.star-cell {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.star-filled {
-  color: #fbbc04;
-  font-size: 1rem;
-}
-
-.star-empty {
-  color: #c0c0c0;
-  font-size: 1rem;
-}
-
-.star-cell:hover .star-empty {
-  color: #888;
-}
-
-body.dark-mode .star-empty {
-  color: #888;
-}
-
-body.dark-mode .star-filled {
-  color: #fbbc04;
-}
-
-body.dark-mode .table-primary td {
-  background-color: #3a3d42 !important;
-  color: #e8eaed !important;
-}
-
-/* Snippet Cell Styles */
-.email-snippet-cell {
-  max-width: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.sender-name,
-.subject-line {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-
-.sender-name {
-  font-weight: 500;
-  color: #202124;
-  font-size: 0.95rem;
-  max-width: 200px;
-}
-
-.subject-line {
-  font-size: 0.85rem;
-  color: #5f6368;
-  max-width: 360px;
-}
-
-body.dark-mode .sender-name {
-  color: #e8eaed;
-}
-
-body.dark-mode .subject-line {
-  color: #9aa0a6;
-}
-
-/* Align end cells */
-.text-end {
-  vertical-align: middle;
-}
-.label-icon-glow {
-  color: #0d6efd !important; /* primary blue glow */
-}
-.unread-mail {
-  font-weight: bold;
-  background-color: #f9f9f9;
-}
-
-.read-mail {
-  font-weight: normal;
-  background-color: #d5dcdf ; 
-  color: #5f6363;
-}
-.email-row-flex.read-mail {
-  background-color: #f1f3f4;
-  font-weight: normal;
-}
-
-.email-row-flex.unread-mail {
-  background-color: #fff;
-  font-weight: bold;
-}
-
-.email-row-flex:hover {
-  background-color: #eaeaea;
-}
-
-/* ──────────  CARD CONTAINER  ────────── */
-.email-list-table {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(60,64,67,.07);
-  margin-top: 0;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* Remove all left padding from table header and cells */
-.email-list-table th,
-.email-list-table td,
-.email-list-table td:first-child,
-.email-list-table th:first-child {
-  padding-left: 0 !important;
-  border-bottom: 1px solid #e0e0e0;
-  vertical-align: middle;
-}
-
-/* Remove all left margin and padding from containers */
-.email-list-container,
-.w-100.p-0 {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-  border-left: none !important;
-}
-
-/* Remove left padding/margin from snippet and sender/subject */
-.email-snippet-cell,
-.sender-name,
-.subject-line,
-.email-checkbox-star {
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-}
-
-/* Remove left padding/margin from toolbar and its children */
-.email-toolbar,
-.email-toolbar .toolbar-group > * {
-  padding-left: 0 !important;
-  border-left: none !important;
-}
-
-.email-toolbar {
-  gap: 6px;
   padding: .25rem 0 .25rem 0 !important;
   background: #fff;
   border-bottom: 1px solid #dadce0;
-  margin-bottom: 0;
-  padding-bottom: 0;
-  margin-left: 0 !important;
   width: 100% !important;
   display: flex !important;
   justify-content: flex-start !important;
 }
 
-/* OPTION 3: Precise margin control for toolbar icons */
 .toolbar-group {
   gap: 4px;
-  margin-left: 16px !important; /* ADJUST THIS VALUE TO MOVE ICONS LEFT/RIGHT */
+  margin-left: 16px !important;
 }
 
 .email-toolbar .gmail-icon-btn {
@@ -239,309 +45,166 @@ body.dark-mode .subject-line {
   align-items: center;
   justify-content: center;
   transition: background-color .2s ease;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-.email-toolbar .gmail-icon-btn:hover { background: rgba(60,64,67,.1);}
-.email-toolbar .gmail-icon-btn svg { color: #5f6368; }
-
-/* ──────────  STAR ICONS  ────────── */
-.star-cell{cursor:pointer;display:flex;align-items:center;}
-.star-filled{color:#fbbc04;font-size:1rem;}
-.star-empty {color:#c0c0c0;font-size:1rem;}
-.star-cell:hover .star-empty{color:#888;}
-
-/* ──────────  SNIPPET CELL  ────────── */
-.email-snippet-cell{
-  max-width:100%;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-.sender-name, .subject-line{
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.sender-name{font-weight:500;color:#202124;font-size:.95rem;max-width:200px;}
-.subject-line{font-size:.85rem;color:#5f6368;max-width:360px;}
-
-/* ──────────  DARK-MODE OVERRIDES  ────────── */
-body.dark-mode .email-toolbar{background:#202124;border-bottom-color:#3c4043;}
-body.dark-mode .email-toolbar .gmail-icon-btn:hover{background:rgba(255,255,255,.1);}
-body.dark-mode .email-toolbar .gmail-icon-btn svg{color:#e8eaed;}
-
-/* DARK MODE: Email list table container */
-body.dark-mode .email-list-table {
-  background: #202124 !important;
-  border-bottom: 1px solid #3c4043 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,.3) !important;
 }
 
-body.dark-mode .email-list-table th,
-body.dark-mode .email-list-table td {
-  border-bottom: 1px solid #333333 !important;
+.email-toolbar .gmail-icon-btn:hover {
+  background: rgba(60, 64, 67, 0.1);
 }
 
-/* DARK MODE: Main containers */
-body.dark-mode .email-list-container,
-body.dark-mode .w-100.p-0,
-body.dark-mode .main-content-area {
-  background: #202124 !important;
+.email-toolbar .gmail-icon-btn svg {
+  color: #5f6368;
 }
 
-/* DARK MODE: Each email row gets BLACK background with WHITE text */
-body.dark-mode .email-list-table > tbody > tr {
-  background: #000000 !important; /* Pure black background */
-  color: #ffffff !important; /* White text */
+input[type="checkbox"] {
+  all: revert;
 }
 
-body.dark-mode .email-list-table > tbody > tr td {
-  background: #000000 !important; /* Pure black background for all cells */
-  color: #ffffff !important; /* White text for all cells */
+.star-cell {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.star-filled {
+  color: #fbbc04;
+  font-size: 1rem;
+}
+.star-empty {
+  color: #c0c0c0;
+  font-size: 1rem;
+}
+.star-cell:hover .star-empty {
+  color: #888;
 }
 
-/* DARK MODE: All email text becomes WHITE */
-body.dark-mode .email-list-table .sender-name,
-body.dark-mode .sender-name {
-  color: #ffffff !important; /* White sender names */
+.email-snippet-cell {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sender-name,
+.subject-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sender-name {
+  font-weight: 500;
+  color: #202124;
+  font-size: .95rem;
+  max-width: 200px;
+}
+.subject-line {
+  font-size: .85rem;
+  color: #5f6368;
+  max-width: 360px;
+}
+
+.read-mail {
+  font-weight: normal;
+  background-color: #d5dcdf;
+  color: #5f6363;
+}
+.unread-mail {
   font-weight: bold;
+  background-color: #f9f9f9;
+}
+.email-row-flex.read-mail {
+  background-color: #f1f3f4;
+}
+.email-row-flex.unread-mail {
+  background-color: #fff;
+}
+.email-row-flex:hover {
+  background-color: #eaeaea;
 }
 
-body.dark-mode .email-list-table .subject-line,
-body.dark-mode .subject-line {
-  color: #ffffff !important; /* White subject lines */
+.text-end {
+  vertical-align: middle;
 }
 
-/* DARK MODE: Read emails - slightly different for distinction */
-body.dark-mode .email-list-table > tbody > tr.email-read {
-  background: #111111 !important; /* Slightly lighter black for read emails */
-  color: #cccccc !important; /* Light gray text for read emails */
+.pagination-controls {
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+}
+.pagination-controls .gmail-icon-btn {
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+.pagination-controls .gmail-icon-btn:hover:not(:disabled) {
+  background-color: rgba(60, 64, 67, 0.1);
+}
+.pagination-controls .gmail-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.pagination-controls .gmail-icon-btn svg {
+  color: #5f6368;
+}
+.pagination-info,
+.email-count-display {
+  font-size: 0.85rem;
+  color: #5f6368;
 }
 
-body.dark-mode .email-list-table > tbody > tr.email-read td {
-  background: #111111 !important;
-  color: #cccccc !important;
+body.dark-mode .email-toolbar {
+  background: #202124;
+  border-bottom-color: #3c4043;
 }
-
-body.dark-mode .email-list-table > tbody > tr.email-read .sender-name {
-  color: #cccccc !important; /* Light gray for read sender names */
+body.dark-mode .email-toolbar .gmail-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
-
-body.dark-mode .email-list-table > tbody > tr.email-read .subject-line {
-  color: #999999 !important; /* Darker gray for read subject lines */
+body.dark-mode .email-toolbar .gmail-icon-btn svg {
+  color: #e8eaed;
 }
-
-/* DARK MODE: Unread emails - pure black with bright white text */
-body.dark-mode .email-list-table > tbody > tr.email-unread {
-  background: #000000 !important; /* Pure black for unread */
-  color: #ffffff !important; /* Bright white text */
-  font-weight: bold;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-unread td {
-  background: #000000 !important;
-  color: #ffffff !important;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-unread .sender-name {
-  color: #ffffff !important; /* Bright white for unread sender names */
-  font-weight: bold;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-unread .subject-line {
-  color: #ffffff !important; /* Bright white for unread subject lines */
-}
-
-/* DARK MODE: Hover effects */
-body.dark-mode .email-list-table > tbody > tr:hover {
-  background: #222222 !important; /* Dark gray on hover */
-  color: #ffffff !important;
-}
-
-body.dark-mode .email-list-table > tbody > tr:hover td {
-  background: #222222 !important;
-  color: #ffffff !important;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-read:hover {
-  background: #222222 !important;
-}
-
-body.dark-mode .email-list-table > tbody > tr.email-unread:hover {
-  background: #222222 !important;
-}
-
-/* DARK MODE: Selected email styling */
-body.dark-mode .email-list-table > tbody > tr.table-primary td {
-  background: #1a73e8 !important; /* Blue background for selected */
-  color: #ffffff !important; /* White text for selected */
-}
-
-/* DARK MODE: Date column */
-body.dark-mode .email-list-table .text-end,
-body.dark-mode .text-end {
-  color: #ffffff !important; /* White text for dates */
-}
-
-/* DARK MODE: Star icons */
 body.dark-mode .star-empty {
   color: #cccccc !important;
 }
-
 body.dark-mode .star-filled {
   color: #fbbc04 !important;
 }
-
-/* DARK MODE: Checkbox styling */
-body.dark-mode input[type="checkbox"] {
-  background-color: #000000 !important;
-  border-color: #ffffff !important;
+body.dark-mode .email-list-table {
+  background: #202124 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3) !important;
 }
-
-/* DARK MODE: Row flex styling */
+body.dark-mode .email-list-table th,
+body.dark-mode .email-list-table td {
+  border-bottom: 1px solid #333 !important;
+}
+body.dark-mode .email-list-table > tbody > tr,
+body.dark-mode .email-list-table > tbody > tr td {
+  background: #000 !important;
+  color: #fff !important;
+}
 body.dark-mode .email-row-flex.read-mail {
-  background-color: #111111 !important;
-  color: #cccccc !important;
+  background-color: #111 !important;
+  color: #ccc !important;
   font-weight: normal;
 }
-
 body.dark-mode .email-row-flex.unread-mail {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+  background-color: #000 !important;
+  color: #fff !important;
   font-weight: bold;
 }
-
 body.dark-mode .email-row-flex:hover {
-  background-color: #222222 !important;
-  color: #ffffff !important;
+  background-color: #222 !important;
 }
-
-/* restore native checkbox in Bootstrap reset */
-input[type="checkbox"] { all: revert; }
-.text-end { vertical-align: middle; }
-
-/* Pagination Controls */
-.pagination-controls {
-  background: #fff;
-  border-bottom: 1px solid #dadce0;
-}
-
-.pagination-controls .gmail-icon-btn {
-  background: none;
-  border: none;
-  width: 32px;
-  height: 32px;
-  font-size: 1.2rem;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.pagination-controls .gmail-icon-btn:hover:not(:disabled) {
-  background-color: rgba(60, 64, 67, 0.1);
-}
-
-.pagination-controls .gmail-icon-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.pagination-controls .gmail-icon-btn svg {
-  color: #5f6368;
-}
-
-.pagination-info {
-  font-size: 0.9rem;
-  color: #5f6368;
-  font-weight: 500;
-}
-
-.email-count-display {
-  font-size: 0.85rem;
-  color: #5f6368;
-}
-
-/* Dark mode pagination */
 body.dark-mode .pagination-controls {
   background: #202124;
   border-bottom-color: #3c4043;
 }
-
-body.dark-mode .pagination-controls .gmail-icon-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
 body.dark-mode .pagination-controls .gmail-icon-btn svg {
   color: #e8eaed;
 }
-
-body.dark-mode .pagination-info,
-body.dark-mode .email-count-display {
-  color: #e8eaed;
-}
-/* Pagination Controls */
-.pagination-controls {
-  background: #fff;
-  border-bottom: 1px solid #dadce0;
-}
-
-.pagination-controls .gmail-icon-btn {
-  background: none;
-  border: none;
-  width: 32px;
-  height: 32px;
-  font-size: 1.2rem;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.pagination-controls .gmail-icon-btn:hover:not(:disabled) {
-  background-color: rgba(60, 64, 67, 0.1);
-}
-
-.pagination-controls .gmail-icon-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.pagination-controls .gmail-icon-btn svg {
-  color: #5f6368;
-}
-
-.pagination-info {
-  font-size: 0.9rem;
-  color: #5f6368;
-  font-weight: 500;
-}
-
-.email-count-display {
-  font-size: 0.85rem;
-  color: #5f6368;
-}
-
-/* Dark mode pagination */
-body.dark-mode .pagination-controls {
-  background: #202124;
-  border-bottom-color: #3c4043;
-}
-
-body.dark-mode .pagination-controls .gmail-icon-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-body.dark-mode .pagination-controls .gmail-icon-btn svg {
-  color: #e8eaed;
-}
-
 body.dark-mode .pagination-info,
 body.dark-mode .email-count-display {
   color: #e8eaed;

@@ -1,18 +1,15 @@
 
-/* Optional: Make email table rows more compact */
 .table td {
   vertical-align: middle;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
 }
 
-/* Optional: Add hover effect to sidebar items */
 .list-group-item:hover {
   background-color: #e9ecef;
   cursor: pointer;
 }
 
-/* Optional: Fix overflow in sidebar */
 .sidebar-scroll {
   overflow-y: auto;
 }
@@ -26,7 +23,7 @@
   padding: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   z-index: 1050;
-  width: 40vw; /* Default for xl+ */
+  width: 40vw; 
 }
 
 .compose-popup {
@@ -74,7 +71,6 @@
   resize: none;
 }
 
-/* Dark mode styles */
 body.dark-mode {
   background-color: #202124;
   color: #e8eaed;
@@ -150,7 +146,6 @@ body.dark-mode {
   border: 1px solid #5f6368;
 }
 
-/* Dark mode styles for EmailList table */
 .dark-mode .table {
   background-color: #202124;
   color: #e8eaed;
@@ -185,12 +180,10 @@ body.dark-mode {
   color: #e8eaed !important;
 }
 
-/* Fix for MailView background in dark mode */
 .dark-mode .col-10 {
   background-color: #202124 !important;
 }
 
-/* Alternative: Add a specific class for mail view container */
 .mail-view-container {
   background-color: white;
   min-height: 100%;
@@ -200,22 +193,19 @@ body.dark-mode {
   background-color: #202124 !important;
 }
 
-/* Media queries */
-/* Large (≥992px and <1200px) */
+
 @media (max-width: 1199.98px) {
   .compose-box {
     width: 50vw;
   }
 }
 
-/* Medium (≥768px and <992px) */
 @media (max-width: 991.98px) {
   .compose-box {
     width: 60vw;
   }
 }
 
-/* Small (<768px) */
 @media (max-width: 767.98px) {
   .compose-box {
     width: 60vw;
@@ -239,7 +229,7 @@ body.dark-mode {
 }
 
 .gmail-icon-btn:hover {
-  background-color: rgba(60, 64, 67, 0.1); /* light gray circle */
+  background-color: rgba(60, 64, 67, 0.1); 
 }
 
 .gmail-icon-btn i {
@@ -261,14 +251,12 @@ body.dark-mode {
 .dark-mode .gmail-icon-btn svg {
   color: #e8eaed;
 }
-/* Sidebar collapsed state */
 .sidebar-collapsed .custom-sidebar {
   width: 72px !important;
   overflow-x: hidden;
   align-items: center;
 }
 
-/* Collapse-specific layout fixes */
 .collapsed-float {
   width: 72px !important;
   align-items: center !important;
@@ -278,7 +266,7 @@ body.dark-mode {
   margin-left: 72px;
 }
 
-/* Hide labels and text when collapsed */
+
 .sidebar-collapsed .sidebar-item span,
 .sidebar-collapsed .sidebar-labels-header span {
   display: none;
@@ -288,7 +276,6 @@ body.dark-mode {
   margin-left: 0 !important;
 }
 
-/* Ensure tooltips or icons remain centered */
 .sidebar-icon {
   display: flex;
   justify-content: center;

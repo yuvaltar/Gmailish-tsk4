@@ -80,7 +80,7 @@ function Sidebar({ onComposeClick, collapsed }) {
       )}
 
       <ListGroup variant="flush" className="flex-grow-1">
-        {/* Labels header row (always shows the plus icon) */}
+        {/* Labels  */}
         <ListGroup.Item
           className="d-flex align-items-center sidebar-labels-header"
           action={!collapsed}
@@ -97,7 +97,7 @@ function Sidebar({ onComposeClick, collapsed }) {
               setShowLabelModal(true);
             }}
           >
-            <BsPlus size={collapsed ? 18 : 20} />
+            <BsPlus size={collapsed ? 24 : 24} />
           </Button>
         </ListGroup.Item>
 

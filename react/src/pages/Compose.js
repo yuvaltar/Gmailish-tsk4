@@ -64,7 +64,7 @@ function Compose({ onClose, draft }) {
       throw new Error(errMsg.error || "Failed to send mail");
     }
 
-    // ✅ STEP 3: If this was a draft, delete it
+    // STEP 3: If this was a draft, delete it
     if (draftId) {
       await fetch(`http://localhost:3000/api/mails/${draftId}`, {
         method: "DELETE",
@@ -140,7 +140,6 @@ function Compose({ onClose, draft }) {
   ></textarea>
   <div className="compose-footer">
     <button type="submit" className="btn-send">Send</button>
-    {/* Optionally add icons like attach, emoji etc */}
   </div>
 </form>
 

@@ -4,8 +4,8 @@ import EmailList from "../components/EmailList";
 import MailView from "../components/MailView";
 
 export default function EmailPage() {
-  const { labelName } = useParams();           // e.g. "spam", "starred", etc.
-  const { searchQuery } = useOutletContext();  // 🔍 from Layout
+  const { labelName } = useParams();           
+  const { searchQuery } = useOutletContext();  
   const folder = labelName || "inbox";
   const [selectedEmail, setSelectedEmail] = useState(null);
 

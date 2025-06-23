@@ -68,7 +68,6 @@
   background-color: #1666c1;
 }
 
-/* Optional: expand/minimized styling */
 .compose-expanded {
   position: fixed;
   bottom: 20px;
@@ -91,7 +90,6 @@
   height: 48px !important;
   overflow: hidden;
 }
-/* override dark mode for compose */
 .compose-popup input,
 .compose-popup textarea {
   background-color: white !important;

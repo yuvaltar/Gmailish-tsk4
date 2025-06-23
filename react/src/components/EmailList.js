@@ -1,4 +1,3 @@
-// src/components/EmailList.js
 import React, { useState, useEffect } from "react";
 import { Table, Form } from "react-bootstrap";
 import {
@@ -13,10 +12,6 @@ import {
   BsArchive,
   BsChevronLeft,
   BsChevronRight,
-  BsArrowLeft,
-  BsArrowRight,
-  BsChevronDoubleLeft,
-  BsChevronDoubleRight,
 } from "react-icons/bs";
 import PropTypes from "prop-types";
 import "./EmailList.css";
@@ -28,7 +23,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [showLabelPicker, setShowLabelPicker] = useState(false);
   const [labels, setLabels] = useState([]);
   
-  // Pagination state - Changed to 50 emails per page
   const [currentPage, setCurrentPage] = useState(1);
   const emailsPerPage = 50;
 
@@ -43,8 +37,8 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Invalid data");
-      setAllEmails(data);   // full copy
-      setEmails(data);      // filtered view (initially all)
+      setAllEmails(data);   
+      setEmails(data);    
       setCheckedEmails(new Set());
       setCurrentPage(1);
     } catch (err) {
@@ -272,7 +266,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   return (
     <div className="w-100 p-0 position-relative">
       <div className="email-toolbar d-flex align-items-center justify-content-between ps-1 py-0.1 border-bottom">
-        {/* Left group: checkboxes and actions */}
+        {/* Left group: checkboxes and actions (including trash if viable) */}
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
           <Form.Check type="checkbox" checked={isAllSelected} onChange={handleSelectAll} />
           {!hasSelection ? (
@@ -313,13 +307,13 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
           <div className="d-flex align-items-center gap-3 pe-3">
             {labelFilter === "trash" && (
               <button className="btn btn-danger btn-sm" onClick={handleClearTrash}>
-                🗑️ Clear Trash
+                Clear Trash
               </button>
             )}
           </div>
         </div>
 
-        {/* Right group: trash and pagination */}
+        {/* Right group: pagination */}
         
           <div className="email-count-pagination-container d-flex align-items-center gap-2">
             <span className="text-muted small">

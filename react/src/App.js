@@ -1,11 +1,9 @@
 // src/App.js
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Login          from "./pages/Login";
 import Register       from "./pages/Register";
 import Compose        from "./pages/Compose";
-import Search         from "./pages/Search";
 import EmailPage      from "./pages/EmailPage";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import Layout         from "./components/Layout";
@@ -37,7 +35,6 @@ function App() {
 
           {/* Compose & Search */}
           <Route path="send"      element={<Compose />} />
-          <Route path="search"    element={<Search />} />
         </Route>
       </Routes>
     </Router>

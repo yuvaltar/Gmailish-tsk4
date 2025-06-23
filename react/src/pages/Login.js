@@ -20,9 +20,6 @@ const Login = () => {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
-
-      // Store the JWT for subsequent requests
-      localStorage.setItem("token", data.token);
       navigate("/inbox");
     } catch (err) {
       setError(err.message);
