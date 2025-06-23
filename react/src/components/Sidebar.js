@@ -8,6 +8,7 @@ import {
   BsStar,
   BsSend,
   BsFileEarmarkText,
+  BsPencilSquare,
   BsExclamationCircle,
   BsArchive,
   BsTrash,
@@ -103,7 +104,7 @@ function Sidebar({ onComposeClick, collapsed }) {
         {/* Built-in folders */}
         {Item("/inbox", BsInbox, "Inbox")}
         {Item("/sent", BsSend, "Sent")}
-        {Item("/drafts", BsFileEarmarkText, "Drafts")}
+        {Item("/drafts", BsPencilSquare, "Drafts")}
         {Item("/archive", BsArchive, "Archive")}
         {Item("/starred", BsStar, "Starred")}
         {Item("/spam", BsExclamationCircle, "Spam")}
