@@ -13,7 +13,6 @@ const initialState = {
 };
 
 const genders = ["Male", "Female", "Other"];
-
 const Register = () => {
   const [form, setForm] = useState(initialState);
   const [error, setError] = useState("");
@@ -32,28 +31,37 @@ const Register = () => {
 
   const isStrongPassword = (password) => {
     const errors = [];
-    if (password.length < 8) errors.push("8 characters");
+    if (password.length < 8 || password.length > 100) errors.push("Between 8 to 100 characters");
     if (!/[a-z]/.test(password)) errors.push("1 lowercase");
     if (!/[A-Z]/.test(password)) errors.push("1 uppercase");
     if (!/\d/.test(password)) errors.push("1 digit");
-    if (!/[!@#$%^&*()_\-+=[\]{};':"\\|,.<>/?]/.test(password))
-      errors.push("1 special character");
+    if (!/[!@#$%^&*()_\-+=[\]{};':"\\|,.<>/?]/.test(password)) errors.push("1 special character");
     return errors.length === 0 ? null : `Password must include: ${errors.join(", ")}`;
   };
 
+  const validUsername = (username) => {
+    const errors = [];
+     if (/^[!@#$%^&*()_\-+=[\]{};':"\\|,.<>/?]/.test(username)) errors.push("Not begin with a special character");
+    if (username.length < 6 || username.length > 30) errors.push("Be between 6 to 30 characters");
+    return errors.length === 0 ? null : `Username must : ${errors.join(", ")}`;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    const errors = [];
 
     if (form.password !== form.confirm) {
-      setError("Passwords do not match");
-      return;
+      errors.push("Passwords do not match");
     }
 
     const passwordError = isStrongPassword(form.password);
     if (passwordError) {
-      setError(passwordError);
-      return;
+      errors.push(passwordError);
+    }
+
+    const userError = validUsername(form.username);
+    if(userError) {
+      errors.push(userError);
     }
 
     if (
@@ -64,9 +72,13 @@ const Register = () => {
       !form.birthdate ||
       !form.picture
     ) {
-      setError("Please fill in all fields and upload a picture.");
-      return;
+      errors.push("Please fill in all fields and upload a picture.");
+      
     }
+      if (errors.length > 0) {
+    setError(errors);
+    return;
+  }
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
@@ -88,7 +100,7 @@ const Register = () => {
       alert(`Registration successful! Your email is: ${user.email}`);
       navigate("/login");
     } catch (err) {
-      setError(err.message);
+      setError([err.message]);
     }
   };
 
@@ -181,7 +193,15 @@ const Register = () => {
             />
           </div>
         )}
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && Array.isArray(error) && (
+          <div className="alert alert-danger">
+            <ul className="mb-0">
+              {error.map((err, idx) => (
+                <li key={idx}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <button className="btn btn-primary w-100" type="submit">
           Register
         </button>
