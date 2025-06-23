@@ -155,8 +155,11 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 ## Screenshots
 
 ### 1. Setup & Docker
+
+![All three containers working pt1](<screenshots/20. docker running by  terminal.png>)
+
 ![All three containers working](<screenshots/1. all 3 containers working .png>)
-*All three Docker containers running successfully*
+*All three Docker containers running successfully, you can see how the "docker-compose" command successfully creates the 3 containers in the Docker Desktop*
 
 ### 2. User Registration & Authentication
 ![Successful user registration](<screenshots/2. registration success.png>)
