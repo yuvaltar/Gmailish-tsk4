@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BsSearch, BsList } from "react-icons/bs";
 import "./Header.css";
 
-function Header({ setSearchQuery, sidebarCollapsed, setSidebarCollapsed }) {
+function Header({ setSearchQuery, setSidebarCollapsed }) {
   const [darkMode, setDarkMode] = useState(false);
   const [query, setQuery] = useState("");
   const [user, setUser] = useState(null);

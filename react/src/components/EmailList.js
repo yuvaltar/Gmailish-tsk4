@@ -22,6 +22,7 @@ import PropTypes from "prop-types";
 import "./EmailList.css";
 
 function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
+  const [allEmails, setAllEmails] = useState([]);
   const [emails, setEmails] = useState([]);
   const [checkedEmails, setCheckedEmails] = useState(new Set());
   const [showLabelPicker, setShowLabelPicker] = useState(false);
@@ -42,11 +43,13 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Invalid data");
-      setEmails(data);
+      setAllEmails(data);   // full copy
+      setEmails(data);      // filtered view (initially all)
       setCheckedEmails(new Set());
       setCurrentPage(1);
     } catch (err) {
       console.error("Failed to fetch mails:", err.message);
+      setAllEmails([]);
       setEmails([]);
     }
   };
@@ -62,20 +65,20 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
 
   useEffect(() => {
     if (!searchQuery) {
-      if (!propEmails) fetchEmails();
+      setEmails(allEmails); 
       return;
     }
-
-    setEmails((prev) =>
-      prev.filter(
+    const q = searchQuery.toLowerCase();
+    setEmails(
+      allEmails.filter(
         (m) =>
-          m.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.content?.toLowerCase().includes(searchQuery.toLowerCase())
+          m.subject?.toLowerCase().includes(q) ||
+          m.content?.toLowerCase().includes(q)
       )
     );
     setCurrentPage(1);
-  }, [searchQuery]);
-
+  },[searchQuery, allEmails]);
+  
   useEffect(() => {
     fetch("http://localhost:3000/api/labels", { credentials: "include" })
       .then((res) => res.json())
