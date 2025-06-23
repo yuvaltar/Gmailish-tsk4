@@ -1,4 +1,3 @@
-//mailview.js
 import React, { useEffect, useState } from "react";
 import { Card, Spinner, Alert } from "react-bootstrap";
 import {
@@ -36,9 +35,7 @@ function MailView({ emailId, onBack }) {
           throw new Error(error || "Mail not found");
         }
         setMailData(await res.json());
-          
-        // Mark as read
-        await fetch(`http://localhost:3000/api/mails/${emailId}/read`, {
+          await fetch(`http://localhost:3000/api/mails/${emailId}/read`, {
           method: "PATCH",
           credentials: "include"
         });
@@ -82,7 +79,6 @@ function MailView({ emailId, onBack }) {
     const isArchived = mailData.labels.includes("archive");
 
     if (isArchived) {
-      // Unarchive: remove "archive", add "inbox"
       await fetch(`http://localhost:3000/api/mails/${emailId}/label/archive`, {
         method: "DELETE",
         credentials: "include"
@@ -96,7 +92,6 @@ function MailView({ emailId, onBack }) {
       });
 
     } else {
-      // Archive: add "archive", remove "inbox"
       await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -132,7 +127,7 @@ function MailView({ emailId, onBack }) {
       if (!res.ok) throw new Error("Spam toggle failed");
 
       const updated = await res.json();
-      setMailData(updated.mail); // ✅ Refresh UI
+      setMailData(updated.mail);
     } catch (err) {
       alert("Failed to toggle spam: " + err.message);
     }
@@ -143,7 +138,6 @@ function MailView({ emailId, onBack }) {
       const isTrashed = mailData.labels.includes("trash");
 
       if (isTrashed) {
-        // Remove "trash", add "inbox"
         await fetch(`http://localhost:3000/api/mails/${emailId}/label/trash`, {
           method: "DELETE",
           credentials: "include",
@@ -157,7 +151,6 @@ function MailView({ emailId, onBack }) {
         });
 
       } else {
-        // Add "trash", remove "inbox"
         await fetch(`http://localhost:3000/api/mails/${emailId}/label`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -181,9 +174,6 @@ function MailView({ emailId, onBack }) {
       alert("Failed to toggle trash: " + err.message);
     }
   };
-
-  
-
 
   const handleToggleStar = async () => {
     try {
@@ -218,7 +208,6 @@ function MailView({ emailId, onBack }) {
     </div>;
   }
 
-  //draft logic
   if (mailData.labels.includes("drafts")) {
     return (
       <Compose

@@ -56,7 +56,6 @@
 .dropdown-item:hover {
   background: #f1f3f4;
 }
-/* Sidebar toggle button styling */
 .sidebar-toggle-btn {
   z-index: 1100;
   background: none;
