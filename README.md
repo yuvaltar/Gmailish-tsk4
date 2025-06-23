@@ -109,27 +109,33 @@ Currently, the application uses an in-memory storage system:
 
 **Prerequisites**: Node.js, npm, and a Linux environment for the C++ Bloom Filter service.
 
-**1. Start the React Frontend**
-cd react
-npm start
+**1. Start the React Frontend:**
+
+*cd react*
+
+*npm start*
 
 
-*Runs on port 3001*
+*Runs on port 3001
 
-**2. Start the Express Backend**
-cd server
-node app.js
+**2. Start the Express Backend:**
 
-*Runs on port 3000*
+*cd server*
 
-**3. Start the Bloom Filter Service (Linux only)**
-cd src
-g++ main.cpp BloomFilter/BloomFilter.cpp BloomFilter/BlackList.cpp BloomFilter/url.cpp server/server.cpp server/SessionHandler.cpp server/CommandManager.cpp -I. -IBloomFilter -Iserver -o cpp_server -pthread -std=gnu++17
+*node app.js*
 
-./cpp_server 4000 1024 3 5
+*Runs on port 3000
+
+**3. Start the Bloom Filter Service (Linux only):**
+
+*cd src*
+
+*g++ main.cpp BloomFilter/BloomFilter.cpp BloomFilter/BlackList.cpp BloomFilter/url.cpp server/server.cpp server/SessionHandler.cpp server/CommandManager.cpp -I. -IBloomFilter -Iserver -o cpp_server -pthread -std=gnu++17*
+
+*./cpp_server 4000 1024 3 5*
 
 
-*Runs on port 4000*
+*Runs on port 4000
 
 ### Access the Application
 Navigate to `http://localhost:3001` to access the Gmailish platform.
@@ -137,13 +143,13 @@ Navigate to `http://localhost:3001` to access the Gmailish platform.
 ## Docker Setup
 
 ### Build and Run All Services
-Build and start all containers
+**Build and start all containers:**
 
-docker-compose up --build
+*docker-compose up --build*
 
-Run without rebuilding 
+**Run without rebuilding:**
 
-docker-compose up
+*docker-compose up*
 
 
 ## Screenshots
