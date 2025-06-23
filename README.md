@@ -1,46 +1,3 @@
-## Screenshots
-
-### 1 – Docker / Containers
-
-![All three containers running](screenshots%20for%20gmailsh4/1.%20docker%20all%203%20containers%20working.png)
-
-### 2 – Registration & Validation
-
-![Registration succeeded](screenshots%20for%20gmailsh4/2.%20registration%20success.png)  
-![Duplicate-username check](screenshots%20for%20gmailsh4/3.%20cant%20register%20with%20the%20same%20username.png)  
-![Weak-password rejection](screenshots%20for%20gmailsh4/4.%20registration%20failure%20because%20Password%20isn't%20safe.png)
-
-### 3 – Light / Dark Modes
-
-![Light vs dark](screenshots%20for%20gmailsh4/5.%20dark%20mode%20vs%20light%20mode.png)  
-![Collapsed sidebar](screenshots%20for%20gmailsh4/6.%20dark%20mode%20vs%20light%20mode%20collapsed.png)
-
-### 4 – Sending & Reading Mail
-
-![Sent → Inbox](screenshots%20for%20gmailsh4/7.%20sending%20a%20mail%20from%20one%20user%20to%20another%20(one%20will%20appear%20in%20sent%20the%20other%20in%20inbox).png)  
-![Read vs unread](screenshots%20for%20gmailsh4/8.%20a%20difference%20between%20a%20mail%20that%20was%20read%20to%20a%20mail%20which%20is%20marked%20as%20read.png)  
-![Starred mail](screenshots%20for%20gmailsh4/9.%20toggle%20a%20mail%20with%20a%20star%20would%20make%20it%20in%20the%20star%20label.png)
-
-### 5 – Label Management
-
-![Create labels](screenshots%20for%20gmailsh4/10.%20creating%203%20more%20labels%20named%20work%20project%20and%20school.png)  
-![Mail view](screenshots%20for%20gmailsh4/11.%20mail%20view.png)  
-![Assign labels in mail view](screenshots%20for%20gmailsh4/12.%20we%20can%20like%20labels%20through%20the%20mailview%20(including%20the%20mails%20we%20just%20have%20created).png)  
-![Work-label inbox](screenshots%20for%20gmailsh4/13.%20work%20is%20labeled%20so%20we%20can%20see%20it%20in%20the%20Work%20labels.png)  
-![Bulk read / label](screenshots%20for%20gmailsh4/14.%20we%20can%20mark%20all%20mails%20read%20or%20other%20label.png)
-
-### 6 – Search & Tokens
-
-![Search box](screenshots%20for%20gmailsh4/15.%20search%20functionality.png)  
-![JWT present](screenshots%20for%20gmailsh4/16.%20having%20a%20unique%20token%20(jwt)%20for%20each%20user%20logged%20in%20before%20logging%20out.png)  
-![JWT cleared](screenshots%20for%20gmailsh4/17.%20no%20jwt%20after%20logging%20out.png)
-
-### 7 – Spam Detection
-
-![Initial spam mail](screenshots%20for%20gmailsh4/18.%20having%20a%20bad%20url%20in%20the%20spam.png)  
-![Repeated spam auto-filtered](screenshots%20for%20gmailsh4/19.%20sending%20the%20same%20bad%20url%20in%20a%20different%20mail%20and%20it%20goes%20directly%20to%20spam.png)
-
-
 
 Gmailish-tsk4: Full-Stack Gmail-Inspired Messaging Platform
 GitHub Repository
@@ -231,8 +188,73 @@ docker-compose up --build
 # Run without rebuilding 
 docker-compose up
 
-Screenshots
-[Screenshots section to be populated with application interface images showing login, inbox, compose, dark/light modes, etc.]
+
+## Screenshots
+
+### 1. Setup & Docker
+![All three containers working](<screenshots/1. all 3 containers working .png>)
+*All three Docker containers running successfully*
+
+### 2. User Registration & Authentication
+![Successful user registration](<screenshots/2. registration success.png>)
+*Successful user registration with profile picture upload*
+
+![Username uniqueness validation](<screenshots/3. cant register with the same username.png>)
+*Validation preventing duplicate username registrations*
+
+![Strong password validation](<screenshots/4. registration failure because Password isnt safe.png>)
+*Enforcing strong password requirements for security*
+
+### 3. Interface & Display Modes
+![Light vs Dark mode comparison](<screenshots/5. dark mode vs light mode.png>)
+*Interface shown in both light and dark modes*
+
+![Collapsed sidebar in both modes](<screenshots/6. Dark mode vs light mode collapsed.png>)
+*Responsive sidebar collapsed in both light and dark themes*
+
+### 4. Core Email Functionality
+![Sending and receiving mail](<screenshots/7. sending a mail from one user to another ( one will appear in sent the other in inbox) .png>)
+*Email sent from one user appears in the recipient's inbox and the sender's "Sent" folder*
+
+![Read vs Unread email status](<screenshots/8. a difference between a mail that was read to a mail which wasnt marked as read.png>)
+*Visual distinction between emails that have been read and those that are unread*
+
+![Starring an email](<screenshots/9. toggle a mail with a star would make it in the star labels.png>)
+*Starring an email correctly adds it to the "Starred" label*
+
+### 5. Label Management
+![Creating custom labels](<screenshots/10. creating 3 more labels named work project and school.png>)
+*Creating new custom labels: "work", "project", and "school"*
+
+![Detailed mail view](<screenshots/11. mail view.png>)
+*Interface for viewing the full content of a single email*
+
+![Assigning labels from mail view](<screenshots/12. we can like lables through the mailview (including the mails we just have created).png>)
+*Applying labels directly from the detailed mail view*
+
+![Viewing emails by label](<screenshots/13. work is labeled so we can see it in the Work lables .png>)
+*Filtering and viewing all emails assigned the "Work" label*
+
+![Bulk email operations](<screenshots/14. we can mark all mails read unread or other label.png>)
+*Selecting multiple emails to perform bulk actions like marking as read or assigning labels*
+
+### 6. Advanced Features & Security
+![Search functionality](<screenshots/15. search functionality.png>)
+*Searching the inbox for specific email content*
+
+![JWT token for logged-in user](<screenshots/16. having a unique token (jwt) for each user logged in before logged out.png>)
+*A unique JWT is present for an authenticated user session*
+
+![JWT token after logout](<screenshots/17. no jwt after logging out.png>)
+*The JWT token is successfully cleared after the user logs out*
+
+![Spam detection for malicious URL](<screenshots/18. having a bad url in the spam.png>)
+*An email containing a blacklisted URL is automatically moved to the spam folder*
+
+![Persistent spam filtering](<screenshots/19. sending the same bad url in a different mail and it goes directly to spam.png>)
+*Subsequent emails with the same malicious URL are also automatically filtered to spam*
+
+
 
 Code Structure
 
