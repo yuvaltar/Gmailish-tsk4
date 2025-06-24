@@ -11,9 +11,7 @@ function createUser({ firstName, lastName, username, gender, password, birthdate
     return null; // Username already taken
   }
 
-  
   const email = `${username}@gmailish.com`;
-
 
   const user = {
     id: uuidv4(),
@@ -32,7 +30,6 @@ function createUser({ firstName, lastName, username, gender, password, birthdate
   users.push(user);
   return user;
 }
-
 
 // Find a user by their ID
 

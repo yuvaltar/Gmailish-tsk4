@@ -5,10 +5,10 @@ const { users } = require('./user');
 // In-memory storage of all mail records
 const mails = [];
 
-/**
- * Create a mail entry in both sender's "sent" and recipient's "inbox".
- * Returns an object with the two created mail records.
- */
+
+// Create a mail entry in both sender's "sent" and recipient's "inbox".
+// Returns an object with the two created mail records.
+
 function createMail(senderId, recipientId, subject, content, recipientLabels = ['inbox']) {
   const sender = users.find(u => u.id === senderId) || {};
   const recipient = users.find(u => u.id === recipientId) || {};
@@ -53,9 +53,9 @@ function createMail(senderId, recipientId, subject, content, recipientLabels = [
   return { inboxMail, sentMail };
 }
 
-/**
- * Find a mail by its ID and owner.
- */
+
+// Find a mail by its ID and owner.
+ 
 function getMailById(id) {
   return mails.find(m => m.id === id);
 }
@@ -106,7 +106,7 @@ function getEmailsByLabelName(labelName, userId) {
         m.labels.includes('inbox') &&
         !isSpam &&
         !isTrashed &&
-        !m.labels.includes('archive') // 👈 EXCLUDE archived mails from inbox
+        !m.labels.includes('archive') 
       );
       if (labelName === 'sent') return m.senderId === userId && m.labels.includes('sent') && !isTrashed;
       if (labelName === 'drafts') return m.labels.includes('drafts') && m.senderId === userId;

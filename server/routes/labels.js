@@ -12,7 +12,7 @@ router.get('/', labelsController.getAllLabels);
 // POST /api/labels - create new label
 router.post('/', labelsController.createLabel);
 
-// ✅ NEW: Get all emails with a given label name
+// Get all emails with a given label name
 router.get('/:name/emails', labelsController.getEmailsByLabelName);
 
 // GET /api/labels/:id - get specific label
