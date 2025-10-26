@@ -1,0 +1,67 @@
+.email-page-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: auto;
+  padding: 0;
+  margin: 0;
+  margin-top: 30px;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  background: transparent;
+  border-radius: 0;
+  max-width: none;
+  max-height: none;
+}
+
+/* Keep shift when sidebar is collapsed if needed */
+.email-page-wrapper.with-collapsed-sidebar {
+  padding-left: 56px;
+}
+
+
+.liquidChrome-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0; 
+}
+
+.liquidChrome-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+/* Make the inner content layer sit above LiquidChrome */
+.email-page-inner {
+  position: relative;
+  z-index: 1;  /* above .liquidChrome-container (z-index:0) */
+}
+
+/* Full-screen overlay to show Compose on top of the page (drafts) */
+.compose-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2140;      /* above panel/list + chrome */
+  pointer-events: none; /* let background be visually present */
+}
+
+/* Allow the Compose component itself to receive clicks */
+.compose-overlay > * {
+  pointer-events: auto;
+}
+
+/* 
+.compose-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.06);
+}
+*/

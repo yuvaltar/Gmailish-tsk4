@@ -1,85 +1,68 @@
+/* === Sidebar Styles - Glassmorphic, Rounded, Responsive === */
 
 .custom-sidebar {
-  background: #f6f8fc;
-  color: #444;
-  border-right: 1px solid #e0e0e0;
+  background: #eaf2ff;
+  color: #2b2e33;
+  border-right: 1px solid #d0d7e3;
   min-width: 220px;
+  width: 220px;
   height: 100vh;
+  position: relative;
   padding: 1rem 0;
-}
+  transition: width 0.25s, background 0.25s;
+  z-index: 1;
 
-.compose-btn, .btn-primary {
-  background: #1a73e8 !important;
-  color: #fff !important;
-  border-radius: 24px !important;
-  padding: 0.75rem 2rem !important;
-  font-weight: bold !important;
-  margin-bottom: 1rem !important;
-  box-shadow: 0 1px 4px rgba(26,115,232,0.1);
-  border: none !important;
-  transition: background 0.2s;
-}
-
-.compose-btn:hover, .btn-primary:hover {
-  background: #1765c1 !important;
+  /* NEW: Avoid white “bleed” in corners when expanded */
+  border-radius: 0;
+  overflow: visible;
 }
 
 .sidebar-item,
 .sidebar-labels-header {
   color: #444;
-  border-radius: 0 24px 24px 0;
-  margin-bottom: 4px;
-  padding: 0.6rem 1rem 0.6rem 1rem; 
-  transition: background 0.2s, color 0.2s;
-  display: flex !important;
-  align-items: center !important;
+  border-radius: 12px;
+  margin: 3px 1px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 4px rgba(246, 12, 12, 0.05);
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-item.active {
+  background: rgba(232, 240, 254, 0.85);
+  color: #1a73e8;
+  font-weight: bold;
 }
 
 .sidebar-icon {
-  width: 20px !important;
-  height: 20px !important;
-  flex-shrink: 0 !important;
-  margin-right: 0.75rem !important;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
 }
 
-
-.sidebar-item span,
-.sidebar-labels-header span {
-  margin-left: 0 !important;
-  text-align: left !important;
+/* ✅ Scoped: compose & primary buttons ONLY inside sidebar */
+.custom-sidebar .compose-btn,
+.custom-sidebar .btn-primary {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #1a73e8 !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: bold !important;
+  margin: 1rem auto !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, box-shadow 0.2s, transform .08s ease, filter .12s ease;
+  border: none !important;
 }
 
-.custom-sidebar .list-group .list-group-item:first-child {
-  border-radius: 24px !important;
-}
-
-.custom-sidebar .list-group .list-group-item:last-child {
-  border-radius: 0 24px 24px 0 !important;
-}
-
-body.dark-mode .sidebar-labels-header {
-  background: #fcfdfd !important;
-  border: 1px solid #c6ccd1 !important;
-  border-radius: 24px !important;
-  padding: 0.6rem 1rem;
-  margin-bottom: 4px;
-}
-
-body.dark-mode .sidebar-item:last-child {
-  border-bottom: 1px solid #fcfdfd !important;
-}
-
-.sidebar-item:hover,
-.sidebar-labels-header:hover {
-  background: #e8f0fe;
-  color: #1a73e8;
-  cursor: pointer;
-}
-
-.sidebar-labels-header {
-  font-weight: bold;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+.custom-sidebar .compose-btn:hover,
+.custom-sidebar .btn-primary:hover {
+  background: rgba(26, 115, 232, 0.7) !important;
+  box-shadow: 0 8px 32px rgba(26, 115, 232, 0.25);
+  color: #fff !important;
 }
 
 .sidebar-labels-add {
@@ -88,86 +71,73 @@ body.dark-mode .sidebar-item:last-child {
   margin-left: auto !important;
 }
 
-.sidebar-item.active {
-  background: #e8f0fe;
-  color: #1a73e8;
-}
-
+/* === Dark Mode === */
 body.dark-mode .custom-sidebar {
-  background: #181a1b;
-  color: #fff;
-  border-right: 1px solid #23272a;
+  background: #0f172a !important;
+  color: #cbd5f1;
+  border-right: 1px solid #334155;
 }
 
 body.dark-mode .sidebar-item,
 body.dark-mode .sidebar-labels-header {
-  color: #bbb !important;
-  background: transparent !important;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5f1;
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+
+  /* NEW: remove white seam lines under items in dark */
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: none;
 }
 
 body.dark-mode .sidebar-item:hover,
 body.dark-mode .sidebar-labels-header:hover {
-  background: #23272a !important;
-  color: #fff !important;
+  background: rgba(96, 165, 250, 0.1);
+  color: #60a5fa;
+  border-color: rgba(96,165,250,0.18);
+  transform: translateX(3px);
 }
 
-body.dark-mode .sidebar-labels-header {
-  background: #181a1b !important;
-  border-bottom: 1px solid #23272a;
+body.dark-mode .sidebar-item.active {
+  background: rgba(96, 165, 250, 0.2);
+  color: #60a5fa;
 }
 
 body.dark-mode .sidebar-labels-add {
   color: #8ab4f8 !important;
 }
 
-body.dark-mode .compose-btn,
-body.dark-mode .btn-primary {
+/* ✅ Scoped: dark mode compose/primary buttons only inside sidebar */
+body.dark-mode .custom-sidebar .compose-btn,
+body.dark-mode .custom-sidebar .btn-primary {
   background: #1a73e8 !important;
   color: #fff !important;
   box-shadow: 0 1px 4px rgba(26,115,232,0.18);
 }
 
-body.dark-mode .sidebar-item.active {
-  background: #23272a !important;
-  color: #8ab4f8 !important;
-}
-
-.custom-sidebar {
-  background: #f6f8fc;
-  color: #444;
-  border-right: 1px solid #e0e0e0;
-  min-width: 220px;
-  width: 220px;
-  height: 100vh;
-  position: relative;
-  padding: 1rem 0;
-  transition: width 0.25s, background 0.25s;
-  z-index: 100;
-}
-
+/* === Collapsed Sidebar === */
 .custom-sidebar.icon-only.collapsed-float {
   position: absolute !important;
   left: 0;
-  top: 0;
-  width: 56px !important; 
+  width: 56px !important;
   min-width: 0 !important;
   height: 100vh;
-  background: rgba(246, 248, 252, 0.95) !important; 
-  border-right: none !important; 
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1) !important; 
-  backdrop-filter: blur(8px) !important; 
+  background: #eaf2ff !important; /* keep light blue when collapsed */
+  border-right: none !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(8px) !important;
   padding: 0.5rem 0 !important;
-  z-index: 1200;
+  z-index: 1;
+  border-radius: 0;
 }
 
-
+/* Hides label text etc. in collapsed */
 .custom-sidebar.icon-only .sidebar-item span,
 .custom-sidebar.icon-only .sidebar-labels-header,
 .custom-sidebar.icon-only .sidebar-labels-add,
 .custom-sidebar.icon-only .btn-primary {
   display: none !important;
 }
-
 
 .custom-sidebar.icon-only .sidebar-item {
   background: transparent !important;
@@ -176,19 +146,10 @@ body.dark-mode .sidebar-item.active {
   justify-content: center !important;
   align-items: center !important;
   padding: 0.75rem 0.5rem !important;
-  margin: 4px 6px !important; 
+  margin: 4px 6px !important;
   width: calc(100% - 12px) !important;
   transition: all 0.2s ease !important;
 }
-
-
-.custom-sidebar.icon-only .sidebar-item:hover {
-  background: rgba(26, 115, 232, 0.1) !important;
-  border: 1px solid rgba(26, 115, 232, 0.3) !important;
-  transform: translateX(2px) !important; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
 
 .custom-sidebar.icon-only .sidebar-icon {
   font-size: 1.3rem !important;
@@ -197,7 +158,6 @@ body.dark-mode .sidebar-item.active {
   width: 20px !important;
   height: 20px !important;
 }
-
 
 .custom-sidebar.icon-only .sidebar-item.active {
   background: rgba(26, 115, 232, 0.15) !important;
@@ -209,32 +169,9 @@ body.dark-mode .sidebar-item.active {
   color: #1a73e8 !important;
 }
 
-
-
-
-.main-content,
-.flex-grow-1.overflow-auto {
-  background: #fff !important;
-  margin-left: 0 !important; 
-  padding-left: 0 !important;
-  width: 100% !important; 
-  min-width: 0 !important;
-  transition: margin-left 0.25s, width 0.25s;
-}
-
-
-.custom-sidebar.icon-only.collapsed-float ~ .main-content,
-.custom-sidebar.icon-only.collapsed-float ~ .flex-grow-1.overflow-auto {
-  margin-left: 56px !important; 
-  width: calc(100% - 56px) !important; 
-}
-
-
-
 body.dark-mode .custom-sidebar.icon-only.collapsed-float {
-  background: rgba(24, 26, 27, 0.95) !important; 
-  border-right: 2px solid #8ab4f8 !important; 
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3) !important; 
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-right: 2px solid #60a5fa !important;
 }
 
 body.dark-mode .custom-sidebar.icon-only .sidebar-item {
@@ -243,31 +180,23 @@ body.dark-mode .custom-sidebar.icon-only .sidebar-item {
 }
 
 body.dark-mode .custom-sidebar.icon-only .sidebar-item:hover {
-  background: rgba(138, 180, 248, 0.1) !important;
-  border: 1px solid rgba(138, 180, 248, 0.3) !important;
+  background: rgba(96, 165, 250, 0.1) !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
   transform: translateX(2px) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 body.dark-mode .custom-sidebar.icon-only .sidebar-icon {
-  color: #e8eaed !important;
+  color: #60a5fa !important;
 }
 
 body.dark-mode .custom-sidebar.icon-only .sidebar-item.active {
-  background: rgba(138, 180, 248, 0.15) !important;
-  border: 1px solid #8ab4f8 !important;
+  background: rgba(96, 165, 250, 0.1) !important;
+  border-left: 3px solid #60a5fa !important;
+  color: #60a5fa !important;
 }
 
-body.dark-mode .custom-sidebar.icon-only .sidebar-item.active .sidebar-icon {
-  color: #8ab4f8 !important;
-}
-
-
-body.dark-mode .custom-sidebar {
-  background: #181a1b;
-  color: #fff;
-  border-right: 1px solid #23272a;
-}
+/* === Compose icon collapsed === */
 .compose-icon-collapsed {
   background-color: #1a73e8;
   color: white;
@@ -285,4 +214,88 @@ body.dark-mode .custom-sidebar {
 
 .compose-icon-collapsed:hover {
   background-color: #1765c1;
+}
+
+/* === NEW: Layout safety so collapsed sidebar never hides mail === */
+/* Default: main beside expanded (220px) */
+.main-content {
+  transition: margin-left .2s ease;
+  min-width: 0;
+}
+/* Expanded sidebar (220px) */
+body.sidebar-expanded .main-content { margin-left: 16px; }
+
+/* Collapsed sidebar (56px) */
+body.sidebar-collapsed .main-content { margin-left: 76px; }
+
+/* --- FIX: stop ListGroup from flattening/cropping the first/last pills --- */
+
+/* 1) Reset Bootstrap list-group item inside the sidebar */
+.custom-sidebar .list-group .list-group-item {
+  border: none !important;
+  background: transparent !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-radius: 0 !important;         /* we control rounding on the pill itself */
+}
+
+/* 2) Add breathing room so first/last pills show full curvature */
+.custom-sidebar .list-group {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* 3) Make ALL pills look identical (incl. Labels & Trash) */
+.custom-sidebar .sidebar-labels-header,
+.custom-sidebar .sidebar-item {
+  border: 1px solid rgba(20,40,80,0.12);
+  border-radius: 12px !important;       /* force rounding regardless of RB styles */
+  background-clip: padding-box;         /* prevents halo/seam artifacts */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+body.dark-mode .custom-sidebar .sidebar-labels-header,
+body.dark-mode .custom-sidebar .sidebar-item {
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: none;
+}
+
+/* --- ENHANCED LIGHT MODE HOVER EFFECT FOR SIDEBAR BUTTONS --- */
+body:not(.dark-mode) .custom-sidebar .sidebar-item:hover,
+body:not(.dark-mode) .custom-sidebar .sidebar-labels-header:hover {
+  background: rgba(173, 216, 255, 0.7); /* lighter blue glow */
+  color: #1a73e8;                       /* maintain Gmail blue accent */
+  transform: translateX(3px);
+  border-color: rgba(26, 115, 232, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* === UNIFIED FIX: Sidebar active item text color only (no blue background) === */
+
+/* Light mode: active/clicked item keeps white bg, blue text */
+body:not(.dark-mode) .custom-sidebar .sidebar-item.active,
+body:not(.dark-mode) .custom-sidebar .sidebar-item:active,
+body:not(.dark-mode) .custom-sidebar .sidebar-item:focus {
+  background: rgba(255, 255, 255, 0.3) !important; /* keep normal look */
+  color: #1a73e8 !important; /* Gmail blue text */
+  font-weight: 600;
+}
+
+/* Dark mode: same idea, keep same bg, only text turns blue */
+body.dark-mode .custom-sidebar .sidebar-item.active,
+body.dark-mode .custom-sidebar .sidebar-item:active,
+body.dark-mode .custom-sidebar .sidebar-item:focus {
+  background: rgba(255, 255, 255, 0.05) !important; /* same as normal dark bg */
+  color: #60a5fa !important; /* light blue hover color */
+  font-weight: 600;
+}
+
+/* Ensure icon color follows text color */
+body.dark-mode .custom-sidebar .sidebar-item.active .sidebar-icon,
+body.dark-mode .custom-sidebar .sidebar-item:active .sidebar-icon,
+body:not(.dark-mode) .custom-sidebar .sidebar-item.active .sidebar-icon,
+body:not(.dark-mode) .custom-sidebar .sidebar-item:active .sidebar-icon {
+  color: inherit !important;
 }

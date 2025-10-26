@@ -1,20 +1,258 @@
+/* ===========================
+   MailView.css (full file)
+   =========================== */
+
+/* Make MailView fill the viewport */
+.is-mail-view {
+  position: relative;
+  min-height: 100dvh;
+}
+
+/* Full-bleed background only for MailView in dark mode */
+body.dark-mode .is-mail-view::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #1c1b3a; /* indigo-navy that harmonizes with the dark chrome */
+  z-index: -1;         /* sit behind everything */
+}
+
+/* Inner wrapper (the “window” that used to be mail-view-container) */
+.mail-view-inner {
+  max-width: 100%;
+  margin-top: 16px;
+}
+
+/* In dark mode, give that inner band a deep slate surface */
+body.dark-mode .is-mail-view .mail-view-inner {
+  background-color: #0f1628;
+  border-radius: 8px;
+}
+
+/* ===========================
+   Toolbar
+   =========================== */
+.mail-toolbar {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid #dadce0;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.gmail-icon-btn {
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: background-color .15s ease, box-shadow .15s ease;
+  color: #5f6368;
+  outline: none;
+}
+.gmail-icon-btn:hover { background-color: rgba(60, 64, 67, 0.1); }
+.gmail-icon-btn:focus-visible { box-shadow: 0 0 0 3px rgba(26,115,232,.25); }
+
+body.dark-mode .is-mail-view .mail-toolbar {
+  background-color: #0f1628 !important;
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+body.dark-mode .gmail-icon-btn { color: #e8eaed; }
+body.dark-mode .gmail-icon-btn:hover { background-color: rgba(255,255,255,0.08); }
+
+/* ===========================
+   Card
+   =========================== */
 .mail-view-card {
-  background: #fff;
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(60,64,67,0.1);
-  padding: 2rem;
-  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 8px 12px 12px;
+  color: var(--text);
 }
 
+/* Force a true dark surface for the card in dark mode (overrides Bootstrap) */
+body.dark-mode .mail-view-card {
+  background-color: #0b1222 !important; /* deep near-black */
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Make "From:" and "To:" readable in dark mode */
+body.dark-mode .mail-view-card .sender-line strong,
+body.dark-mode .mail-view-card .to-line strong {
+  color: #eaf2ff !important;   /* same light text as the rest */
+  font-weight: 600;             /* keep them slightly emphasized */
+}
+
+/* (Optional) ensure good contrast in light mode too */
+.mail-view-card .sender-line strong,
+.mail-view-card .to-line strong {
+  color: var(--text);
+}
+
+
+/* Reset any Card.Header default gray */
 .mail-view-card .card-header {
-  background: #f1f3f4;
-  border-radius: 12px 12px 0 0;
-  font-size: 1.05em;
-  font-weight: 500;
-  border-bottom: 1px solid #e0e0e0;
+  background: transparent;
+  border-bottom: none;
+  padding: 0;
 }
 
+/* ===========================
+   Header (avatar + meta)
+   =========================== */
+.sender-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* avatar | meta | star btn */
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px;
+}
+
+.sender-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--glass-border);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.sender-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sender-avatar .initials { font-size: .9rem; }
+
+.sender-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sender-line,
+.to-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25rem;
+  font-size: 14px;
+}
+
+/* Make sender and recipient names the same weight */
+.sender-name { font-weight: 400; color: var(--text); }
+.recipient-name { font-weight: 400; color: var(--text); }
+
+.sender-email,
+.to-line .muted { color: var(--text-muted); }
+
+.subject-line-strong {
+  margin-top: 2px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ===========================
+   Divider & Body
+   =========================== */
+.divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin-top: 6px;
+}
+
+/* Light mode body text inherits theme */
 .mail-view-card .card-body {
-  font-size: 1.1em;
-  color: #222;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* Dark mode: readable light text in the card body */
+body.dark-mode .mail-view-card .card-body,
+body.dark-mode .mail-view-card .card-body * {
+  color: #eaf2ff !important;
+}
+
+/* Also lighten header text in dark mode */
+body.dark-mode .mail-view-card .sender-name,
+body.dark-mode .mail-view-card .recipient-name,
+body.dark-mode .mail-view-card .subject-line-strong {
+  color: #eaf2ff !important;
+  opacity: 1 !important;
+}
+
+/* Keep only the email addresses grey in both modes */
+.sender-email,
+.to-line .muted {
+  color: #6c757d !important;
+}
+
+/* Links remain readable */
+.mail-view-card .card-body a {
+  color: #1a73e8 !important;
+  text-decoration: none;
+}
+.mail-view-card .card-body a:hover { text-decoration: underline; }
+
+/* Divider tint in dark mode */
+body.dark-mode .divider {
+  background: rgba(255,255,255,0.08);
+}
+
+/* ===========================
+   Label menu
+   =========================== */
+.label-menu {
+  position: absolute;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  min-width: 180px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+.label-menu-empty { padding: 12px 16px; color: var(--text-muted); }
+
+.label-picker-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+  border-radius: 4px;
+}
+.label-picker-item:hover {
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+/* Highlight labels already assigned to the mail */
+.label-picker-item.selected-label {
+  background-color: #cce5ff !important;
+  color: #000 !important;
+  font-weight: 500;
+}
+.label-picker-item.selected-label:hover {
+  background-color: #b6dbff !important;
+}
+/* Dark-mode variant for readability */
+body.dark-mode .label-picker-item.selected-label {
+  background-color: rgba(96,165,250,0.22) !important;
+  color: #eaf2ff !important;
+}
+
+/* ===========================
+   Theme variables (optional)
+   =========================== */
+/* If you use CSS variables elsewhere, these keep everything in sync */
+body.dark-mode {
+  --surface: #0b1222;      /* card/background surfaces */
+  --surface-2: #141a2b;    /* subtle raised surfaces (avatar bg, etc.) */
+  --glass-border: rgba(255,255,255,0.08);
+  --text: #eaf2ff;
+  --text-muted: #9aa0a6;
 }

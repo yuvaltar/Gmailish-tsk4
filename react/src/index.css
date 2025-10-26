@@ -5,9 +5,85 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--text);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+:root {
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #f1f3f4;
+  --text: #0c1222;
+  --text-muted: #5b667a;
+  --accent: #1a73e8;            /* your blue */
+  --accent-strong: #1666c1;     /* hover */
+  --glass-border: rgba(20, 40, 80, 0.12);
+}
+
+body.dark-mode {
+  --bg: #0a0f1a;
+  --surface: #0f1628;
+  --surface-2: #111a2e;
+  --text: #eaf0ff;
+  --text-muted: #a5b0c7;
+  --accent: #1a73e8;
+  --accent-strong: #6b9aff;
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+/* Main content surface: distinct from sidebar */
+.content-surface {
+  /* Light mode: soft blue hue, subtle gradient */
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(142, 197, 255, 0.18), transparent 60%),
+    linear-gradient(180deg, #f6f9ff 0%, #eef4ff 100%);
+  /* Give a bit of separation from the sidebar edge */
+  padding-top: 0.5rem;  /* optional */
+}
+
+/* Dark mode: complementary warm glow on deep slate */
+body.dark-mode .content-surface {
+  background:
+    radial-gradient(900px 500px at 75% -10%, rgba(255, 176, 104, 0.14), transparent 65%),
+    linear-gradient(180deg, #0b1020 0%, #0a0f1a 100%);
+}
+
+/* Make Bootstrap modals use the same theme variables */
+.modal-content {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--glass-border) !important;
+}
+
+.modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+/* Make modal form controls follow theme */
+.modal-content .form-control {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--glass-border) !important;
+}
+.modal-content .form-control::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.9;
+}
+.modal-content .form-control:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent) !important;
+}
+
+/* Make the close (X) visible on dark backgrounds */
+body.dark-mode .modal-content .btn-close {
+  filter: invert(1) grayscale(100%);
 }

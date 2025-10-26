@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// Layout.js
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -9,6 +10,11 @@ export default function Layout() {
   const [showCompose, setShowCompose] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("dark-mode", darkMode);
+  }, [darkMode]);
 
   return (
     <div className={`container-fluid vh-100 d-flex flex-column p-0${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
@@ -16,19 +22,23 @@ export default function Layout() {
         setSearchQuery={setSearchQuery}
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
 
-      <div className="flex-grow-1 d-flex overflow-hidden position-relative">
+      <div className="layout-wrapper">
         <Sidebar
           onComposeClick={() => setShowCompose(true)}
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
         />
 
-        <main className="main-content-area flex-grow-1 overflow-auto" style={{ position: "relative" }}>
-          {sidebarCollapsed && <div className="vertical-divider"></div>}
-          <Outlet context={{ searchQuery, sidebarCollapsed }} />
-        </main>
+        {/* NEW: route-surface gives the full-bleed indigo bg on list pages */}
+        <div className="route-surface">
+          <div className="email-list-container">
+            <Outlet context={{ searchQuery, sidebarCollapsed, darkMode }} />
+          </div>
+        </div>
       </div>
 
       {showCompose && <Compose onClose={() => setShowCompose(false)} />}

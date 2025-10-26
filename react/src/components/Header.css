@@ -7,7 +7,28 @@
   justify-content: space-between;
   position: sticky;
   top: 0;
+  z-index: 11;
+}
+
+.header-bar {
+  position: relative;
+  top: 0;
   z-index: 10;
+  padding: 0.5rem 2rem;
+  min-height: 40px;
+  background: #d8e6ff; /* Light mode */
+  color: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+body.dark-mode .header-bar {
+  background: #0f172a;
+  color: #cbd5f1;
+  border-bottom: 1px solid #334155;
 }
 
 .search-bar-container {
@@ -20,11 +41,15 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  background: transparent;
   border: none;
-  color: #5f6368;
-  font-size: 1.2rem;
-  z-index: 1;
+  color: inherit;
+  z-index: 2;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .form-control.ps-5 {
@@ -51,26 +76,47 @@
   background: none;
   width: 100%;
   text-align: left;
+  z-index: 1;
 }
 
 .dropdown-item:hover {
   background: #f1f3f4;
 }
+
 .sidebar-toggle-btn {
-  z-index: 1100;
-  background: none;
-  border: none;
+  position: absolute;
+  top: 6px;
+  left: 8px;  /* Shift it closer to the edge */
+  z-index: 13;
   width: 44px;
   height: 44px;
+  margin-right: 40px;
+  background: none;
+  border: none;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
-  font-size: 1.6rem;
+
+  /* NEW: smoother feedback */
+  transition: background-color .15s ease, box-shadow .15s ease;
 }
 
 .sidebar-toggle-btn:hover {
   background-color: rgba(60, 64, 67, 0.1);
 }
+
+/* NEW: Make burger visible in dark mode */
+body.dark-mode .sidebar-toggle-btn svg { color: #eaf0ff; }
+body.dark-mode .sidebar-toggle-btn:hover { background-color: rgba(255,255,255,0.08); }
+.sidebar-toggle-btn:focus-visible { box-shadow: 0 0 0 2px rgba(45,113,255,.35); }
+
+/* Light mode placeholder */
+body:not(.dark-mode) .search-input::placeholder { color: #555; }
+
+/* Dark mode placeholder */
+body.dark-mode .search-input::placeholder { color: #9aa4b7; }
+
+/* Optional: adapt input text color too */
+body.dark-mode .search-input { color: #eaf0ff; }

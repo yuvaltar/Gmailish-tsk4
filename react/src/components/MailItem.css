@@ -1,0 +1,71 @@
+/* Base glassmorphic style */
+.mail-item {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  padding: 10px 12px;
+}
+
+/* === LIGHT MODE === */
+body:not(.dark-mode) .mail-item.read-mail {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  color: #333;
+}
+
+body:not(.dark-mode) .mail-item.unread-mail {
+  background-color: rgba(230, 230, 230, 0.6) !important;
+  color: #111;
+}
+
+body:not(.dark-mode) .mail-item:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* === DARK MODE === */
+body.dark-mode .mail-item.read-mail {
+  background-color: rgba(85, 85, 86, 0.4) !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .mail-item.unread-mail {
+  background-color: rgba(42, 42, 42, 0.6) !important;
+  color: #ffffff;
+}
+
+body.dark-mode .mail-item:hover {
+  background-color: rgba(32, 33, 36, 0.4) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Fix visibility: sender text in dark mode */
+body.dark-mode .sender-name span {
+  color: #f1f1f1;
+}
+
+/* Fix visibility: subject & date text in dark mode */
+body.dark-mode .subject-line span,
+body.dark-mode .email-date span {
+  color: #ffffff;
+}
+
+/* Bold text for unread emails */
+.unread-bold {
+  font-weight: bold;
+}
+
+/* === Fix dark mode text visibility === */
+body.dark-mode .sender-name,
+body.dark-mode .subject-line-strong,
+body.dark-mode .mail-view-card .card-body,
+body.dark-mode .mail-view-card .card-body * {
+  color: #e8eaed !important; /* readable light gray for dark backgrounds */
+}
+
+/* Keep muted email addresses dimmer for contrast */
+body.dark-mode .sender-email,
+body.dark-mode .to-line .muted {
+  color: #9aa0a6 !important;
+}
+

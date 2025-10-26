@@ -24,6 +24,27 @@
   align-items: center;
 }
 
+/* NEW: formatting toolbar (place JSX in Compose.js) */
+.editor-toolbar {
+  display: flex;
+  gap: .5rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f7f8fa;
+  padding: .5rem 1rem;
+}
+.tool-btn {
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  padding: .35rem .55rem;
+  cursor: pointer;
+  transition: background .12s ease, box-shadow .12s ease, transform .08s ease;
+}
+.tool-btn:hover {
+  background: #f1f3f4;
+  box-shadow: 0 0 0 2px rgba(45,113,255,.15);
+}
+
 .compose-popup form {
   padding: 1rem;
   display: flex;
@@ -64,17 +85,15 @@
   border-radius: 18px;
 }
 
-.compose-popup .btn-send:hover {
-  background-color: #1666c1;
-}
+.compose-popup .btn-send:hover { background-color: #1666c1; }
 
 .compose-expanded {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 80vw;      
-  height: 80vh;     
-  max-height: 600px;  
+  width: 80vw;
+  height: 80vh;
+  max-height: 600px;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   background-color: #fff;
@@ -83,35 +102,22 @@
   z-index: 1100;
 }
 
+.minimized { height: 48px !important; overflow: hidden; }
 
-
-
-.minimized {
-  height: 48px !important;
-  overflow: hidden;
-}
 .compose-popup input,
 .compose-popup textarea {
   background-color: white !important;
   color: black !important;
   border: none;
   border-bottom: 1px solid #ddd;
-  
 }
 
-.compose-popup {
-  background-color: #fff !important;
-  color: #000 !important;
-}
+.compose-popup { background-color: #fff !important; color: #000 !important; }
 
-.compose-header {
-  background-color: #f1f3f4 !important;
-  color: #000 !important;
-}
+.compose-header { background-color: #f1f3f4 !important; color: #000 !important; }
 
-.compose-footer {
-  background-color: #fff;
-}
+.compose-footer { background-color: #fff; }
+
 .compose-header button {
   background-color: #fff !important;
   color: #202124 !important;
@@ -126,11 +132,53 @@
   transition: background-color 0.2s ease;
 }
 
-.compose-header button:hover {
-  background-color: #f1f3f4 !important;
+.compose-header button:hover { background-color: #f1f3f4 !important; }
+
+.compose-header svg { color: #5f6368; pointer-events: none; }
+
+/* ===== NEW: Dark mode overrides ===== */
+body.dark-mode .compose-popup,
+body.dark-mode .compose-expanded {
+  background-color: #0f1628 !important;
+  color: #eaf0ff !important;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 12px 30px rgba(0,0,0,.5);
 }
 
-.compose-header svg {
-  color: #5f6368;
-  pointer-events: none;
+body.dark-mode .compose-header {
+  background-color: #111a2e !important;
+  color: #eaf0ff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+body.dark-mode .editor-toolbar {
+  background: #111a2e;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+body.dark-mode .tool-btn {
+  background: transparent;
+  color: #eaf0ff;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+body.dark-mode .tool-btn:hover {
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 0 0 2px rgba(131,178,255,.25);
+}
+
+body.dark-mode .compose-popup input,
+body.dark-mode .compose-popup textarea {
+  background: transparent !important;
+  color: #eaf0ff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+body.dark-mode .compose-footer { background-color: #0f1628 !important; }
+
+body.dark-mode .compose-header button {
+  background-color: transparent !important;
+  color: #eaf0ff !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+body.dark-mode .compose-header button:hover {
+  background-color: rgba(255,255,255,0.08) !important;
 }

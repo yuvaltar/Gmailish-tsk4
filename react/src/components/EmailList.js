@@ -5,7 +5,6 @@ import {
   BsEnvelopeOpen,
   BsEnvelope,
   BsStar,
-  BsStarFill,
   BsTag,
   BsExclamationCircle,
   BsTrash,
@@ -15,6 +14,7 @@ import {
 } from "react-icons/bs";
 import PropTypes from "prop-types";
 import "./EmailList.css";
+import MailItem from "./MailItem";
 
 function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [allEmails, setAllEmails] = useState([]);
@@ -22,7 +22,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const [checkedEmails, setCheckedEmails] = useState(new Set());
   const [showLabelPicker, setShowLabelPicker] = useState(false);
   const [labels, setLabels] = useState([]);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const emailsPerPage = 50;
 
@@ -37,8 +37,8 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Invalid data");
-      setAllEmails(data);   
-      setEmails(data);    
+      setAllEmails(data);
+      setEmails(data);
       setCheckedEmails(new Set());
       setCurrentPage(1);
     } catch (err) {
@@ -59,7 +59,7 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
 
   useEffect(() => {
     if (!searchQuery) {
-      setEmails(allEmails); 
+      setEmails(allEmails);
       return;
     }
     const q = searchQuery.toLowerCase();
@@ -71,8 +71,8 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       )
     );
     setCurrentPage(1);
-  },[searchQuery, allEmails]);
-  
+  }, [searchQuery, allEmails]);
+
   useEffect(() => {
     fetch("http://localhost:3000/api/labels", { credentials: "include" })
       .then((res) => res.json())
@@ -80,14 +80,12 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
       .catch(() => setLabels([]));
   }, []);
 
-  // Pagination calculations
   const totalEmails = emails.length;
   const totalPages = Math.ceil(totalEmails / emailsPerPage);
   const startIndex = (currentPage - 1) * emailsPerPage;
   const endIndex = startIndex + emailsPerPage;
   const currentEmails = emails.slice(startIndex, endIndex);
 
-  // Pagination handlers
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -264,9 +262,8 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
   const showPagination = totalEmails > emailsPerPage;
 
   return (
-    <div className="w-100 p-0 position-relative">
+    <div className="email-list-container w-100 position-relative">
       <div className="email-toolbar d-flex align-items-center justify-content-between ps-1 py-0.1 border-bottom">
-        {/* Left group: checkboxes and actions (including trash if viable) */}
         <div className="toolbar-group d-flex align-items-center gap-2 px-2 py-1">
           <Form.Check type="checkbox" checked={isAllSelected} onChange={handleSelectAll} />
           {!hasSelection ? (
@@ -302,7 +299,6 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
                 <BsTrash size={18} />
               </button>
             </>
-
           )}
           <div className="d-flex align-items-center gap-3 pe-3">
             {labelFilter === "trash" && (
@@ -313,37 +309,34 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
           </div>
         </div>
 
-        {/* Right group: pagination */}
-        
-          <div className="email-count-pagination-container d-flex align-items-center gap-2">
-            <span className="text-muted small">
-              {totalEmails === 0
-                ? "No emails"
-                : `${startIndex + 1}-${Math.min(endIndex, totalEmails)} of ${totalEmails}`}
-            </span>
-            {showPagination && (
-              <div className="pagination-controls-inline d-flex align-items-center">
-                <button
-                  className="gmail-icon-btn-small"
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
-                  title="Previous page"
-                >
-                  <BsChevronLeft size={16} />
-                </button>
-                <button
-                  className="gmail-icon-btn-small"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  title="Next page"
-                >
-                  <BsChevronRight size={16} />
-                </button>
-              </div>
-            )}
+        <div className="email-count-pagination-container d-flex align-items-center gap-2">
+          <span className="text-muted small" style={{ color: "white" }}>
+            {totalEmails === 0
+              ? "No emails"
+              : `${startIndex + 1}-${Math.min(endIndex, totalEmails)} of ${totalEmails}`}
+          </span>
+          {showPagination && (
+            <div className="pagination-controls-inline d-flex align-items-center">
+              <button
+                className="gmail-icon-btn-small"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                title="Previous page"
+              >
+                <BsChevronLeft size={16} />
+              </button>
+              <button
+                className="gmail-icon-btn-small"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                title="Next page"
+              >
+                <BsChevronRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
-
 
       {showLabelPicker && (
         <div
@@ -378,58 +371,20 @@ function EmailList({ setSelectedEmail, propEmails, labelFilter, searchQuery }) {
         </div>
       )}
 
-      <Table hover className="mb-0">
-        <tbody>
-          {currentEmails.map((email) => (
-            <tr key={email.id} onClick={() => setSelectedEmail(email.id)} style={{ cursor: "pointer" }}>
-              <td colSpan={3} className="p-0">
-                <div
-                  className={`email-row-flex d-flex align-items-center justify-content-between w-100 ${
-                    checkedEmails.has(email.id) ? "table-primary" : ""
-                  } ${email.read ? "read-mail" : "unread-mail"}`}
-                >
-                  <div className="d-flex align-items-center gap-2 ps-3">
-                    <Form.Check
-                      type="checkbox"
-                      checked={checkedEmails.has(email.id)}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handleCheckboxChange(email.id);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleStar(email.id);
-                      }}
-                      className="star-cell"
-                    >
-                      {email.starred ? (
-                        <BsStarFill className="star-filled" size={14} />
-                      ) : (
-                        <BsStar className="star-empty" size={14} />
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="email-snippet-cell flex-grow-1 px-3">
-                    <div className="sender-name" title={email.senderName || email.senderId}>
-                      {email.senderName || email.senderId}
-                    </div>
-                    <div className="subject-line" title={email.subject}>
-                      {email.subject.length > 80 ? email.subject.slice(0, 77) + "..." : email.subject}
-                    </div>
-                  </div>
-
-                  <div className="email-date pe-3 text-nowrap">
-                    {new Date(email.timestamp).toLocaleDateString()}
-                  </div>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+      <Table hover className="mb-0 email-list-table">
+          {currentEmails.map(
+            (email) =>
+              email && (
+                <MailItem
+                  key={email.id}
+                  email={email}
+                  isChecked={checkedEmails.has(email.id)}
+                  onCheckboxChange={handleCheckboxChange}
+                  onToggleStar={toggleStar}
+                  onClick={setSelectedEmail}
+                />
+              )
+          )}
       </Table>
     </div>
   );

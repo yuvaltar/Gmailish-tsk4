@@ -1,0 +1,25 @@
+.liquidChrome-container {
+  position: absolute;
+  border-radius: inherit;  /* this is key */
+  overflow: hidden;        /* this enforces clipping */
+  z-index: -1;
+}
+
+.liquidChrome-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow-clip-margin: padding-box;
+}
+
+.liquid-chrome-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+

@@ -39,6 +39,7 @@ function Label({ show, onClose, onCreate }) {
       <Modal.Header closeButton>
         <Modal.Title>New label</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
         <Form.Group>
           <Form.Label>Please enter a new label name:</Form.Label>
@@ -50,14 +51,19 @@ function Label({ show, onClose, onCreate }) {
           />
         </Form.Group>
       </Modal.Body>
+
       <Modal.Footer className="gap-2 d-flex align-items-center">
+        {/* ✅ Neutral cancel button that adapts to theme */}
         <Button
           onClick={onClose}
-          className="rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center justify-content-center border border-secondary text-secondary bg-white"
+          variant="outline-secondary"
+          className="rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center justify-content-center"
           style={{ minWidth: "100px" }}
         >
           Cancel
         </Button>
+
+        {/* ✅ Create button stays accent blue */}
         <Button
           onClick={handleCreate}
           disabled={!labelName.trim()}

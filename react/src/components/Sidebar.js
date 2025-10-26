@@ -21,6 +21,14 @@ function Sidebar({ onComposeClick, collapsed }) {
   const [customLabels, setCustomLabels] = useState([]);
 
   useEffect(() => {
+    document.body.classList.toggle("sidebar-collapsed", !!collapsed);
+    document.body.classList.toggle("sidebar-expanded", !collapsed);
+    return () => {
+      document.body.classList.remove("sidebar-collapsed", "sidebar-expanded");
+    };
+  }, [collapsed]);
+
+  useEffect(() => {
     const fetchLabels = async () => {
       try {
         const res = await fetch("/api/labels", {
@@ -57,10 +65,7 @@ function Sidebar({ onComposeClick, collapsed }) {
   );
 
   return (
-    <aside
-      className={`custom-sidebar d-flex flex-column h-100 p-2 ${collapsed ? "icon-only collapsed-float" : ""}`}
-    >
-      {/* Compose button is hidden when sidebar is collapsed */}
+      <div className={`custom-sidebar d-flex flex-column h-100 p-2 ${collapsed ? "icon-only collapsed-float" : ""}`}>
       {collapsed ? (
         <button
           className="compose-icon-collapsed"
@@ -79,7 +84,7 @@ function Sidebar({ onComposeClick, collapsed }) {
         </Button>
       )}
 
-      <ListGroup variant="flush" className="flex-grow-1">
+      <ListGroup className="flex-grow-1">
         {/* Labels  */}
         <ListGroup.Item
           className="d-flex align-items-center sidebar-labels-header"
@@ -122,7 +127,7 @@ function Sidebar({ onComposeClick, collapsed }) {
         onClose={() => setShowLabelModal(false)}
         onCreate={addLabel}
       />
-    </aside>
+      </div>
   );
 }
 

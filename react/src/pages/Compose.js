@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, ArrowsFullscreen } from "react-bootstrap-icons";
 import "./Compose.css";
+import StyledPanel from "../components/StyledPanel";
 
 function Compose({ onClose, draft }) {
   const [minimized, setMinimized] = useState(false);
@@ -120,6 +121,7 @@ function Compose({ onClose, draft }) {
       </div>
 
       {!minimized && (
+        <>
         <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
   <input
     type="email"
@@ -133,6 +135,17 @@ function Compose({ onClose, draft }) {
     value={subject}
     onChange={(e) => setSubject(e.target.value)}
   />
+        <div className="editor-toolbar px-3 py-2" aria-label="Formatting toolbar">
+            <button type="button" className="tool-btn" title="Bold" aria-label="Bold">
+              <b>B</b>
+            </button>
+            <button type="button" className="tool-btn" title="Italic" aria-label="Italic">
+              <i>I</i>
+            </button>
+            <button type="button" className="tool-btn" title="Underline" aria-label="Underline">
+              <u>U</u>
+            </button>
+          </div>
   <textarea
     placeholder="Write your message..."
     value={body}
@@ -142,9 +155,10 @@ function Compose({ onClose, draft }) {
     <button type="submit" className="btn-send">Send</button>
   </div>
 </form>
-
+</>
       )}
     </div>
+    
   );
 }
 
